@@ -125,13 +125,13 @@ const API_BASE = "https://poker-backend-production-64cf.up.railway.app"; // ← 
         }
 
 const stored = {
-  user_id: user.id,
-  name: user.display_name || user.name || "",
-  email: user.email || "",
-  plan: user.plan || null,
-};
+          user_id: user.id,                             // ← user_id に合わせる
+          name: user.display_name || user.name || "",
+          email: user.email || "",
+          plan: user.plan || null,
+        };
 localStorage.setItem("pa_user", JSON.stringify(stored));
-// GitHub Pages 上の record.html へのフルパスにリダイレクトする
+// GitHub Pages 上の record.html へのフルパスにリダイレクト
 window.location.href = "/pokerAIanalyzer-frontend/record.html";
 
       } catch (err) {
