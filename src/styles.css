@@ -1,0 +1,563 @@
+/* ======================
+   Neo-dark Poker Theme
+   （Stripe 決済画面寄せ）
+   ====================== */
+:root{
+  --bg:#050910;
+  --surface:rgba(5,9,16,0.98);
+  --elev:rgba(10,14,25,0.97);
+  --line:rgba(120,180,255,0.24);
+  --text:#e7edf8;
+  --muted:#9fb0c1;
+  --accent:#35b5ff;           /* 明るめのシアンブルー */
+  --danger:#f97373;
+  --radius:18px;
+}
+
+/* Base */
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+body{
+  margin:0;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 0% 0%, #123259 0, transparent 55%),
+    radial-gradient(circle at 100% 0%, #132949 0, transparent 55%),
+    #050910;
+  font:14px/1.5 "Inter", system-ui, -apple-system, Segoe UI, Roboto,
+       "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  letter-spacing:.2px;
+}
+
+/* Topbar（ネイビーカード風） */
+.topbar{
+  position:sticky; top:0; z-index:50;
+  height:60px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 20px;
+  background:linear-gradient(to bottom, rgba(10,16,30,0.96), rgba(5,9,16,0.98));
+  border-bottom:1px solid var(--line);
+  box-shadow:0 20px 40px rgba(0,0,0,0.85);
+}
+.logo-pill{
+  padding:0;
+  height:auto;
+  border-radius:0;
+  border:none;
+  background:none;
+  display:inline-flex;
+  align-items:flex-end;
+  gap:6px;
+  color:var(--text);
+  font-weight:700;
+  font-size:16px;
+  letter-spacing:.12em;               /* 文字間を少しあけてロゴっぽく */
+  text-transform:uppercase;           /* POKER ANALYZER 風 */
+}
+
+.top-title{
+  font-size:14px;
+  color:var(--muted);
+}
+
+/* Layout */
+.page{
+  max-width:1200px;
+  margin:24px auto 40px;
+  padding:0 18px;
+}
+.panel{
+  background:var(--elev);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:
+    0 24px 60px rgba(0,0,0,0.85),
+    0 0 0 1px rgba(10,20,40,0.6);
+}
+.grid{ display:grid; grid-template-columns:1fr 340px; gap:16px }
+@media (max-width:1100px){ .grid{ grid-template-columns:1fr } }
+
+/* Cards / Sidebar */
+.side-card{
+  background:var(--elev);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:12px;
+  box-shadow:0 18px 40px rgba(0,0,0,0.65);
+}
+.log-card{
+  background:var(--elev);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:10px;
+  height:280px;
+  overflow:auto;
+  color:var(--muted);
+}
+
+/* Inputs */
+label{
+  display:block;
+  margin:10px 0 6px;
+  color:var(--muted);
+  font-size:12px;
+}
+input,select{
+  width:100%; height:38px; padding:0 10px;
+  color:var(--text);
+  background:#070b12;
+  border:1px solid rgba(80,105,145,0.8);
+  border-radius:10px;
+  outline:none;
+}
+input:focus,select:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 1px rgba(53,181,255,0.4), 0 0 0 6px rgba(53,181,255,0.12);
+}
+
+/* ================================
+   Buttons ② Nordic Blue Glow
+   ================================ */
+.btn_glow,
+.btn{
+  all:unset;
+  box-sizing:border-box;
+  cursor:pointer;
+  height:36px;
+  padding:0 14px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:.2px;
+  transition:
+    background .16s ease,
+    box-shadow .16s ease,
+    transform .08s ease,
+    border-color .16s ease,
+    filter .10s ease;
+}
+
+/* 通常ボタン：深く落ち着いたブルー光 */
+.btn{
+  color:#e3eaf5;
+  background:linear-gradient(
+    180deg,
+    #1b2738 0%,
+    #151f2f 55%,
+    #0f1623 100%
+  );
+  border:1px solid rgba(74,111,165,0.65); /* 北欧ブルー */
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.04) inset,
+    0 10px 24px rgba(74,111,165,0.28);
+}
+.btn:hover{
+  background:linear-gradient(
+    180deg,
+    #202e42 0%,
+    #182435 55%,
+    #111a28 100%
+  );
+  border-color:rgba(98,143,206,0.85);
+}
+.btn:active{
+  transform:translateY(1px);
+  box-shadow:0 6px 14px rgba(0,0,0,0.85);
+}
+
+/* メインアクション：静かな深青の光 */
+.btn--primary,
+.btn.glow,
+.btn-accent{
+  color:#f4f7ff;
+  background:linear-gradient(
+    180deg,
+    #2b405e 0%,
+    #23354f 55%,
+    #1b2a40 100%
+  );
+  border:1px solid rgba(94,126,180,0.85);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.07) inset,
+    0 12px 26px rgba(59,91,135,0.45);
+}
+.btn--primary:hover,
+.btn.glow:hover,
+.btn-accent:hover{
+  background:linear-gradient(
+    180deg,
+    #314766 0%,
+    #293d58 55%,
+    #203145 100%
+  );
+}
+
+
+
+/* 危険系ボタン（削除など） */
+.btn-danger{
+  background:linear-gradient(135deg, #fb7185, #f97316);
+  border-color:rgba(248,113,113,0.85);
+  color:#020308;
+  box-shadow:0 18px 40px rgba(248,113,113,0.55);
+}
+.btn-danger:hover{
+  filter:brightness(1.06);
+}
+
+.btn--pill{ border-radius:999px; height:30px; padding:0 10px }
+
+/* Table stage（カードテーブル面） */
+.table-stage{
+  position:relative;
+  min-height:620px;
+  padding:12px;
+  background:radial-gradient(circle at 50% 0, #1d3657 0, #050910 55%);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+}
+.table-stage svg{
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+/* Action row */
+.action-bar{
+  margin-top:12px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.action-bar .btn,
+.action-bar .btn--primary{
+  height:34px;
+  border-radius:999px;
+}
+
+/* Badges / small */
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 8px;
+  border-radius:999px;
+  background:#070b12;
+  border:1px solid rgba(80,105,145,0.85);
+  color:var(--muted);
+}
+.muted{ color:var(--muted) }
+.small{ font-size:12px }
+
+/* Table seats（読みやすくシンプル） */
+.seat{
+  background:#070c14;
+  border:1px solid rgba(60,90,135,0.9);
+  border-radius:12px;
+  padding:6px 8px;
+  min-width:120px;
+  text-align:center;
+  box-shadow:0 10px 24px rgba(0,0,0,0.8);
+}
+.seat .is-hero{
+  color:var(--accent);
+  font-weight:600;
+}
+
+/* Cards text (A♥ 等) */
+.cardtext{
+  font-weight:600;
+  letter-spacing:.4px;
+}
+
+/* Raise 行の補助 */
+.raise-wrap{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+}
+.raise-label{
+  min-width:140px;
+  font-variant-numeric:tabular-nums;
+}
+
+/* --- Raise行 共通 --- */
+.raise-fixed{
+  width:170px;                 /* ← 横幅を固定（可変にしない） */
+  justify-content:center;
+  font-variant-numeric:tabular-nums; /* 桁ズレ防止 */
+}
+
+/* 充填型スライダー（値に応じて左から塗る） */
+input[type="range"].bb-slider{
+  -webkit-appearance:none;
+  appearance:none;
+  width:100%;
+  height:8px;
+  border-radius:999px;
+  background:linear-gradient(
+    to right,
+    var(--accent, #3b82f6) calc(var(--pct,0)*1%),
+    #223043             calc(var(--pct,0)*1%)
+  );
+  outline:none;
+  box-shadow:inset 0 0 0 1px #1c2a3b;
+}
+input[type="range"].bb-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  appearance:none;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:#111b29;
+  border:3px solid #ff5a5a;   /* 赤リング */
+  box-shadow:0 0 0 2px rgba(0,0,0,.35);
+  margin-top:-5px;
+}
+input[type="range"].bb-slider::-moz-range-thumb{
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:#111b29;
+  border:3px solid #ff5a5a;
+  box-shadow:0 0 0 2px rgba(0,0,0,.35);
+}
+.bb-ticks{
+  display:flex;
+  justify-content:space-between;
+  margin-top:2px;
+}
+.bb-ticks>span{
+  width:2px;
+  height:5px;
+  background:#34465e;
+  border-radius:1px;
+  opacity:.8;
+}
+
+/* --- セグメント（倍率プリセット）を引き締める --- */
+.segment{
+  display:inline-flex;
+  gap:0;
+  border:1px solid #2c3e50;
+  border-radius:999px;
+  overflow:hidden;
+  background:#0e1d2e;
+}
+.segment .seg{
+  border:0;
+  background:#0f1b2b;
+  color:#cfe4ff;
+  padding:6px 10px;
+  font-size:12px;
+  line-height:20px;
+  cursor:pointer;
+}
+.segment .seg + .seg{ border-left:1px solid #2c3e50; }
+.segment .seg:hover{ background:#14263b; color:#fff; }
+.segment .seg.active{
+  background:var(--accent, #3b82f6);
+  color:#0b0f14;
+}
+
+/* ===== プリセット：チップ風 ===== */
+.chip-group{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+}
+.chip{
+  border:1px solid #2c3e50;
+  background:#0f1b2b;
+  color:#cfe4ff;
+  padding:6px 12px;
+  line-height:20px;
+  font-size:12px;
+  border-radius:9999px;
+  cursor:pointer;
+  transition:background .15s ease, color .15s ease, border-color .15s ease;
+}
+.chip:hover{ background:#14263b; color:#fff; }
+.chip.active{
+  background:var(--accent, #3b82f6);
+  color:#0b0f14;
+  border-color:var(--accent, #3b82f6);
+}
+
+
+/* ================================
+   Card / Board Picker Modal 共通
+   ================================ */
+
+.cardpicker-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(3, 7, 18, 0.68);
+  z-index: 1000;
+}
+
+.cardpicker-dialog {
+  width: min(1120px, 96vw);
+  max-height: 80vh;
+  padding: 20px 18px 18px;
+  border-radius: 16px;
+  background: #0b1621;
+  border: 1px solid #1f2937;
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.65);
+  overflow: auto;
+}
+
+.cardpicker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.cardpicker-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #d7e7ff;
+}
+
+.cardpicker-current {
+  font-size: 13px;
+  color: #8aa3b8;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.cardpicker-current-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.6);
+}
+
+/* 4 行（スート） × 13 列（ランク） */
+.cardpicker-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cardpicker-row{
+  display:grid;
+  grid-template-columns:repeat(13, minmax(40px,1fr));
+  gap:6px;
+}
+
+@media (max-width:960px){
+  .cardpicker-row{
+    grid-template-columns:repeat(13, minmax(32px,1fr));
+  }
+}
+
+.cardpicker-suit-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardpicker-suit-icon {
+  font-size: 20px;
+}
+
+.cardpicker-suit-icon[data-suit="h"],
+.cardpicker-suit-icon[data-suit="d"] {
+  color: #fb7185;
+}
+
+.cardpicker-suit-icon[data-suit="s"],
+.cardpicker-suit-icon[data-suit="c"] {
+  color: #93c5fd;
+}
+
+/* カードタイル */
+.cardpicker-card {
+  position: relative;
+  height: 38px;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #101827 0%, #070f1a 100%);
+  border: 1px solid #1f2937;
+  color: #e5edf7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.12s ease,
+    border-color 0.12s ease,
+    background 0.12s ease,
+    filter 0.12s ease;
+}
+
+.cardpicker-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.7);
+  border-color: #3b82f6;
+}
+
+.cardpicker-card--active {
+  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+  border-color: #60a5fa;
+  box-shadow:
+    0 0 0 1px rgba(96, 165, 250, 0.75),
+    0 10px 26px rgba(37, 99, 235, 0.6);
+}
+
+.cardpicker-card--disabled {
+  opacity: 0.35;
+  cursor: default;
+  box-shadow: none;
+}
+
+.cardpicker-card--disabled:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: #1f2937;
+}
+
+.cardpicker-rank {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.cardpicker-suit {
+  font-size: 13px;
+}
+
+.cardpicker-suit[data-suit="h"],
+.cardpicker-suit[data-suit="d"] {
+  color: #fb7185;
+}
+
+.cardpicker-suit[data-suit="s"],
+.cardpicker-suit[data-suit="c"] {
+  color: #93c5fd;
+}
+
+/* フッター */
+.cardpicker-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
