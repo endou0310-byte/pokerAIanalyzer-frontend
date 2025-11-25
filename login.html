@@ -124,16 +124,15 @@ const API_BASE = "https://poker-backend-production-64cf.up.railway.app"; // ← 
           return;
         }
 
-        // 他の画面と共通の localStorage 形式に保存
-        // React / Auth 側は pa_user.user_id を前提にしている
-        const stored = {
-          user_id: user.id,                             // ← user_id に合わせる
-          name: user.display_name || user.name || "",
-          email: user.email || "",
-          plan: user.plan || null,
-        };
+const stored = {
+  user_id: user.id,
+  name: user.display_name || user.name || "",
+  email: user.email || "",
+  plan: user.plan || null,
+};
 localStorage.setItem("pa_user", JSON.stringify(stored));
-window.location.href = "record.html";
+// GitHub Pages 上の record.html へのフルパスにリダイレクトする
+window.location.href = "/pokerAIanalyzer-frontend/record.html";
 
       } catch (err) {
         console.error("loginWithIdToken error:", err);
