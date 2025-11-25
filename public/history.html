@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>履歴 - Poker Analyzer</title>
-  <link rel="stylesheet" href="css/styles.css" />
-  <script src="/js/config.js"></script>
+<link rel="stylesheet" href="css/style.css" />
+<script src="js/config.js"></script>
   <style>
     body {
       margin: 0;
@@ -299,9 +299,9 @@
 <body>
   <!-- ヘッダー -->
   <div class="nav">
-    <a href="/record.html">ハンド記録</a>
-    <a href="/history.html" aria-current="page">履歴</a>
-    <a href="#" id="logoutLink" class="nav-right">ログアウト</a>
+<a href="index.html">ハンド記録</a>
+<a href="history.html" aria-current="page">履歴</a>
+<a href="#" id="logoutLink" class="nav-right">ログアウト</a>
   </div>
 
   <main class="page">
@@ -348,9 +348,9 @@
     let user = null;
     try {
       user = JSON.parse(localStorage.getItem("pa_user") || "null");
-      if (!user || !user.user_id) location.replace("/login.html");
+      if (!user || !user.user_id) location.replace("login.html");
     } catch {
-      location.replace("/login.html");
+      location.replace("login.html");
     }
 
     // ログアウト
@@ -358,7 +358,7 @@
       e.preventDefault();
       localStorage.removeItem("pa_user");
       localStorage.removeItem("pa_plan");
-      location.replace("/login.html");
+      location.replace("login.html");
     });
 
     // -------- API 基本 URL --------
