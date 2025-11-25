@@ -1,16 +1,10 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  build: {
-    rollupOptions: {
-      input: {
-        login:  resolve(__dirname, 'login.html'),   // ← index ではなく login
-        record: resolve(__dirname, 'record.html'),
-        history: resolve(__dirname, 'history.html'), // ← 追加
-      },
-    },
-  },
-})
+  // ★GitHub Pages (https://endou0310-byte.github.io/pokerAIanalyzer-frontend/)
+  //   で正しいパスになるように、base をリポジトリ名に合わせる
+  base: "/pokerAIanalyzer-frontend/",
+});

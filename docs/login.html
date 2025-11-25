@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>POKERGPT ログイン</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    body {
+      background: #050910;
+      color: #f5f5f5;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .login-wrapper {
+      width: 100%;
+      max-width: 420px;
+      padding: 32px 24px;
+      background: rgba(10, 14, 25, 0.9);
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(120, 180, 255, 0.2);
+    }
+    .login-title {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .login-sub {
+      font-size: 13px;
+      color: #b0b8c5;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .login-section-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #9fb4ff;
+    }
+    .google-btn-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 16px 0 8px;
+    }
+    .debug-info {
+      margin-top: 16px;
+      font-size: 12px;
+      color: #808aa0;
+      line-height: 1.6;
+    }
+    .login-error {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #ff7b7b;
+    }
+  </style>
+
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <div class="login-wrapper">
+    <div class="login-title">Poker Analyzer ログイン</div>
+    <div class="login-sub">
+      Google アカウントでログインして、ハンド解析と履歴管理を利用できます。
+    </div>
+
+    <div class="login-section-title">Google でログイン</div>
+    <div id="google-login-button" class="google-btn-wrap"></div>
+
+    <div id="login-error" class="login-error" style="display:none;"></div>
+
+    <div class="debug-info">
+      ・初回ログイン時にユーザー情報が DB に作成されます。<br />
+      ・ログイン後はハンド記録画面へ自動的に移動します。<br />
+      ・開発中エラーが出る場合はコンソールのログも確認してください。
+    </div>
+  </div>
+
+  <script type="module">
+// ======== 1) backend の URL を決める =========
+const API_BASE = "https://poker-backend-production-64cf.up.railway.app"; // ← Railway の URL に固定
+
+
+    // ======== 2) Google クライアント ID =========
+    // ※ここは「Google Cloud Console で発行した Web クライアント ID」を直接書いてください
+    //   （Railway の GOOGLE_CLIENT_ID は backend 用なので、フロントからは見えません）
+    const GOOGLE_CLIENT_ID = "599236787224-kig324ieevvr7b7q0haqeutj0qehc2m8.apps.googleusercontent.com";
+
+    const errorBox = document.getElementById("login-error");
+
+    function showError(message) {
+      errorBox.textContent = message;
+      errorBox.style.display = "block";
+    }
+
+    // ======== 3) backend に id_token を送ってログイン =========
+    async function loginWithIdToken(idToken) {
+      try {
+        const res = await fetch(`${API_BASE}/auth/google`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id_token: idToken }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+          console.error("login error:", data);
+          showError("ログインに失敗しました。しばらくしてからもう一度お試しください。");
+          return;
+        }
+
+        const user = data.user;
+        if (!user || !user.id) {
+          console.error("invalid user payload:", data);
+          showError("サーバーから不正なユーザー情報が返されました。");
+          return;
+        }
+
+const stored = {
+          user_id: user.id,                             // ← user_id に合わせる
+          name: user.display_name || user.name || "",
+          email: user.email || "",
+          plan: user.plan || null,
+        };
+localStorage.setItem("pa_user", JSON.stringify(stored));
+// GitHub Pages 上の record.html へ確実に飛ばす
+window.location.href = "index.html";
+
+      } catch (err) {
+        console.error("loginWithIdToken error:", err);
+        showError("ネットワークエラーが発生しました。接続環境を確認してください。");
+      }
+    }
+
+    // ======== 4) Google Identity のコールバック =========
+    window.handleCredentialResponse = (response) => {
+      if (!response || !response.credential) {
+        showError("Google からの認証情報が取得できませんでした。");
+        return;
+      }
+      loginWithIdToken(response.credential);
+    };
+
+    // ======== 5) ボタンの描画 =========
+    window.onload = () => {
+      if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+        showError("Google ログイン用のスクリプトの読み込みに失敗しました。");
+        return;
+      }
+
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: window.handleCredentialResponse,
+        auto_select: false,
+        cancel_on_tap_outside: true,
+      });
+
+      window.google.accounts.id.renderButton(
+        document.getElementById("google-login-button"),
+        {
+          type: "standard",
+          theme: "outline",
+          size: "large",
+          text: "continue_with",
+          shape: "pill",
+        }
+      );
+
+      // 必要なら One Tap を有効化することも可能（とりあえずコメントアウト）
+      // window.google.accounts.id.prompt();
+    };
+  </script>
+</body>
+</html>
