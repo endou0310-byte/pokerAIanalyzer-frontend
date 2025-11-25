@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>POKERGPT ログイン</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="stylesheet" href="css/styles.css" />
   <style>
     body {
       background: #050910;
@@ -133,8 +133,7 @@ const API_BASE = "https://poker-backend-production-64cf.up.railway.app"; // ← 
           plan: user.plan || null,
         };
 localStorage.setItem("pa_user", JSON.stringify(stored));
-window.location.href = "/record.html";     // ← 必ず先頭に / を付ける
-
+window.location.href = "record.html";
 
       } catch (err) {
         console.error("loginWithIdToken error:", err);
