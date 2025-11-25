@@ -131,8 +131,9 @@ const stored = {
           plan: user.plan || null,
         };
 localStorage.setItem("pa_user", JSON.stringify(stored));
-// GitHub Pages 上の record.html へのフルパスにリダイレクト
-window.location.href = "/pokerAIanalyzer-frontend/record.html";
+// GitHub Pages 上の record.html へ確実に飛ばす
+window.location.href = "record.html"; // 相対パスでOK
+
       } catch (err) {
         console.error("loginWithIdToken error:", err);
         showError("ネットワークエラーが発生しました。接続環境を確認してください。");
