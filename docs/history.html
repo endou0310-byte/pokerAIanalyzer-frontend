@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>履歴 - Poker Analyzer</title>
+<link rel="stylesheet" href="css/style.css" />
+<script src="js/config.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #e7edf8;
+      background:
+        radial-gradient(circle at 0% 0%, #123259 0, transparent 55%),
+        radial-gradient(circle at 100% 0%, #132949 0, transparent 55%),
+        #050910;
+    }
+
+.nav {
+      display: flex;
+      gap: 8px;
+      /* 画面いっぱいではなく .page と同じ幅で中央寄せ */
+      max-width: 960px;
+      margin: 16px auto 0;
+      padding: 6px 8px;
+      border-radius: 999px;
+
+      background: radial-gradient(circle at 0% 0%, rgba(24,45,85,0.95), rgba(6,12,24,0.98));
+      border: 1px solid rgba(120,180,255,0.35);
+      align-items: center;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.7);
+    }
+    .nav a {
+      color: #9fb4ff;
+      text-decoration: none;
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      transition: background-color .15s ease-out, color .15s ease-out, box-shadow .15s ease-out;
+    }
+    .nav a:hover {
+      background-color: rgba(15,118,255,0.12);
+      color: #e5edff;
+    }
+    .nav a[aria-current="page"] {
+      color: #f9fbff;
+      font-weight: 600;
+      background: linear-gradient(135deg, rgba(59,130,246,0.45), rgba(96,165,250,0.35));
+      box-shadow: 0 0 0 1px rgba(148,185,255,0.8);
+    }
+    .nav-right {
+      margin-left: auto;
+    }
+
+    .page {
+      max-width: 960px;
+      margin: 24px auto 40px;
+      padding: 0 18px 24px;
+    }
+    .page h1 {
+      font-size: 20px;
+      margin: 0 0 10px;
+    }
+    .page-desc {
+      font-size: 12px;
+      color: #9fb0c1;
+      margin-bottom: 16px;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .history-empty {
+      font-size: 14px;
+      color: #9ca3af;
+      margin-top: 16px;
+    }
+
+    .history-item {
+      background: rgba(10,14,25,0.97);
+      border-radius: 16px;
+      border: 1px solid rgba(120,180,255,0.24);
+      padding: 10px 14px;
+      cursor: pointer;
+      transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        transform 0.08s ease,
+        box-shadow 0.12s ease;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.7);
+    }
+    .history-item:hover {
+      background: rgba(16,24,40,0.98);
+      border-color: rgba(148,210,255,0.9);
+      transform: translateY(-1px);
+      box-shadow: 0 22px 50px rgba(0,0,0,0.85);
+    }
+    .h-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .h-sub {
+      font-size: 11px;
+      color: #9fb0c1;
+      margin-bottom: 2px;
+    }
+    .h-tags {
+      font-size: 11px;
+      color: #d1d5db;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .h-tag {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(120,180,255,0.3);
+      background: #050910;
+      font-size: 10px;
+      color: #e5e7eb;
+    }
+
+    /* モーダル */
+    .modal-outer {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-inner {
+      width: 90%;
+      max-width: 840px;
+      max-height: 90vh;
+      background: rgba(10,14,25,0.97);
+      border-radius: 18px;
+      border: 1px solid rgba(120,180,255,0.24);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.85);
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(80,105,145,0.8);
+      background: radial-gradient(circle at 0 0, rgba(56,189,248,0.16), transparent 55%);
+    }
+    .modal-header h2 {
+      font-size: 15px;
+      margin: 0;
+    }
+    .modal-close {
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: #cbd5f5;
+      font-size: 18px;
+      padding: 0 4px;
+    }
+    .modal-body {
+      padding: 12px 16px 16px;
+      overflow-y: auto;
+      font-size: 13px;
+    }
+    .modal-body h3 {
+      margin-top: 0;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+    .modal-body p {
+      margin: 4px 0;
+    }
+    .modal-section-title {
+      font-size: 12px;
+      font-weight: 600;
+      margin: 10px 0 4px;
+      color: #cbd5f5;
+    }
+    .analysis-text {
+      background: #050910;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(80,105,145,0.85);
+      font-size: 12px;
+      line-height: 1.6;
+      margin: 4px 0 8px;
+    }
+    .analysis-text h2,
+    .analysis-text h3,
+    .analysis-text h4 {
+      margin: 12px 0 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #e7edf8;
+    }
+    .analysis-text p {
+      margin: 4px 0 8px;
+    }
+    .analysis-text ul {
+      margin: 4px 0 8px 18px;
+      padding-left: 0;
+    }
+    .analysis-text li {
+      margin: 2px 0;
+    }
+    .analysis-text strong {
+      font-weight: 600;
+    }
+    .qa-block {
+      margin-top: 8px;
+      border-top: 1px dashed rgba(80,105,145,0.8);
+      padding-top: 8px;
+    }
+    .qa-item {
+      margin-bottom: 6px;
+    }
+    .qa-role {
+      font-size: 11px;
+      color: #9fb0c1;
+      margin-bottom: 2px;
+    }
+    .qa-msg {
+      font-size: 12px;
+      background: #050910;
+      border-radius: 8px;
+      border: 1px solid rgba(80,105,145,0.8);
+      padding: 6px 8px;
+      white-space: pre-wrap;
+    }
+        .history-pager {
+      margin-top: 12px;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      font-size: 12px;
+    }
+    .pager-btn {
+      min-width: 28px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(120,180,255,0.5);
+      background: #050910;
+      color: #e5e7eb;
+      cursor: pointer;
+    }
+    .pager-btn[disabled] {
+      border-color: rgba(148,163,184,0.8);
+      background: rgba(15,23,42,0.9);
+      color: #9ca3af;
+      cursor: default;
+    }
+    .pager-btn[disabled] {
+      border-color: rgba(148,163,184,0.8);
+      background: rgba(15,23,42,0.9);
+      color: #9ca3af;
+      cursor: default;
+    }
+
+    .modal-header-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .title-edit-btn {
+      border: none;
+      background: transparent;
+      color: #cbd5f5;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 0 4px;
+      opacity: 0.7;
+    }
+    .title-edit-btn:hover {
+      opacity: 1;
+    }
+    .title-edit-input {
+      font-size: 14px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(148,163,184,0.9);
+      background: #020617;
+      color: #e5e7eb;
+      width: 100%;
+    }
+
+  </style>
+
+</head>
+<body>
+  <!-- ヘッダー -->
+  <div class="nav">
+<a href="index.html">ハンド記録</a>
+<a href="history.html" aria-current="page">履歴</a>
+<a href="#" id="logoutLink" class="nav-right">ログアウト</a>
+  </div>
+
+  <main class="page">
+    <h1>解析履歴</h1>
+    <div class="page-desc">
+      これまで解析したハンドの一覧です。見出しをクリックすると、解析内容と追い質問のログを表示します。
+    </div>
+
+    <div id="historyList" class="history-list"></div>
+    <div id="historyEmpty" class="history-empty" style="display:none;">
+      まだ解析履歴がありません。ハンドを記録して解析すると、ここに一覧が表示されます。
+    </div>
+    <!-- ▼ ページャ -->
+    <div id="historyPager" class="history-pager"></div>
+  </main>
+
+
+  <!-- 詳細モーダル -->
+  <div id="historyModalOuter" class="modal-outer">
+    <div class="modal-inner">
+<div class="modal-header">
+  <div class="modal-header-left">
+    <h2 id="modalTitle">履歴詳細</h2>
+    <button
+      id="titleEditBtn"
+      class="title-edit-btn"
+      type="button"
+      title="ハンド名を編集"
+    >
+      ✏
+    </button>
+  </div>
+  <button id="modalClose" class="modal-close" aria-label="閉じる">×</button>
+</div>
+
+      <div id="modalBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script type="module">
+    // -------- 共通：ログインチェック --------
+
+    let user = null;
+    try {
+      user = JSON.parse(localStorage.getItem("pa_user") || "null");
+      if (!user || !user.user_id) location.replace("login.html");
+    } catch {
+      location.replace("login.html");
+    }
+
+    // ログアウト
+    document.getElementById("logoutLink")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      localStorage.removeItem("pa_user");
+      localStorage.removeItem("pa_plan");
+      location.replace("login.html");
+    });
+
+    // -------- API 基本 URL --------
+  const API =
+    (window.PA && window.PA.API_BASE) ||
+    window.API_BASE ||
+    "";
+
+    const listEl = document.getElementById("historyList");
+    const emptyEl = document.getElementById("historyEmpty");
+    const modalOuter = document.getElementById("historyModalOuter");
+    const modalBody = document.getElementById("modalBody");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalClose = document.getElementById("modalClose");
+    const pagerEl = document.getElementById("historyPager");
+    const titleEditBtn = document.getElementById("titleEditBtn");
+
+    // ページング用
+    const PAGE_SIZE = 20;
+    let allItems = [];
+    let currentPage = 1;
+
+    // タイトル編集用
+    let currentTitle = "";
+    let currentEditingId = null;
+    let titleEditing = false;
+
+
+    modalClose.onclick = () => { modalOuter.style.display = "none"; };
+    modalOuter.onclick = (e) => {
+      if (e.target === modalOuter) modalOuter.style.display = "none";
+    };
+
+    // ===== カード変換ユーティリティ =====
+    // 例: "Ah" -> "A♥"
+    function convertCard(card) {
+      if (!card || typeof card !== "string" || card.length < 2) return card;
+      const rank = card.slice(0, card.length - 1);
+      const suit = card.slice(-1).toLowerCase();
+      const suitMap = {
+        h: "♥",
+        s: "♠",
+        d: "♦",
+        c: "♣",
+      };
+      return rank + (suitMap[suit] || suit);
+    }
+
+    // 例: ["Ah","Kd"] -> "A♥ K♦"
+    function convertCards(cards) {
+      if (!Array.isArray(cards)) return "";
+      return cards.map(convertCard).join(" ");
+    }
+
+    // -------- 1) 履歴一覧取得 --------
+    async function loadHistory() {
+      listEl.innerHTML = "";
+      emptyEl.style.display = "none";
+
+      try {
+        const res = await fetch(
+          `${API}/history/list?user_id=${encodeURIComponent(user.user_id)}`
+        );
+        if (!res.ok) {
+          console.error("history/list status:", res.status);
+          emptyEl.textContent = "履歴の取得に失敗しました。時間をおいて再度お試しください。";
+          emptyEl.style.display = "block";
+          return;
+        }
+
+const data = await res.json();
+if (!data.ok || !Array.isArray(data.items)) {
+  console.error("history/list payload:", data);
+  emptyEl.textContent = "履歴データの形式が不正です。";
+  emptyEl.style.display = "block";
+  return;
+}
+
+// 取得した全件を保持して、ページ単位で描画する
+allItems = data.items || [];
+currentPage = 1;
+
+if (!allItems.length) {
+  emptyEl.style.display = "block";
+  listEl.innerHTML = "";
+  pagerEl.innerHTML = "";
+  return;
+}
+
+// 1ページ目を描画
+renderHistoryPage();
+      } catch (err) {
+        console.error("loadHistory error:", err);
+        emptyEl.textContent = "履歴の取得中にエラーが発生しました。";
+        emptyEl.style.display = "block";
+      }
+    }
+    // -------- ページごとの描画 --------
+    function renderHistoryPage() {
+      listEl.innerHTML = "";
+      pagerEl.innerHTML = "";
+      emptyEl.style.display = "none";
+
+      if (!allItems.length) {
+        emptyEl.style.display = "block";
+        return;
+      }
+
+      const totalPages = Math.max(1, Math.ceil(allItems.length / PAGE_SIZE));
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const pageItems = allItems.slice(start, start + PAGE_SIZE);
+
+      // ---- リスト本体 ----
+      pageItems.forEach((item) => {
+        const div = document.createElement("div");
+        div.className = "history-item";
+
+        const dt = item.created_at
+          ? new Date(item.created_at).toLocaleString()
+          : "";
+
+        let heroLabel = "";
+        let boardLabel = "";
+        try {
+          const snap =
+            typeof item.snapshot === "string"
+              ? JSON.parse(item.snapshot)
+              : item.snapshot;
+
+          if (snap && snap.hero) {
+            const seat = snap.hero.seat || "";
+            const cards = convertCards(snap.hero.cards || []);
+            const stack = snap.hero.stack_bb ?? "";
+            heroLabel =
+              seat || cards || stack !== ""
+                ? `Hero: ${seat} ${cards} / ${stack}bb`
+                : "";
+          }
+
+          if (snap && snap.board) {
+            const all = [];
+            if (Array.isArray(snap.board.FLOP)) {
+              all.push(...snap.board.FLOP.map(convertCard));
+            }
+            if (Array.isArray(snap.board.TURN)) {
+              all.push(...snap.board.TURN.map(convertCard));
+            }
+            if (Array.isArray(snap.board.RIVER)) {
+              all.push(...snap.board.RIVER.map(convertCard));
+            }
+            if (all.length) {
+              boardLabel = `BOARD: ${all.join(" ")}`;
+            }
+          }
+        } catch (e) {
+          console.warn("snapshot parse error:", e);
+        }
+
+        const baseTitle =
+          item.title && String(item.title).trim()
+            ? String(item.title).trim()
+            : `Hand #${item.hand_id || "-"}`;
+        const title = item.title_override || baseTitle;
+        const sub = dt || "";
+        const tags = [];
+        if (heroLabel) tags.push(heroLabel);
+        if (boardLabel) tags.push(boardLabel);
+
+        div.innerHTML = `
+          <div class="h-title">${title}</div>
+          ${sub ? `<div class="h-sub">${sub}</div>` : ""}
+          ${
+            tags.length
+              ? `<div class="h-tags">${tags
+                  .map((t) => `<span class="h-tag">${t}</span>`)
+                  .join("")}</div>`
+              : ""
+          }
+        `;
+
+        div.onclick = () => openDetail(item.id, title);
+        listEl.appendChild(div);
+      });
+
+      // ---- ページャ ----
+      if (totalPages <= 1) {
+        pagerEl.innerHTML = "";
+        return;
+      }
+
+      const makeBtn = (label, page, disabled = false) => {
+        const btn = document.createElement("button");
+        btn.textContent = label;
+        btn.className = "pager-btn";
+        if (disabled) {
+          btn.disabled = true;
+        } else {
+          btn.addEventListener("click", () => {
+            currentPage = page;
+            renderHistoryPage();
+          });
+        }
+        return btn;
+      };
+
+      // 前へ
+      pagerEl.appendChild(
+        makeBtn("‹ 前へ", currentPage - 1, currentPage <= 1)
+      );
+
+      // ページ番号（必要に応じて簡易的に）
+      for (let p = 1; p <= totalPages; p++) {
+        pagerEl.appendChild(
+          makeBtn(String(p), p, p === currentPage)
+        );
+      }
+
+      // 次へ
+      pagerEl.appendChild(
+        makeBtn("次へ ›", currentPage + 1, currentPage >= totalPages)
+      );
+    }
+
+    // -------- 2) 履歴詳細取得 --------
+    async function openDetail(id, title) {
+      try {
+        const res = await fetch(`${API}/history/detail?id=${encodeURIComponent(id)}`);
+        if (!res.ok) {
+          console.error("history/detail status:", res.status);
+          return;
+        }
+        const data = await res.json();
+        if (!data.ok || !data.history) {
+          console.error("history/detail payload:", data);
+          return;
+        }
+
+        const h = data.history;
+
+        const dbTitle =
+          h.title && typeof h.title === "string" && h.title.trim()
+            ? h.title.trim()
+            : null;
+
+        currentEditingId = id;
+        currentTitle = dbTitle || title || `Hand #${h.hand_id || "-"}`;
+        titleEditing = false;
+        modalTitle.textContent = currentTitle;
+        const created = h.created_at
+          ? new Date(h.created_at).toLocaleString()
+          : "";
+
+        // 解析本文（markdown or evaluation）
+        const analysisText =
+          (h.markdown && typeof h.markdown === "string" && h.markdown.trim()) ||
+          (h.evaluation && typeof h.evaluation === "string" && h.evaluation.trim()) ||
+          "解析本文が保存されていません。";
+
+        let html = "";
+
+        if (created) {
+          html += `<p style="font-size:11px;color:#aaa;margin-bottom:6px;">${created}</p>`;
+        }
+
+        html += `<div class="modal-section-title">解析結果</div>`;
+
+        // Markdown を HTML に変換（marked が利用可能なら使用）
+        const analysisHtml =
+          window.marked && window.marked.parse
+            ? window.marked.parse(analysisText)
+            : escapeHtml(analysisText).replace(/\n/g, "<br>");
+
+        html += `<div class="analysis-text">${analysisHtml}</div>`;
+
+// Q/A ログ
+if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
+  html += `<div class="qa-block">
+    <div class="modal-section-title">質問ログ</div>
+  `;
+  h.conversation.forEach((msg) => {
+    if (!msg || !msg.role) return;
+
+    const roleLabel = msg.role === "user" ? "Q" : "A";
+    const content =
+      typeof msg.message === "string" ? msg.message : JSON.stringify(msg.message);
+    html += `
+      <div class="qa-item">
+        <div class="qa-role">${roleLabel}.</div>
+        <div class="qa-msg">${escapeHtml(content)}</div>
+      </div>
+    `;
+  });
+  html += `</div>`;
+}
+        modalBody.innerHTML = html;
+        modalOuter.style.display = "flex";
+      } catch (err) {
+        console.error("openDetail error:", err);
+      }
+    }
+
+    // -------- タイトル編集 --------
+    if (titleEditBtn) {
+      titleEditBtn.addEventListener("click", () => {
+        if (titleEditing) return;
+        titleEditing = true;
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = currentTitle || "";
+        input.className = "title-edit-input";
+
+        modalTitle.textContent = "";
+        modalTitle.appendChild(input);
+        input.focus();
+        input.select();
+
+        const finish = (commit) => {
+          if (!titleEditing) return;
+          titleEditing = false;
+
+          if (commit) {
+            let v = input.value.trim();
+            if (!v) v = currentTitle || "";
+            currentTitle = v || currentTitle || "";
+
+            // モーダルのタイトルを更新
+            modalTitle.textContent = currentTitle;
+
+            // 一覧データ(allItems)も更新
+            if (currentEditingId != null) {
+              const item = allItems.find(
+                (it) => String(it.id) === String(currentEditingId)
+              );
+              if (item) {
+                item.title = currentTitle;         // DBの値として扱う
+                item.title_override = undefined;   // 一時上書きは不要
+                renderHistoryPage();
+              }
+
+              // DB に保存（失敗してもUIはそのまま）
+              saveTitle(currentEditingId, currentTitle).catch((err) => {
+                console.error("saveTitle error:", err);
+                alert("タイトルの保存に失敗しました。時間をおいて再度お試しください。");
+              });
+            }
+          } else {
+            // キャンセル → 元のタイトルに戻す
+            modalTitle.textContent = currentTitle || "";
+          }
+        };
+
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            finish(true);
+          } else if (e.key === "Escape") {
+            e.preventDefault();
+            finish(false);
+          }
+        });
+
+        input.addEventListener("blur", () => {
+          finish(true);
+        });
+      });
+    }
+    async function saveTitle(id, title) {
+      if (!user || !user.user_id) {
+        throw new Error("user not found");
+      }
+      const res = await fetch(`${API}/history/update-title`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: user.user_id,
+          id,
+          title,
+        }),
+      });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(`update-title failed: ${res.status} ${text}`);
+      }
+
+      const json = await res.json();
+      if (!json.ok) {
+        throw new Error(`update-title error: ${json.error || "unknown"}`);
+      }
+      return json;
+    }
+
+    // -------- HTML エスケープ --------
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    // 初期ロード
+    loadHistory();
+  </script>
+</body>
+</html>
