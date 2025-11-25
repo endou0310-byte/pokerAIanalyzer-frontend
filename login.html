@@ -133,7 +133,6 @@ const stored = {
 localStorage.setItem("pa_user", JSON.stringify(stored));
 // GitHub Pages 上の record.html へのフルパスにリダイレクト
 window.location.href = "/pokerAIanalyzer-frontend/record.html";
-
       } catch (err) {
         console.error("loginWithIdToken error:", err);
         showError("ネットワークエラーが発生しました。接続環境を確認してください。");
