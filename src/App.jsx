@@ -699,7 +699,7 @@ return (
     <button
       className="btn glow"
       onClick={() => {
-        window.location.href = "/history.html";
+        window.location.href = "history.html";
       }}
     >
       履歴
