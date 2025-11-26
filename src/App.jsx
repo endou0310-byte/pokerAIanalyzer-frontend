@@ -111,6 +111,29 @@ export default function App(){
     }
   }, []);
 
+// ==== default_stack を DB から取得 ====
+useEffect(() => {
+  const u = JSON.parse(localStorage.getItem("pa_user") || "null");
+  if (!u || !u.user_id) return;
+
+  (async () => {
+    try {
+      const resp = await fetch(`/settings/user_info?user_id=${u.user_id}`);
+      const json = await resp.json();
+      if (json.ok && json.user) {
+        const v = Number(json.user.default_stack);
+        if (Number.isFinite(v) && v > 0) {
+          setDefaultStack(v);
+          setHeroStack(v);
+        }
+      }
+    } catch (e) {
+      console.error("default_stack fetch failed:", e);
+    }
+  })();
+}, []);
+
+
   // プラン情報の取得
   useEffect(() => {
     const u = JSON.parse(localStorage.getItem("pa_user") || "null");
@@ -151,6 +174,12 @@ export default function App(){
   const [players, setPlayers] = useState(6);
   const [heroSeat, setHeroSeat] = useState("UTG");
   const [heroStack, setHeroStack] = useState(100);
+
+// 設定モーダル
+const [showSettings, setShowSettings] = useState(false);
+
+// default_stack（DB同期）
+const [defaultStack, setDefaultStack] = useState(100);
 
   /* engine */
 const [recording, setRecording] = useState(false);
@@ -706,17 +735,12 @@ return (
       履歴
     </button>
 
-    <button
-      className="btn glow"
-      onClick={() => {
-        localStorage.removeItem("pa_user");
-        localStorage.removeItem("pa_plan");
-        // ★ 相対パスに変更
-        window.location.href = "login.html";
-      }}
-    >
-      ログアウト
-    </button>
+<button
+  className="btn glow"
+  onClick={() => setShowSettings(true)}
+>
+  設定
+</button>
   </div>
 </header>
 
@@ -766,7 +790,7 @@ return (
         <label style={{marginTop:8}}>Hero Stack (BB)
           <input
             type="number"
-            value={heroStack}
+            value={heroStack ?? defaultStack}
             onChange={e=>setHeroStack(e.target.value)}
             disabled={recording}
             style={{width:"100%",marginTop:4}}
@@ -898,7 +922,7 @@ return (
   {isHero ? `${s} (YOU)` : s}
 </div>
 <div>
-  Stack: {(S?.stacks?.[i] ?? 100).toFixed(2)} BB
+  Stack: {(S?.stacks?.[i] ?? defaultStack).toFixed(2)} BB
 </div>
 {!!(S?.bets?.[i] ?? 0) && (
   <div style={{ fontSize: 11, opacity: 0.9 }}>Bet: {(S?.bets?.[i] ?? 0).toFixed(2)} BB</div>
@@ -1615,6 +1639,187 @@ return (
         数秒〜十数秒ほどかかる場合があります。
         <br />
         そのままお待ちください。
+      </div>
+    </div>
+  </div>
+)}
+{/* ===== 設定モーダル ===== */}
+{showSettings && (
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,.55)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 2000,
+    }}
+    onClick={(e) => {
+      if (e.target === e.currentTarget) setShowSettings(false);
+    }}
+  >
+    <div
+      style={{
+        width: 500,
+        maxWidth: "92vw",
+        background: "#0b1621",
+        border: "1px solid #203040",
+        borderRadius: 12,
+        padding: 20,
+        boxShadow: "0 12px 40px rgba(0,0,0,.45)",
+        color: "#e5e7eb",
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <h2 style={{ fontSize: 18, marginBottom: 16, textAlign: "center" }}>
+        設定
+      </h2>
+
+      {/* アカウント */}
+      <section style={{ marginBottom: 20 }}>
+        <h3 style={{ fontSize: 14, marginBottom: 8 }}>アカウント情報</h3>
+        <div style={{ fontSize: 12, lineHeight: 1.6 }}>
+          <div>メール：{userInfo?.email || "（取得中）"}</div>
+          <div>プラン：{plan?.toUpperCase()}</div>
+          <div>
+            今月の解析残り：{remainingMonth === null ? "∞" : remainingMonth}
+          </div>
+        </div>
+      </section>
+
+      {/* default_stack */}
+      <section style={{ marginBottom: 20 }}>
+        <h3 style={{ fontSize: 14, marginBottom: 8 }}>デフォルトスタック</h3>
+
+        <input
+          type="number"
+          value={defaultStack}
+          min={10}
+          max={500}
+          onChange={(e) => setDefaultStack(Number(e.target.value))}
+          onBlur={async () => {
+            try {
+              const u = JSON.parse(localStorage.getItem("pa_user") || "{}");
+              if (!u.user_id) return;
+
+              await fetch("/settings/default_stack", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  user_id: u.user_id,
+                  default_stack: defaultStack,
+                }),
+              });
+              setHeroStack(defaultStack);
+            } catch (e) {
+              alert("保存に失敗しました");
+            }
+          }}
+          style={{
+            width: "80px",
+            padding: "4px 8px",
+            borderRadius: 6,
+            border: "1px solid #374151",
+            background: "#020617",
+            color: "#e5e7eb",
+            fontSize: 13,
+          }}
+        />
+      </section>
+
+      {/* 履歴削除 */}
+      <section style={{ marginBottom: 20 }}>
+        <h3 style={{ fontSize: 14, marginBottom: 8 }}>履歴データ</h3>
+        <button
+          className="btn glow btn-danger"
+          onClick={async () => {
+            if (!window.confirm("本当にサーバー上の履歴をすべて削除しますか？")) return;
+
+            try {
+              const u = JSON.parse(localStorage.getItem("pa_user") || "{}");
+              const resp = await fetch("/history/delete_all", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: u.user_id }),
+              });
+              const json = await resp.json();
+              if (json.ok) {
+                alert("サーバー上の履歴を削除しました");
+              } else {
+                alert("削除に失敗しました");
+              }
+            } catch (e) {
+              alert("通信エラー");
+            }
+          }}
+        >
+          履歴をすべて削除
+        </button>
+      </section>
+
+      {/* サブスクリプション解約 */}
+      <section style={{ marginBottom: 20 }}>
+        <h3 style={{ fontSize: 14, marginBottom: 8 }}>サブスクリプション</h3>
+        <button
+          className="btn glow btn-danger"
+          onClick={async () => {
+            if (!window.confirm("定期課金を解約しますか？")) return;
+            try {
+              const u = JSON.parse(localStorage.getItem("pa_user") || "{}");
+              const resp = await fetch("/plan/cancel", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: u.user_id }),
+              });
+              const json = await resp.json();
+
+              if (json.ok) {
+                alert("解約手続きが完了しました（今期終了後に自動停止します）");
+              } else {
+                alert("解約に失敗しました");
+              }
+            } catch (e) {
+              alert("通信エラー");
+            }
+          }}
+        >
+          解約する
+        </button>
+      </section>
+
+      {/* サポート */}
+      <section style={{ marginBottom: 20 }}>
+        <h3 style={{ fontSize: 14, marginBottom: 8 }}>サポート</h3>
+        <button
+          className="btn"
+          onClick={() => window.open("https://docs.google.com/forms/xxxx", "_blank")}
+        >
+          ご意見・不具合報告
+        </button>
+      </section>
+
+      {/* ログアウト */}
+      <section style={{ marginBottom: 20 }}>
+        <h3 style={{ fontSize: 14, marginBottom: 8, color: "#f87171" }}>
+          アカウント操作
+        </h3>
+        <button
+          className="btn glow btn-danger"
+          onClick={() => {
+            localStorage.removeItem("pa_user");
+            localStorage.removeItem("pa_plan");
+            window.location.href = "login.html";
+          }}
+        >
+          ログアウト
+        </button>
+      </section>
+
+      <div style={{ textAlign: "right" }}>
+        <button className="btn" onClick={() => setShowSettings(false)}>
+          閉じる
+        </button>
       </div>
     </div>
   </div>
