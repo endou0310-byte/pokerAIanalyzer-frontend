@@ -99,16 +99,17 @@ export default function App(){
   // 未ログインなら public 側のログインへ
   useEffect(() => {
     const path = window.location.pathname;
-  const onLogin = path === "/login.html" || path.endsWith("/login.html");
+    const onLogin = path === "/login.html" || path.endsWith("/login.html");
 
-  const u = JSON.parse(localStorage.getItem("pa_user") || "null");
+    const u = JSON.parse(localStorage.getItem("pa_user") || "null");
 
-  // 未ログイン → 保護ページなら login へ
-  if (!u || !u.user_id) {
-    if (!onLogin) window.location.replace("/login.html");
-    return; // ここで終了（login 上では何もしない）
-  }
-   }, []);
+    // 未ログイン → 保護ページなら login へ
+    if (!u || !u.user_id) {
+      // ★ 先頭のスラッシュをやめて相対パスにする
+      if (!onLogin) window.location.replace("login.html");
+      return; // ここで終了（login 上では何もしない）
+    }
+  }, []);
 
   // プラン情報の取得
   useEffect(() => {
@@ -710,7 +711,8 @@ return (
       onClick={() => {
         localStorage.removeItem("pa_user");
         localStorage.removeItem("pa_plan");
-        window.location.href = "/login.html";
+        // ★ 相対パスに変更
+        window.location.href = "login.html";
       }}
     >
       ログアウト
