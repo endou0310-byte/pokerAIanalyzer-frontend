@@ -110,7 +110,17 @@ export default function App(){
       return; // ここで終了（login 上では何もしない）
     }
   }, []);
-
+// ログイン情報から userInfo をセット
+useEffect(() => {
+  try {
+    const u = JSON.parse(localStorage.getItem("pa_user") || "null");
+    if (u && u.email) {
+      setUserInfo({ email: u.email });
+    }
+  } catch (e) {
+    console.error("userInfo load failed:", e);
+  }
+}, []);
 // ==== default_stack を DB から取得 ====
 useEffect(() => {
   const u = JSON.parse(localStorage.getItem("pa_user") || "null");
@@ -118,7 +128,7 @@ useEffect(() => {
 
   (async () => {
     try {
-      const resp = await fetch(`/settings/user_info?user_id=${u.user_id}`);
+      const resp = await fetch(`${API_BASE}/settings/user_info?user_id=${u.user_id}`);
       const json = await resp.json();
       if (json.ok && json.user) {
         const v = Number(json.user.default_stack);
@@ -171,9 +181,12 @@ useEffect(() => {
   }, []);
 
   /* 左ペイン */
-  const [players, setPlayers] = useState(6);
-  const [heroSeat, setHeroSeat] = useState("UTG");
-  const [heroStack, setHeroStack] = useState(100);
+const [players, setPlayers] = useState(6);
+const [heroSeat, setHeroSeat] = useState("UTG");
+const [heroStack, setHeroStack] = useState(100);
+
+// ユーザー情報（メール表示用）
+const [userInfo, setUserInfo] = useState(null);
 
 // 設定モーダル
 const [showSettings, setShowSettings] = useState(false);
