@@ -37,13 +37,17 @@ export default function ResultModal({
     "解析結果が見つかりません。";
 
   // Q&A ログ
-const [conversation, setConversation] = useState([]);
-React.useEffect(() => {
-  // 履歴から開いた場合 result.conversation が入っているので初期化する
-  if (Array.isArray(result?.conversation)) {
-    setConversation(result.conversation);
-  }
-}, [result]);
+  const [conversation, setConversation] = useState([]);
+
+  React.useEffect(() => {
+    // 履歴から開いた場合 result.conversation が入っているので初期化する
+    if (Array.isArray(result?.conversation)) {
+      // ★ すでにモーダル内で会話が進んでいる場合は上書きしない
+      setConversation((prev) =>
+        prev.length === 0 ? result.conversation : prev
+      );
+    }
+  }, [result]);
 
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(false);
