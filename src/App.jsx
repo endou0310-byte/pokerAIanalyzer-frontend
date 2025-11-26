@@ -4,7 +4,8 @@ import CardPickerModal from "./components/CardPickerModal.jsx";
 import BoardPickerModal from "./components/BoardPickerModal.jsx";
 import ResultModal from "./components/ResultModal.jsx";  
 import * as E from "./lib/engine.js";
-
+// バックエンドのベースURL（.env の VITE_API_BASE）
+const API_BASE = import.meta.env.VITE_API_BASE || "";
 /* ====== layout utils ====== */
 function useSize(){
   const ref = useRef(null);
@@ -1705,40 +1706,41 @@ return (
       <section style={{ marginBottom: 20 }}>
         <h3 style={{ fontSize: 14, marginBottom: 8 }}>デフォルトスタック</h3>
 
-        <input
-          type="number"
-          value={defaultStack}
-          min={10}
-          max={500}
-          onChange={(e) => setDefaultStack(Number(e.target.value))}
-          onBlur={async () => {
-            try {
-              const u = JSON.parse(localStorage.getItem("pa_user") || "{}");
-              if (!u.user_id) return;
+<input
+  type="number"
+  value={defaultStack}
+  min={10}
+  max={500}
+  onChange={(e) => setDefaultStack(Number(e.target.value))}
+  onBlur={async () => {
+    try {
+      const u = JSON.parse(localStorage.getItem("pa_user") || "{}");
+      if (!u.user_id) return;
 
-              await fetch("/settings/default_stack", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  user_id: u.user_id,
-                  default_stack: defaultStack,
-                }),
-              });
-              setHeroStack(defaultStack);
-            } catch (e) {
-              alert("保存に失敗しました");
-            }
-          }}
-          style={{
-            width: "80px",
-            padding: "4px 8px",
-            borderRadius: 6,
-            border: "1px solid #374151",
-            background: "#020617",
-            color: "#e5e7eb",
-            fontSize: 13,
-          }}
-        />
+      const base = API_BASE || "";
+      await fetch(`${base}/settings/default_stack`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: u.user_id,
+          default_stack: defaultStack,
+        }),
+      });
+      setHeroStack(defaultStack);
+    } catch (e) {
+      alert("保存に失敗しました");
+    }
+  }}
+  style={{
+    width: "80px",
+    padding: "4px 8px",
+    borderRadius: 6,
+    border: "1px solid #374151",
+    background: "#020617",
+    color: "#e5e7eb",
+    fontSize: 13,
+  }}
+/>
       </section>
 
       {/* 履歴削除 */}
