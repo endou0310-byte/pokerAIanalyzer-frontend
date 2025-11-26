@@ -1742,66 +1742,77 @@ return (
   }}
 />
       </section>
+// 履歴削除
+<section style={{ marginBottom: 20 }}>
+  <h3 style={{ fontSize: 14, marginBottom: 8 }}>履歴データ</h3>
+  <button
+    className="btn glow btn-danger"
+    onClick={async () => {
+      if (!window.confirm("本当にサーバー上の履歴をすべて削除しますか？")) return;
 
-      {/* 履歴削除 */}
-      <section style={{ marginBottom: 20 }}>
-        <h3 style={{ fontSize: 14, marginBottom: 8 }}>履歴データ</h3>
-        <button
-          className="btn glow btn-danger"
-          onClick={async () => {
-            if (!window.confirm("本当にサーバー上の履歴をすべて削除しますか？")) return;
+      try {
+        const u = JSON.parse(localStorage.getItem("pa_user") || "{}");
+        if (!u.user_id) {
+          alert("ユーザー情報が取得できませんでした。再ログインしてください。");
+          return;
+        }
 
-            try {
-              const u = JSON.parse(localStorage.getItem("pa_user") || "{}");
-              const resp = await fetch("/history/delete_all", {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: u.user_id }),
-              });
-              const json = await resp.json();
-              if (json.ok) {
-                alert("サーバー上の履歴を削除しました");
-              } else {
-                alert("削除に失敗しました");
-              }
-            } catch (e) {
-              alert("通信エラー");
-            }
-          }}
-        >
-          履歴をすべて削除
-        </button>
-      </section>
+        const base = API_BASE || "";
+        const resp = await fetch(`${base}/history/delete_all`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: u.user_id }),
+        });
 
-      {/* サブスクリプション解約 */}
-      <section style={{ marginBottom: 20 }}>
-        <h3 style={{ fontSize: 14, marginBottom: 8 }}>サブスクリプション</h3>
-        <button
-          className="btn glow btn-danger"
-          onClick={async () => {
-            if (!window.confirm("定期課金を解約しますか？")) return;
-            try {
-              const u = JSON.parse(localStorage.getItem("pa_user") || "{}");
-              const resp = await fetch("/plan/cancel", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: u.user_id }),
-              });
-              const json = await resp.json();
+        const json = await resp.json();
+        if (json.ok) {
+          alert("サーバー上の履歴を削除しました");
+        } else {
+          alert("削除に失敗しました");
+        }
+      } catch (e) {
+        alert("通信エラー");
+      }
+    }}
+  >
+    履歴をすべて削除
+  </button>
+</section>
+// サブスクリプション解約
+<section style={{ marginBottom: 20 }}>
+  <h3 style={{ fontSize: 14, marginBottom: 8 }}>サブスクリプション</h3>
+  <button
+    className="btn glow btn-danger"
+    onClick={async () => {
+      if (!window.confirm("定期課金を解約しますか？")) return;
+      try {
+        const u = JSON.parse(localStorage.getItem("pa_user") || "{}");
+        if (!u.user_id) {
+          alert("ユーザー情報が取得できませんでした。再ログインしてください。");
+          return;
+        }
 
-              if (json.ok) {
-                alert("解約手続きが完了しました（今期終了後に自動停止します）");
-              } else {
-                alert("解約に失敗しました");
-              }
-            } catch (e) {
-              alert("通信エラー");
-            }
-          }}
-        >
-          解約する
-        </button>
-      </section>
+        const base = API_BASE || "";
+        const resp = await fetch(`${base}/plan/cancel`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: u.user_id }),
+        });
+
+        const json = await resp.json();
+        if (json.ok) {
+          alert("解約手続きが完了しました（今期終了後に自動停止します）");
+        } else {
+          alert("解約に失敗しました");
+        }
+      } catch (e) {
+        alert("通信エラー");
+      }
+    }}
+  >
+    解約する
+  </button>
+</section>
 
       {/* サポート */}
       <section style={{ marginBottom: 20 }}>
