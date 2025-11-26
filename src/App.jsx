@@ -1384,12 +1384,37 @@ return (
         決済へお進みください。
       </p>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {[
-          { id: "basic",    label: "Basic（月30回）",      note: "広告なし・追い質問つき", tag: "おすすめ" },
-          { id: "pro",      label: "Pro（月100回）",        note: "ヘビーユーザー向け",       tag: "たくさん解析したい方" },
-          { id: "premium",  label: "Premium（回数無制限）",  note: "プロ志向の方向け",         tag: "本気で打ち込みたい方" },
-        ].map((p) => {
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 12,
+          }}
+        >
+          {[
+            {
+              id: "basic",
+              label: "Basic（月30回）",
+              note: "広告なし・追い質問つき",
+              price: "月額 980円",
+              tag: "おすすめ",
+            },
+            {
+              id: "pro",
+              label: "Pro（月100回）",
+              note: "ヘビーユーザー向け",
+              price: "月額 1,480円",
+              tag: "たくさん解析したい方",
+            },
+            {
+              id: "premium",
+              label: "Premium（回数無制限）",
+              note: "プロ志向の方向け",
+              price: "月額 2,480円",
+              tag: "本気で打ち込みたい方",
+            },
+          ].map((p) => {
+
           const selected = planForCheckout === p.id;
           return (
             <label
@@ -1438,7 +1463,7 @@ return (
                 />
               </div>
 
-              {/* 中央：プラン名＋説明（広めのスペース） */}
+              {/* 中央：プラン名＋料金＋説明（広めのスペース） */}
               <div
                 style={{
                   flex: 1,
@@ -1452,7 +1477,7 @@ return (
                     fontSize: 14,
                     color: "#e5e7eb",
                     fontWeight: 600,
-                    marginBottom: 4,
+                    marginBottom: 2,
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -1460,6 +1485,20 @@ return (
                 >
                   {p.label}
                 </div>
+
+                {p.price && (
+                  <div
+                    style={{
+                      fontSize: 12,
+                      color: "#f97316", // ちょっと目立つオレンジ
+                      fontWeight: 600,
+                      marginBottom: 2,
+                    }}
+                  >
+                    {p.price}
+                  </div>
+                )}
+
                 <div
                   style={{
                     fontSize: 12,
