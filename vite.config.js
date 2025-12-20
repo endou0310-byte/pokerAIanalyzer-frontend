@@ -4,8 +4,8 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/',                // ★ ここだけ変更（ルート配信用）
+  base: '/pokerAIanalyzer-frontend/',
   build: {
-    outDir: 'docs',         // ここはそのまま（docs にビルド）
+    outDir: 'docs',
   },
 })
