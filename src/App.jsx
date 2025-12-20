@@ -1677,28 +1677,27 @@ return (
   >
     <div
       style={{
-        width: 520,
-        maxWidth: "92vw",
+        width: 560,
+        maxWidth: "94vw",
         background: "#0b1621",
         border: "1px solid #203040",
-        borderRadius: 12,
-        padding: 20,
+        borderRadius: 14,
+        padding: 22,
         boxShadow: "0 12px 40px rgba(0,0,0,.45)",
         color: "#e5e7eb",
       }}
       onClick={(e) => e.stopPropagation()}
     >
-      <h2 style={{ fontSize: 18, marginBottom: 14, textAlign: "center" }}>
+      <h2 style={{ fontSize: 18, marginBottom: 16, textAlign: "center" }}>
         設定
       </h2>
 
-      {/* 共通カード風スタイル（インラインで統一） */}
-      {/* アカウント */}
+      {/* ===== アカウント ===== */}
       <section
         style={{
           marginBottom: 14,
-          padding: 12,
-          borderRadius: 10,
+          padding: 14,
+          borderRadius: 12,
           border: "1px solid rgba(148,163,184,0.25)",
           background: "rgba(2,6,23,0.35)",
         }}
@@ -1707,7 +1706,7 @@ return (
           アカウント
         </h3>
 
-        <div style={{ fontSize: 12, lineHeight: 1.8 }}>
+        <div style={{ fontSize: 12, lineHeight: 1.9 }}>
           <div style={{ display: "flex", gap: 10 }}>
             <div style={{ width: 96, color: "#93a4c7" }}>メール</div>
             <div>{userInfo?.email || "（取得中）"}</div>
@@ -1725,12 +1724,12 @@ return (
         </div>
       </section>
 
-      {/* default_stack */}
+      {/* ===== 入力設定 ===== */}
       <section
         style={{
           marginBottom: 14,
-          padding: 12,
-          borderRadius: 10,
+          padding: 14,
+          borderRadius: 12,
           border: "1px solid rgba(148,163,184,0.25)",
           background: "rgba(2,6,23,0.35)",
         }}
@@ -1765,13 +1764,13 @@ return (
                   }),
                 });
                 setHeroStack(defaultStack);
-              } catch (e) {
+              } catch {
                 alert("保存に失敗しました");
               }
             }}
             style={{
-              width: 110,
-              padding: "6px 10px",
+              width: 120,
+              padding: "7px 10px",
               borderRadius: 8,
               border: "1px solid rgba(148,163,184,0.35)",
               background: "#020617",
@@ -1783,22 +1782,22 @@ return (
         </div>
       </section>
 
-      {/* 履歴削除 */}
+      {/* ===== データ管理（危険操作） ===== */}
       <section
         style={{
           marginBottom: 14,
-          padding: 12,
-          borderRadius: 10,
-          border: "1px solid rgba(248,113,113,0.25)",
-          background: "rgba(2,6,23,0.35)",
+          padding: 14,
+          borderRadius: 12,
+          border: "1px solid rgba(248,113,113,0.35)",
+          background: "rgba(60,10,10,0.35)",
         }}
       >
-        <h3 style={{ fontSize: 13, marginBottom: 10, color: "#fecaca" }}>
+        <h3 style={{ fontSize: 13, marginBottom: 8, color: "#fecaca" }}>
           データ管理
         </h3>
 
-        <div style={{ fontSize: 12, color: "#fca5a5", marginBottom: 8 }}>
-          この操作は取り消せません。
+        <div style={{ fontSize: 12, color: "#fca5a5", marginBottom: 10 }}>
+          この操作は取り消せません。すべての解析履歴が削除されます。
         </div>
 
         <button
@@ -1821,12 +1820,8 @@ return (
               });
 
               const json = await resp.json();
-              if (json.ok) {
-                alert("サーバー上の履歴を削除しました");
-              } else {
-                alert("削除に失敗しました");
-              }
-            } catch (e) {
+              alert(json.ok ? "サーバー上の履歴を削除しました" : "削除に失敗しました");
+            } catch {
               alert("通信エラー");
             }
           }}
@@ -1835,26 +1830,26 @@ return (
         </button>
       </section>
 
-      {/* サブスクリプション解約 */}
+      {/* ===== サブスクリプション ===== */}
       <section
         style={{
           marginBottom: 14,
-          padding: 12,
-          borderRadius: 10,
+          padding: 14,
+          borderRadius: 12,
           border: "1px solid rgba(248,113,113,0.25)",
           background: "rgba(2,6,23,0.35)",
         }}
       >
-        <h3 style={{ fontSize: 13, marginBottom: 10, color: "#fecaca" }}>
+        <h3 style={{ fontSize: 13, marginBottom: 8, color: "#fecaca" }}>
           サブスクリプション
         </h3>
 
-        <div style={{ fontSize: 12, color: "#fca5a5", marginBottom: 8 }}>
+        <div style={{ fontSize: 12, color: "#fca5a5", marginBottom: 10 }}>
           解約後も、当月（または契約期間）終了までは利用できます。
         </div>
 
         <button
-          className="btn glow btn-danger"
+          className="btn btn-danger"
           onClick={async () => {
             if (!window.confirm("定期課金を解約しますか？")) return;
             try {
@@ -1872,12 +1867,8 @@ return (
               });
 
               const json = await resp.json();
-              if (json.ok) {
-                alert("解約手続きが完了しました（今期終了後に自動停止します）");
-              } else {
-                alert("解約に失敗しました");
-              }
-            } catch (e) {
+              alert(json.ok ? "解約手続きが完了しました" : "解約に失敗しました");
+            } catch {
               alert("通信エラー");
             }
           }}
@@ -1886,12 +1877,12 @@ return (
         </button>
       </section>
 
-      {/* サポート */}
+      {/* ===== サポート ===== */}
       <section
         style={{
           marginBottom: 14,
-          padding: 12,
-          borderRadius: 10,
+          padding: 14,
+          borderRadius: 12,
           border: "1px solid rgba(148,163,184,0.25)",
           background: "rgba(2,6,23,0.35)",
         }}
@@ -1900,19 +1891,19 @@ return (
           サポート
         </h3>
         <button
-          className="btn"
+          className="btn btn-secondary"
           onClick={() => window.open("https://docs.google.com/forms/xxxx", "_blank")}
         >
           ご意見・不具合報告
         </button>
       </section>
 
-      {/* ログアウト */}
+      {/* ===== アカウント操作 ===== */}
       <section
         style={{
-          marginBottom: 14,
-          padding: 12,
-          borderRadius: 10,
+          marginBottom: 18,
+          padding: 14,
+          borderRadius: 12,
           border: "1px solid rgba(148,163,184,0.25)",
           background: "rgba(2,6,23,0.35)",
         }}
@@ -1921,7 +1912,7 @@ return (
           アカウント操作
         </h3>
         <button
-          className="btn glow btn-danger"
+          className="btn btn-secondary"
           onClick={() => {
             localStorage.removeItem("pa_user");
             localStorage.removeItem("pa_plan");
@@ -1933,15 +1924,13 @@ return (
       </section>
 
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-        <button className="btn" onClick={() => setShowSettings(false)}>
+        <button className="btn btn-secondary" onClick={() => setShowSettings(false)}>
           閉じる
         </button>
       </div>
     </div>
   </div>
 )}
-
-
 
 </>
 );
