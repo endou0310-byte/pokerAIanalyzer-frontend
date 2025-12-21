@@ -1664,168 +1664,148 @@ return (
     style={{
       position: "fixed",
       inset: 0,
-      background: "rgba(0,0,0,.55)",
+      background: "rgba(0,0,0,.6)",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       zIndex: 2000,
       padding: 16,
     }}
-    onClick={(e) => {
-      if (e.target === e.currentTarget) setShowSettings(false);
-    }}
+    onClick={(e) => e.target === e.currentTarget && setShowSettings(false)}
   >
     <div
       style={{
         width: 560,
         maxWidth: "94vw",
-        background: "#0b1621",
-        border: "1px solid #203040",
-        borderRadius: 14,
-        padding: 22,
-        boxShadow: "0 12px 40px rgba(0,0,0,.45)",
+        background: "linear-gradient(180deg,#0b1621,#020617)",
+        borderRadius: 16,
+        padding: 24,
+        boxShadow: "0 20px 60px rgba(0,0,0,.55)",
         color: "#e5e7eb",
       }}
       onClick={(e) => e.stopPropagation()}
     >
-      <h2 style={{ fontSize: 18, marginBottom: 16, textAlign: "center" }}>
+      <h2
+        style={{
+          fontSize: 18,
+          fontWeight: 600,
+          marginBottom: 20,
+          textAlign: "center",
+        }}
+      >
         設定
       </h2>
 
-      {/* ===== アカウント ===== */}
-      <section
-        style={{
-          marginBottom: 14,
-          padding: 14,
-          borderRadius: 12,
-          border: "1px solid rgba(148,163,184,0.25)",
-          background: "rgba(2,6,23,0.35)",
-        }}
-      >
-        <h3 style={{ fontSize: 13, marginBottom: 10, color: "#cbd5f5" }}>
-          アカウント
-        </h3>
+      {/* 共通カードスタイル */}
+      {[
+        /* ===== アカウント ===== */
+        {
+          title: "アカウント",
+          content: (
+            <div style={{ fontSize: 12, lineHeight: 1.9 }}>
+              {[
+                ["メール", userInfo?.email || "（取得中）"],
+                ["プラン", plan?.toUpperCase()],
+                ["今月の残り", remainingMonth === null ? "∞" : remainingMonth],
+              ].map(([label, value]) => (
+                <div key={label} style={{ display: "flex", gap: 12 }}>
+                  <div style={{ width: 96, color: "#94a3b8" }}>{label}</div>
+                  <div style={{ fontWeight: 500 }}>{value}</div>
+                </div>
+              ))}
+            </div>
+          ),
+        },
 
-        <div style={{ fontSize: 12, lineHeight: 1.9 }}>
-          <div style={{ display: "flex", gap: 10 }}>
-            <div style={{ width: 96, color: "#93a4c7" }}>メール</div>
-            <div>{userInfo?.email || "（取得中）"}</div>
-          </div>
-
-          <div style={{ display: "flex", gap: 10 }}>
-            <div style={{ width: 96, color: "#93a4c7" }}>プラン</div>
-            <div>{plan?.toUpperCase()}</div>
-          </div>
-
-          <div style={{ display: "flex", gap: 10 }}>
-            <div style={{ width: 96, color: "#93a4c7" }}>今月の残り</div>
-            <div>{remainingMonth === null ? "∞" : remainingMonth}</div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== 入力設定 ===== */}
-      <section
-        style={{
-          marginBottom: 14,
-          padding: 14,
-          borderRadius: 12,
-          border: "1px solid rgba(148,163,184,0.25)",
-          background: "rgba(2,6,23,0.35)",
-        }}
-      >
-        <h3 style={{ fontSize: 13, marginBottom: 10, color: "#cbd5f5" }}>
-          入力設定
-        </h3>
-
-        <div style={{ fontSize: 12, color: "#93a4c7", marginBottom: 8 }}>
-          デフォルトスタック（BB）
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <input
-            type="number"
-            value={defaultStack}
-            min={10}
-            max={500}
-            onChange={(e) => setDefaultStack(Number(e.target.value))}
-            onBlur={async () => {
-              try {
-                const u = JSON.parse(localStorage.getItem("pa_user") || "{}");
-                if (!u.user_id) return;
-
-                const base = API_BASE || "";
-                await fetch(`${base}/settings/default_stack`, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    user_id: u.user_id,
-                    default_stack: defaultStack,
-                  }),
-                });
-                setHeroStack(defaultStack);
-              } catch {
-                alert("保存に失敗しました");
-              }
-            }}
+        /* ===== 入力設定 ===== */
+        {
+          title: "入力設定",
+          content: (
+            <>
+              <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6 }}>
+                デフォルトスタック（BB）
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <input
+                  type="number"
+                  value={defaultStack}
+                  min={10}
+                  max={500}
+                  onChange={(e) => setDefaultStack(Number(e.target.value))}
+                  onBlur={async () => {
+                    try {
+                      const u = JSON.parse(localStorage.getItem("pa_user") || "{}");
+                      if (!u.user_id) return;
+                      await fetch(`${API_BASE || ""}/settings/default_stack`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          user_id: u.user_id,
+                          default_stack: defaultStack,
+                        }),
+                      });
+                      setHeroStack(defaultStack);
+                    } catch {
+                      alert("保存に失敗しました");
+                    }
+                  }}
+                  style={{
+                    width: 120,
+                    padding: "8px 10px",
+                    borderRadius: 8,
+                    border: "1px solid rgba(148,163,184,.3)",
+                    background: "#020617",
+                    color: "#e5e7eb",
+                    fontSize: 14,
+                  }}
+                />
+                <span style={{ fontSize: 12, color: "#94a3b8" }}>BB</span>
+              </div>
+            </>
+          ),
+        },
+      ].map(({ title, content }) => (
+        <section
+          key={title}
+          style={{
+            marginBottom: 18,
+            padding: 16,
+            borderRadius: 14,
+            border: "1px solid rgba(148,163,184,.2)",
+            background: "rgba(2,6,23,.4)",
+          }}
+        >
+          <h3
             style={{
-              width: 120,
-              padding: "7px 10px",
-              borderRadius: 8,
-              border: "1px solid rgba(148,163,184,0.35)",
-              background: "#020617",
-              color: "#e5e7eb",
               fontSize: 14,
+              fontWeight: 600,
+              marginBottom: 12,
+              color: "#e5e7eb",
             }}
-          />
-          <span style={{ fontSize: 12, color: "#93a4c7" }}>BB</span>
-        </div>
-      </section>
+          >
+            {title}
+          </h3>
+          {content}
+        </section>
+      ))}
 
       {/* ===== データ管理（危険操作） ===== */}
       <section
         style={{
-          marginBottom: 14,
-          padding: 14,
-          borderRadius: 12,
-          border: "1px solid rgba(248,113,113,0.35)",
-          background: "rgba(60,10,10,0.35)",
+          marginBottom: 18,
+          padding: 16,
+          borderRadius: 14,
+          background: "linear-gradient(180deg,#3b0a0a,#220505)",
+          border: "1px solid rgba(248,113,113,.45)",
         }}
       >
-        <h3 style={{ fontSize: 13, marginBottom: 8, color: "#fecaca" }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: "#fecaca", marginBottom: 6 }}>
           データ管理
         </h3>
-
-        <div style={{ fontSize: 12, color: "#fca5a5", marginBottom: 10 }}>
-          この操作は取り消せません。すべての解析履歴が削除されます。
+        <div style={{ fontSize: 12, color: "#fca5a5", marginBottom: 12 }}>
+          ⚠ この操作は元に戻せません。すべての解析履歴が完全に削除されます。
         </div>
-
-        <button
-          className="btn glow btn-danger"
-          onClick={async () => {
-            if (!window.confirm("本当にサーバー上の履歴をすべて削除しますか？")) return;
-
-            try {
-              const u = JSON.parse(localStorage.getItem("pa_user") || "{}");
-              if (!u.user_id) {
-                alert("ユーザー情報が取得できませんでした。再ログインしてください。");
-                return;
-              }
-
-              const base = API_BASE || "";
-              const resp = await fetch(`${base}/history/delete_all`, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: u.user_id }),
-              });
-
-              const json = await resp.json();
-              alert(json.ok ? "サーバー上の履歴を削除しました" : "削除に失敗しました");
-            } catch {
-              alert("通信エラー");
-            }
-          }}
-        >
+        <button className="btn btn-danger">
           履歴をすべて削除
         </button>
       </section>
@@ -1833,97 +1813,45 @@ return (
       {/* ===== サブスクリプション ===== */}
       <section
         style={{
-          marginBottom: 14,
-          padding: 14,
-          borderRadius: 12,
-          border: "1px solid rgba(248,113,113,0.25)",
-          background: "rgba(2,6,23,0.35)",
+          marginBottom: 18,
+          padding: 16,
+          borderRadius: 14,
+          border: "1px solid rgba(248,113,113,.25)",
+          background: "rgba(2,6,23,.4)",
         }}
       >
-        <h3 style={{ fontSize: 13, marginBottom: 8, color: "#fecaca" }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: "#fecaca", marginBottom: 6 }}>
           サブスクリプション
         </h3>
-
-        <div style={{ fontSize: 12, color: "#fca5a5", marginBottom: 10 }}>
-          解約後も、当月（または契約期間）終了までは利用できます。
+        <div style={{ fontSize: 12, color: "#fca5a5", marginBottom: 12 }}>
+          解約後も契約期間終了までは利用できます。
         </div>
+        <button className="btn btn-danger">解約する</button>
+      </section>
 
-        <button
-          className="btn btn-danger"
-          onClick={async () => {
-            if (!window.confirm("定期課金を解約しますか？")) return;
-            try {
-              const u = JSON.parse(localStorage.getItem("pa_user") || "{}");
-              if (!u.user_id) {
-                alert("ユーザー情報が取得できませんでした。再ログインしてください。");
-                return;
-              }
-
-              const base = API_BASE || "";
-              const resp = await fetch(`${base}/plan/cancel`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: u.user_id }),
-              });
-
-              const json = await resp.json();
-              alert(json.ok ? "解約手続きが完了しました" : "解約に失敗しました");
-            } catch {
-              alert("通信エラー");
-            }
+      {/* ===== サポート / アカウント操作 ===== */}
+      {[
+        { title: "サポート", label: "ご意見・不具合報告" },
+        { title: "アカウント操作", label: "ログアウト" },
+      ].map(({ title, label }) => (
+        <section
+          key={title}
+          style={{
+            marginBottom: 18,
+            padding: 16,
+            borderRadius: 14,
+            border: "1px solid rgba(148,163,184,.2)",
+            background: "rgba(2,6,23,.4)",
           }}
         >
-          解約する
-        </button>
-      </section>
+          <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>
+            {title}
+          </h3>
+          <button className="btn btn-secondary">{label}</button>
+        </section>
+      ))}
 
-      {/* ===== サポート ===== */}
-      <section
-        style={{
-          marginBottom: 14,
-          padding: 14,
-          borderRadius: 12,
-          border: "1px solid rgba(148,163,184,0.25)",
-          background: "rgba(2,6,23,0.35)",
-        }}
-      >
-        <h3 style={{ fontSize: 13, marginBottom: 10, color: "#cbd5f5" }}>
-          サポート
-        </h3>
-        <button
-          className="btn btn-secondary"
-          onClick={() => window.open("https://docs.google.com/forms/xxxx", "_blank")}
-        >
-          ご意見・不具合報告
-        </button>
-      </section>
-
-      {/* ===== アカウント操作 ===== */}
-      <section
-        style={{
-          marginBottom: 18,
-          padding: 14,
-          borderRadius: 12,
-          border: "1px solid rgba(148,163,184,0.25)",
-          background: "rgba(2,6,23,0.35)",
-        }}
-      >
-        <h3 style={{ fontSize: 13, marginBottom: 10, color: "#cbd5f5" }}>
-          アカウント操作
-        </h3>
-        <button
-          className="btn btn-secondary"
-          onClick={() => {
-            localStorage.removeItem("pa_user");
-            localStorage.removeItem("pa_plan");
-            window.location.href = "login.html";
-          }}
-        >
-          ログアウト
-        </button>
-      </section>
-
-      <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
         <button className="btn btn-secondary" onClick={() => setShowSettings(false)}>
           閉じる
         </button>
