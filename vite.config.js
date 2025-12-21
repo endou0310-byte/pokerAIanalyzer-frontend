@@ -4,8 +4,10 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/pokerAIanalyzer-frontend/',
+  base: "/",              // ← 独自ドメインでは必ず /
   build: {
-    outDir: 'docs',
+    outDir: "docs",
   },
 })
+
+
