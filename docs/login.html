@@ -2,95 +2,313 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>POKERGPT ログイン</title>
+  <title>Poker Analyzer | ログイン</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="css/styles.css" />
+
+  <!-- Vite/GitHub Pages の構成に合わせて root の styles.css を参照 -->
+  <link rel="stylesheet" href="./styles.css" />
+
   <style>
-    body {
-      background: #050910;
-      color: #f5f5f5;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
+    body{
+      background:#050910;
+      color:#f5f5f5;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
     }
-    .login-wrapper {
-      width: 100%;
-      max-width: 420px;
-      padding: 32px 24px;
-      background: rgba(10, 14, 25, 0.9);
-      border-radius: 16px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(120, 180, 255, 0.2);
+    .shell{
+      width:min(1040px, 100%);
+      display:grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap:18px;
+      align-items:stretch;
     }
-    .login-title {
-      font-size: 22px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      text-align: center;
+    @media (max-width: 920px){
+      .shell{ grid-template-columns: 1fr; }
     }
-    .login-sub {
+
+    .card{
+      background: rgba(10, 14, 25, 0.92);
+      border: 1px solid rgba(120,180,255,0.18);
+      border-radius: 18px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.55);
+      padding: 22px 22px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom: 14px;
+    }
+    .brand-left{
+      display:flex;
+      align-items:baseline;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .brand-title{
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      font-size: 16px;
+      color:#eaf2ff;
+    }
+    .badge{
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.22);
+      color:#b9c7da;
+      background: rgba(2,6,23,0.35);
+      white-space:nowrap;
+    }
+
+    .hero{
+      margin-top: 6px;
+    }
+    .hero h1{
+      margin: 10px 0 10px;
+      font-size: 26px;
+      line-height: 1.25;
+      letter-spacing: .2px;
+      color:#f3f7ff;
+    }
+    .hero p{
+      margin: 0;
+      color:#b7c0cf;
+      line-height: 1.8;
       font-size: 13px;
-      color: #b0b8c5;
-      text-align: center;
-      margin-bottom: 24px;
     }
-    .login-section-title {
+
+    .grid2{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 920px){
+      .grid2{ grid-template-columns:1fr; }
+    }
+
+    .panel{
+      border: 1px solid rgba(148,163,184,0.16);
+      background: rgba(2,6,23,0.35);
+      border-radius: 14px;
+      padding: 14px 14px;
+    }
+    .panel h3{
+      margin: 0 0 8px;
       font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 8px;
+      color:#cfe0ff;
+      letter-spacing:.2px;
+    }
+    .list{
+      margin: 0;
+      padding-left: 18px;
+      color:#b7c0cf;
+      font-size: 12px;
+      line-height: 1.75;
+    }
+    .steps{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin:0;
+      padding:0;
+      list-style:none;
+      color:#b7c0cf;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    .step{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .step .n{
+      flex:0 0 auto;
+      width:22px;
+      height:22px;
+      border-radius:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 12px;
+      font-weight: 700;
+      color:#0b1220;
+      background: rgba(96,165,250,0.95);
+    }
+    .muted{
+      color:#8d99ad;
+    }
+
+    /* right card */
+    .login-title{
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 6px;
+      text-align:left;
+    }
+    .login-sub{
+      font-size: 12px;
+      color:#b0b8c5;
+      margin: 0 0 14px;
+      line-height:1.7;
+    }
+    .login-section-title{
+      font-size: 12px;
+      font-weight: 700;
+      margin: 10px 0 8px;
       color: #9fb4ff;
     }
-    .google-btn-wrap {
-      display: flex;
-      justify-content: center;
-      margin: 16px 0 8px;
+    .google-btn-wrap{
+      display:flex;
+      justify-content:flex-start;
+      margin: 10px 0 8px;
     }
-    .debug-info {
-      margin-top: 16px;
-      font-size: 12px;
-      color: #808aa0;
-      line-height: 1.6;
-    }
-    .login-error {
-      margin-top: 12px;
+    .login-error{
+      margin-top: 10px;
       font-size: 12px;
       color: #ff7b7b;
+      line-height:1.6;
+    }
+    .fineprint{
+      margin-top: 12px;
+      font-size: 11px;
+      color:#7f8aa0;
+      line-height: 1.7;
+    }
+    .links{
+      margin-top: 12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      font-size: 11px;
+    }
+    .links a{
+      color:#93c5fd;
+      text-decoration:none;
+    }
+    .links a:hover{ text-decoration:underline; }
+
+    .mini-badge-row{
+      margin-top: 12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
     }
   </style>
 
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
+
 <body>
-  <div class="login-wrapper">
-    <div class="login-title">Poker Analyzer ログイン</div>
-    <div class="login-sub">
-      Google アカウントでログインして、ハンド解析と履歴管理を利用できます。
-    </div>
+  <div class="shell">
+    <!-- Left: LP-like explanation -->
+    <section class="card">
+      <div class="brand">
+        <div class="brand-left">
+          <div class="brand-title">Poker Analyzer</div>
+          <div class="badge">キャッシュゲーム向け</div>
+          <div class="badge">記録 → 解析 → 履歴</div>
+        </div>
+        <div class="badge muted">開発版</div>
+      </div>
 
-    <div class="login-section-title">Google でログイン</div>
-    <div id="google-login-button" class="google-btn-wrap"></div>
+      <div class="hero">
+        <h1>プレイ直後に、ハンドを整理して次に活かす</h1>
+        <p>
+          Poker Analyzer は、アクションを時系列で入力し、状況に応じた考え方を文章で確認できるツールです。<br />
+          履歴管理と追い質問で「なぜそうなるか」まで掘り下げられます（プランにより回数制限あり）。
+        </p>
+      </div>
 
-    <div id="login-error" class="login-error" style="display:none;"></div>
+      <div class="grid2">
+        <div class="panel">
+          <h3>できること</h3>
+          <ul class="list">
+            <li>座席・スタック・アクションを入力してハンドを再現</li>
+            <li>解析結果を Markdown で読みやすく表示</li>
+            <li>履歴に保存して、後から見返せる</li>
+            <li>追い質問で論点を深掘り（Basic 以上）</li>
+          </ul>
+        </div>
 
-    <div class="debug-info">
-      ・初回ログイン時にユーザー情報が DB に作成されます。<br />
-      ・ログイン後はハンド記録画面へ自動的に移動します。<br />
-      ・開発中エラーが出る場合はコンソールのログも確認してください。
-    </div>
+        <div class="panel">
+          <h3>使い方（3ステップ）</h3>
+          <ul class="steps">
+            <li class="step"><div class="n">1</div><div>Google でログイン（履歴とプラン判定のため）</div></li>
+            <li class="step"><div class="n">2</div><div>ハンドを記録（座席/スタック/アクション/ボード）</div></li>
+            <li class="step"><div class="n">3</div><div>解析して結果を確認 → 必要なら追い質問</div></li>
+          </ul>
+        </div>
+
+        <div class="panel">
+          <h3>想定ユーザー</h3>
+          <ul class="list">
+            <li>ライブ・オンライン問わず、振り返りを習慣化したい人</li>
+            <li>自分のプレイの「理由」を言語化したい人</li>
+            <li>履歴を貯めて改善点を追いたい人</li>
+          </ul>
+        </div>
+
+        <div class="panel">
+          <h3>プラン（目安）</h3>
+          <ul class="list">
+            <li>Basic：月30回（広告なし・追い質問）</li>
+            <li>Pro：月100回（ヘビーユーザー向け）</li>
+            <li>Premium：無制限（本気で打ち込みたい方向け）</li>
+          </ul>
+          <div class="muted" style="margin-top:6px;font-size:11px;line-height:1.6;">
+            ※実際の表示・購入はログイン後の「プラン変更」から行えます。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: login -->
+    <aside class="card">
+      <div class="login-title">ログイン</div>
+      <p class="login-sub">
+        履歴保存・プラン判定のため、利用にはログインが必要です。<br />
+        ログイン後はハンド記録画面へ移動します。
+      </p>
+
+      <div class="login-section-title">Google で続ける</div>
+      <div id="google-login-button" class="google-btn-wrap"></div>
+
+      <div id="login-error" class="login-error" style="display:none;"></div>
+
+      <div class="mini-badge-row">
+        <div class="badge">履歴保存</div>
+        <div class="badge">プラン判定</div>
+        <div class="badge">追い質問</div>
+      </div>
+
+      <div class="fineprint">
+        ・初回ログイン時にユーザー情報が DB に作成されます。<br />
+        ・この端末には user_id / email 等の最小情報を保存します（解析の紐付け用）。<br />
+        ・不具合が出る場合はブラウザのコンソールも確認してください。
+      </div>
+
+      <div class="links">
+        <!-- 既存導線と整合（未作成なら後で用意） -->
+        <a href="privacy.html" target="_blank" rel="noreferrer">プライバシーポリシー</a>
+        <a href="terms.html" target="_blank" rel="noreferrer">利用規約</a>
+      </div>
+    </aside>
   </div>
 
   <script type="module">
-// ======== 1) backend の URL を決める =========
-const API_BASE = "https://poker-backend-production-64cf.up.railway.app"; // ← Railway の URL に固定
-
+    // ======== 1) backend の URL =========
+    const API_BASE = "https://poker-backend-production-64cf.up.railway.app";
 
     // ======== 2) Google クライアント ID =========
-    // ※ここは「Google Cloud Console で発行した Web クライアント ID」を直接書いてください
-    //   （Railway の GOOGLE_CLIENT_ID は backend 用なので、フロントからは見えません）
     const GOOGLE_CLIENT_ID = "599236787224-kig324ieevvr7b7q0haqeutj0qehc2m8.apps.googleusercontent.com";
 
     const errorBox = document.getElementById("login-error");
@@ -99,6 +317,14 @@ const API_BASE = "https://poker-backend-production-64cf.up.railway.app"; // ← 
       errorBox.textContent = message;
       errorBox.style.display = "block";
     }
+
+    // ======== 0) ログイン済みなら index へ =========
+    try {
+      const u = JSON.parse(localStorage.getItem("pa_user") || "null");
+      if (u && u.user_id) {
+        window.location.replace("index.html");
+      }
+    } catch {}
 
     // ======== 3) backend に id_token を送ってログイン =========
     async function loginWithIdToken(idToken) {
@@ -124,15 +350,16 @@ const API_BASE = "https://poker-backend-production-64cf.up.railway.app"; // ← 
           return;
         }
 
-const stored = {
-          user_id: user.id,                             // ← user_id に合わせる
+        const stored = {
+          user_id: user.id,
           name: user.display_name || user.name || "",
           email: user.email || "",
           plan: user.plan || null,
         };
-localStorage.setItem("pa_user", JSON.stringify(stored));
-// GitHub Pages 上の record.html へ確実に飛ばす
-window.location.href = "index.html";
+        localStorage.setItem("pa_user", JSON.stringify(stored));
+
+        // login → index（相対パスで統一）
+        window.location.href = "index.html";
 
       } catch (err) {
         console.error("loginWithIdToken error:", err);
@@ -173,9 +400,6 @@ window.location.href = "index.html";
           shape: "pill",
         }
       );
-
-      // 必要なら One Tap を有効化することも可能（とりあえずコメントアウト）
-      // window.google.accounts.id.prompt();
     };
   </script>
 </body>
