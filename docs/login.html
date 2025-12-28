@@ -56,6 +56,40 @@
       backdrop-filter: blur(10px);
     }
 
+    /* === 追加：ヒーローカードに背景画像を差し込む === */
+    .hero-card{
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-visual{
+      position: absolute;
+      right: -40px;
+      bottom: -30px;
+      width: min(520px, 60%);
+      height: auto;
+      opacity: 0.35;              /* 文字を邪魔しない濃さ */
+      filter: blur(0px);
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+    }
+
+    /* 追加：文字を前面に出す（画像の上に載せる） */
+    .hero-content{
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 追加：読みやすさ用のうっすら暗幕（必要なら） */
+    .hero-dim{
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(0,0,0,0.0), rgba(0,0,0,0.35));
+      z-index: 0;
+      pointer-events: none;
+    }
+
     /* Brand & Hero */
     .brand {
       display: flex;
@@ -171,24 +205,30 @@
 <body>
   <div class="shell">
     <div class="main-grid">
-      <section class="card">
-        <div class="brand">
-          <div class="brand-title">Poker Analyzer</div>
-          <div class="badge-dev">BETA</div>
-        </div>
+      <section class="card hero-card">
+        <div class="hero-dim"></div>
 
-        <div class="hero">
-          <h1>プレイ直後に、ハンドを整理して次に活かす</h1>
-          <p>
-            Poker Analyzerは、ポーカーのハンドを時系列で入力し、AIが状況に応じた最適な思考プロセスを言語化する解析ツールです。
-          </p>
-          <div class="feature-tags">
-            <span class="tag">ハンド再現</span>
-            <span class="tag">AI解析</span>
-            <span class="tag">履歴管理</span>
-            <span class="tag">深掘り質問</span>
+        <div class="hero-content">
+          <div class="brand">
+            <div class="brand-title">Poker Analyzer</div>
+            <div class="badge-dev">BETA</div>
+          </div>
+
+          <div class="hero">
+            <h1>プレイ直後に、ハンドを整理して次に活かす</h1>
+            <p>
+              Poker Analyzerは、ポーカーのハンドを時系列で入力し、AIが状況に応じた最適な思考プロセスを言語化する解析ツールです。
+            </p>
+            <div class="feature-tags">
+              <span class="tag">ハンド再現</span>
+              <span class="tag">AI解析</span>
+              <span class="tag">履歴管理</span>
+              <span class="tag">深掘り質問</span>
+            </div>
           </div>
         </div>
+
+        <img class="hero-visual" src="./img/login-hero.png" alt="" aria-hidden="true" />
       </section>
 
       <aside class="card login-box">
