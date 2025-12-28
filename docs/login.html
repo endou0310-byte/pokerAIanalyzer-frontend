@@ -197,6 +197,30 @@
       border-radius: 4px;
       border: 1px solid #334155;
     }
+      /* ===== 追加：ヒーロー画像枠 ===== */
+  .hero-media{
+    margin-top: 18px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(120, 180, 255, 0.18);
+    background: rgba(2, 6, 23, 0.35);
+    box-shadow: 0 18px 46px rgba(0,0,0,0.45);
+  }
+  .hero-media img{
+    width: 100%;
+    height: auto;
+    display: block;
+    opacity: 0.92;
+    transform: scale(1.02); /* ほんの少しだけ面を埋める */
+  }
+
+  /* 画像の上に薄いグラデを重ねて文字の世界観に馴染ませる（任意） */
+  .hero-media::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+  }
   </style>
 
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -228,7 +252,7 @@
           </div>
         </div>
 
-        <img class="hero-visual" src="./img/login-hero.png" alt="" aria-hidden="true" />
+        <img class="hero-visual" src="img/login-hero.png" alt="" aria-hidden="true" />
       </section>
 
       <aside class="card login-box">
