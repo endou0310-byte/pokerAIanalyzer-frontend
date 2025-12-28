@@ -6,6 +6,230 @@ import ResultModal from "./components/ResultModal.jsx";
 import * as E from "./lib/engine.js";
 // バックエンドのベースURL（.env の VITE_API_BASE）
 const API_BASE = import.meta.env.VITE_API_BASE || "";
+
+function SettingsModal({
+  open,
+  onClose,
+  userInfo,
+  plan,
+  remainingMonth,
+  defaultStack,
+  setDefaultStack,
+}) {
+  const [activeTab, setActiveTab] = React.useState("account");
+
+  if (!open) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,.6)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 2000,
+        padding: 16,
+      }}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div
+        style={{
+          width: 820,
+          maxWidth: "96vw",
+          height: 520,
+          background: "linear-gradient(180deg,#0b1621,#020617)",
+          borderRadius: 16,
+          boxShadow: "0 20px 60px rgba(0,0,0,.55)",
+          color: "#e5e7eb",
+          display: "flex",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+{/* 左ナビ */}
+<aside style={{ width: 220, padding: 16, borderRight: "1px solid rgba(148,163,184,0.18)" }}>
+  <div style={{ fontSize: 11, color: "rgba(203,213,225,0.7)", margin: "6px 8px 8px" }}>
+    アカウント
+  </div>
+  {[
+    ["account", "アカウント"],
+    ["plan", "プラン"],
+  ].map(([id, label]) => (
+    <button
+      key={id}
+      onClick={() => setActiveTab(id)}
+      style={{
+        width: "100%",
+        padding: "10px 12px",
+        textAlign: "left",
+        borderRadius: 10,
+        border: "1px solid transparent",
+        background: activeTab === id ? "rgba(99,102,241,.15)" : "transparent",
+        color: "#e5e7eb",
+        marginBottom: 6,
+      }}
+    >
+      {label}
+    </button>
+  ))}
+
+  <div style={{ height: 12 }} />
+
+  <div style={{ fontSize: 11, color: "rgba(203,213,225,0.7)", margin: "6px 8px 8px" }}>
+    プレイ設定
+  </div>
+  {[
+    ["input", "入力設定"],
+    ["analysis", "解析設定"],
+  ].map(([id, label]) => (
+    <button
+      key={id}
+      onClick={() => setActiveTab(id)}
+      style={{
+        width: "100%",
+        padding: "10px 12px",
+        textAlign: "left",
+        borderRadius: 10,
+        border: "1px solid transparent",
+        background: activeTab === id ? "rgba(99,102,241,.15)" : "transparent",
+        color: "#e5e7eb",
+        marginBottom: 6,
+      }}
+    >
+      {label}
+    </button>
+  ))}
+
+  <div style={{ height: 12 }} />
+
+  <div style={{ fontSize: 11, color: "rgba(203,213,225,0.7)", margin: "6px 8px 8px" }}>
+    サポート
+  </div>
+  {[
+    ["support", "サポート"],
+    ["data", "データ管理"],
+  ].map(([id, label]) => (
+    <button
+      key={id}
+      onClick={() => setActiveTab(id)}
+      style={{
+        width: "100%",
+        padding: "10px 12px",
+        textAlign: "left",
+        borderRadius: 10,
+        border: "1px solid transparent",
+        background: activeTab === id ? "rgba(99,102,241,.15)" : "transparent",
+        color: id === "data" ? "#fca5a5" : "#e5e7eb",
+        marginBottom: 6,
+      }}
+    >
+      {label}
+    </button>
+  ))}
+</aside>
+
+{/* 右ペイン */}
+<main style={{ flex: 1, padding: 24, overflow: "auto" }}>
+  {activeTab === "account" && (
+    <>
+      <h3 style={{ marginTop: 0 }}>アカウント</h3>
+      <div style={{ color: "#cbd5e1", lineHeight: 1.9 }}>
+        <div>メール：{userInfo?.email || "-"}</div>
+        <div>プラン：{plan ? plan.toUpperCase() : "-"}</div>
+        <div>今月の残り解析：{remainingMonth === null ? "∞" : `${remainingMonth} 回`}</div>
+      </div>
+    </>
+  )}
+
+  {activeTab === "input" && (
+    <>
+      <h3 style={{ marginTop: 0 }}>入力設定</h3>
+      <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 10 }}>
+        新規ハンド作成時の初期スタック（BB）に反映されます。
+      </div>
+      <input
+        type="number"
+        value={defaultStack}
+        onChange={(e) => setDefaultStack(Number(e.target.value))}
+        min={1}
+      />
+    </>
+  )}
+
+  {activeTab === "analysis" && (
+    <>
+      <h3 style={{ marginTop: 0 }}>解析設定</h3>
+      <div style={{ fontSize: 12, color: "#9ca3af", lineHeight: 1.8 }}>
+        現在はキャッシュゲーム専用です。解析ロジック自体は固定で、表示スタイルのみ今後調整できるようにします。
+      </div>
+
+      <div style={{ marginTop: 14, padding: 12, borderRadius: 12, border: "1px solid rgba(148,163,184,0.18)", background: "rgba(2,6,23,0.35)" }}>
+        <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>説明の詳しさ</div>
+        <div style={{ fontSize: 12, color: "#9ca3af" }}>
+          （準備中）短い / 標準 / 詳しい を選べるようにする予定です。
+        </div>
+      </div>
+    </>
+  )}
+
+  {activeTab === "plan" && (
+    <>
+      <h3 style={{ marginTop: 0 }}>プラン</h3>
+      <div style={{ color: "#cbd5e1", lineHeight: 1.9 }}>
+        <div>現在：{plan ? plan.toUpperCase() : "-"}</div>
+        <div>今月の残り解析：{remainingMonth === null ? "∞" : `${remainingMonth} 回`}</div>
+      </div>
+
+      <div style={{ marginTop: 12, fontSize: 12, color: "#9ca3af" }}>
+        プラン変更は右上の「プラン変更」から行えます。
+      </div>
+    </>
+  )}
+
+  {activeTab === "support" && (
+    <>
+      <h3 style={{ marginTop: 0 }}>サポート</h3>
+      <div style={{ fontSize: 12, color: "#9ca3af", lineHeight: 1.9 }}>
+        ご意見・不具合報告はお問い合わせからお願いします。
+      </div>
+
+      <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
+        <a href="https://forms.gle/" target="_blank" rel="noreferrer" style={{ color: "#93c5fd", textDecoration: "none" }}>
+          お問い合わせ（Googleフォーム）
+        </a>
+
+        {/* 実ファイルを置くなら privacy.html / terms.html 等に差し替え */}
+        <a href="privacy.html" target="_blank" rel="noreferrer" style={{ color: "#93c5fd", textDecoration: "none" }}>
+          プライバシーポリシー
+        </a>
+        <a href="terms.html" target="_blank" rel="noreferrer" style={{ color: "#93c5fd", textDecoration: "none" }}>
+          利用規約
+        </a>
+      </div>
+    </>
+  )}
+
+  {activeTab === "data" && (
+    <>
+      <h3 style={{ marginTop: 0, color: "#fecaca" }}>データ管理</h3>
+      <div style={{ fontSize: 12, color: "#9ca3af", lineHeight: 1.8 }}>
+        データ削除は元に戻せません。
+      </div>
+
+      {/* ここは “本当に削除する機能” になるので、まずは無効化を推奨 */}
+      <button className="btn btn-danger" disabled style={{ marginTop: 12, opacity: 0.6, cursor: "not-allowed" }}>
+        履歴をすべて削除（準備中）
+      </button>
+    </>
+  )}
+</main>
+
+      </div>
+    </div>
+  );
+}
+
 /* ====== layout utils ====== */
 function useSize(){
   const ref = useRef(null);
@@ -97,35 +321,34 @@ export default function App(){
   const [showPlanModal, setShowPlanModal] = useState(false);
   const [planForCheckout, setPlanForCheckout] = useState("basic");
 
-  // 未ログインなら public 側のログインへ
-  useEffect(() => {
-    const path = window.location.pathname;
-    const onLogin = path === "/login.html" || path.endsWith("/login.html");
+// 認証状態（B案：未ログインでも画面に入れる）
+const [auth, setAuth] = useState({ loggedIn: false, user: null });
 
-    const u = JSON.parse(localStorage.getItem("pa_user") || "null");
-
-    // 未ログイン → 保護ページなら login へ
-    if (!u || !u.user_id) {
-      // ★ 先頭のスラッシュをやめて相対パスにする
-      if (!onLogin) window.location.replace("login.html");
-      return; // ここで終了（login 上では何もしない）
-    }
-  }, []);
-// ログイン情報から userInfo をセット
 useEffect(() => {
   try {
     const u = JSON.parse(localStorage.getItem("pa_user") || "null");
-    if (u && u.email) {
-      setUserInfo({ email: u.email });
+    if (u && u.user_id) {
+      setAuth({ loggedIn: true, user: u });
+    } else {
+      setAuth({ loggedIn: false, user: null });
     }
-  } catch (e) {
-    console.error("userInfo load failed:", e);
+  } catch {
+    setAuth({ loggedIn: false, user: null });
   }
 }, []);
+
+// auth から userInfo をセット（未ログインは null）
+useEffect(() => {
+  if (auth.loggedIn && auth.user?.email) {
+    setUserInfo({ email: auth.user.email });
+  } else {
+    setUserInfo(null);
+  }
+}, [auth.loggedIn, auth.user]);
+
 // ==== default_stack を DB から取得 ====
 useEffect(() => {
-  const u = JSON.parse(localStorage.getItem("pa_user") || "null");
-  if (!u || !u.user_id) return;
+  if (!auth.loggedIn || !auth.user?.user_id) return;
 
   (async () => {
     try {
@@ -410,6 +633,13 @@ function buildPayload() {
 async function doAnalyze() {
   if (analyzing) return;
 
+  // B案：解析はログイン必須
+  if (!auth.loggedIn) {
+    alert("解析するにはログインが必要です。ログイン画面へ移動します。");
+    window.location.href = "login.html";
+    return;
+  }
+
   // 新しい解析開始時に追い質問ログと historyId / handId をリセット
   setConversation([]);
   setHistoryId(null);
@@ -692,13 +922,13 @@ async function sendFollowup() {
     );
 
   // 残り回数が 0 のときは解析不可
-  const canAnalyze =
-    !recording &&
-    !!S &&
-    heroCards.length === 2 &&
-    hasActions &&
-    (remainingMonth === null || remainingMonth > 0);
-
+const canAnalyze =
+  auth.loggedIn &&
+  !recording &&
+  !!S &&
+  heroCards.length === 2 &&
+  hasActions &&
+  (remainingMonth === null || remainingMonth > 0);
   /* UI */
 
 return (
@@ -732,11 +962,10 @@ return (
       </div>
     )}
 
+{auth.loggedIn ? (
+  <>
     {/* プラン変更ボタン */}
-    <button
-      className="btn"
-      onClick={() => setShowPlanModal(true)}
-    >
+    <button className="btn" onClick={() => setShowPlanModal(true)}>
       プラン変更
     </button>
 
@@ -749,15 +978,33 @@ return (
       履歴
     </button>
 
-<button
-  className="btn glow"
-  onClick={() => setShowSettings(true)}
->
-  設定
-</button>
+    <button className="btn glow" onClick={() => setShowSettings(true)}>
+      設定
+    </button>
+  </>
+) : (
+  <>
+    <button className="btn glow btn-accent" onClick={() => (window.location.href = "login.html")}>
+      ログイン
+    </button>
+  </>
+)}
   </div>
 </header>
 
+{!auth.loggedIn && (
+  <div className="login-banner">
+    <div className="login-banner__title">Poker Analyzer</div>
+    <div className="login-banner__text">
+      ハンド記録UIは体験できます。解析・履歴・課金機能はログインが必要です。
+    </div>
+    <div className="login-banner__actions">
+      <button className="btn glow btn-accent" onClick={() => (window.location.href = "login.html")}>
+        Googleでログインして解析する
+      </button>
+    </div>
+  </div>
+)}
 
 
     <main className="page">
@@ -1621,6 +1868,17 @@ return (
   </div>
 )}
 
+{/* ===== 設定モーダル ===== */}
+<SettingsModal
+  open={showSettings}
+  onClose={() => setShowSettings(false)}
+  userInfo={userInfo}
+  plan={plan}
+  remainingMonth={remainingMonth}
+  defaultStack={defaultStack}
+  setDefaultStack={setDefaultStack}
+/>
+
 {analyzing && (
   <div
     style={{
@@ -1653,208 +1911,6 @@ return (
         数秒〜十数秒ほどかかる場合があります。
         <br />
         そのままお待ちください。
-      </div>
-    </div>
-  </div>
-)}
-
-{/* ===== 設定モーダル ===== */}
-{showSettings && (
-  <div
-    style={{
-      position: "fixed",
-      inset: 0,
-      background: "rgba(0,0,0,.6)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 2000,
-      padding: 16,
-    }}
-    onClick={(e) => e.target === e.currentTarget && setShowSettings(false)}
-  >
-    <div
-      style={{
-        width: 560,
-        maxWidth: "94vw",
-        background: "linear-gradient(180deg,#0b1621,#020617)",
-        borderRadius: 16,
-        padding: 24,
-        boxShadow: "0 20px 60px rgba(0,0,0,.55)",
-        color: "#e5e7eb",
-      }}
-      onClick={(e) => e.stopPropagation()}
-    >
-      <h2
-        style={{
-          fontSize: 18,
-          fontWeight: 600,
-          marginBottom: 20,
-          textAlign: "center",
-        }}
-      >
-        設定
-      </h2>
-
-      {/* 共通カードスタイル */}
-      {[
-        /* ===== アカウント ===== */
-        {
-          title: "アカウント",
-          content: (
-            <div style={{ fontSize: 12, lineHeight: 1.9 }}>
-              {[
-                ["メール", userInfo?.email || "（取得中）"],
-                ["プラン", plan?.toUpperCase()],
-                ["今月の残り", remainingMonth === null ? "∞" : remainingMonth],
-              ].map(([label, value]) => (
-                <div key={label} style={{ display: "flex", gap: 12 }}>
-                  <div style={{ width: 96, color: "#94a3b8" }}>{label}</div>
-                  <div style={{ fontWeight: 500 }}>{value}</div>
-                </div>
-              ))}
-            </div>
-          ),
-        },
-
-        /* ===== 入力設定 ===== */
-        {
-          title: "入力設定",
-          content: (
-            <>
-              <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6 }}>
-                デフォルトスタック（BB）
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <input
-                  type="number"
-                  value={defaultStack}
-                  min={10}
-                  max={500}
-                  onChange={(e) => setDefaultStack(Number(e.target.value))}
-                  onBlur={async () => {
-                    try {
-                      const u = JSON.parse(localStorage.getItem("pa_user") || "{}");
-                      if (!u.user_id) return;
-                      await fetch(`${API_BASE || ""}/settings/default_stack`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          user_id: u.user_id,
-                          default_stack: defaultStack,
-                        }),
-                      });
-                      setHeroStack(defaultStack);
-                    } catch {
-                      alert("保存に失敗しました");
-                    }
-                  }}
-                  style={{
-                    width: 120,
-                    padding: "8px 10px",
-                    borderRadius: 8,
-                    border: "1px solid rgba(148,163,184,.3)",
-                    background: "#020617",
-                    color: "#e5e7eb",
-                    fontSize: 14,
-                  }}
-                />
-                <span style={{ fontSize: 12, color: "#94a3b8" }}>BB</span>
-              </div>
-            </>
-          ),
-        },
-      ].map(({ title, content }) => (
-        <section
-          key={title}
-          style={{
-            marginBottom: 18,
-            padding: 16,
-            borderRadius: 14,
-            border: "1px solid rgba(148,163,184,.2)",
-            background: "rgba(2,6,23,.4)",
-          }}
-        >
-          <h3
-            style={{
-              fontSize: 14,
-              fontWeight: 600,
-              marginBottom: 12,
-              color: "#e5e7eb",
-            }}
-          >
-            {title}
-          </h3>
-          {content}
-        </section>
-      ))}
-
-      {/* ===== データ管理（危険操作） ===== */}
-      <section
-        style={{
-          marginBottom: 18,
-          padding: 16,
-          borderRadius: 14,
-          background: "linear-gradient(180deg,#3b0a0a,#220505)",
-          border: "1px solid rgba(248,113,113,.45)",
-        }}
-      >
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: "#fecaca", marginBottom: 6 }}>
-          データ管理
-        </h3>
-        <div style={{ fontSize: 12, color: "#fca5a5", marginBottom: 12 }}>
-          ⚠ この操作は元に戻せません。すべての解析履歴が完全に削除されます。
-        </div>
-        <button className="btn btn-danger">
-          履歴をすべて削除
-        </button>
-      </section>
-
-      {/* ===== サブスクリプション ===== */}
-      <section
-        style={{
-          marginBottom: 18,
-          padding: 16,
-          borderRadius: 14,
-          border: "1px solid rgba(248,113,113,.25)",
-          background: "rgba(2,6,23,.4)",
-        }}
-      >
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: "#fecaca", marginBottom: 6 }}>
-          サブスクリプション
-        </h3>
-        <div style={{ fontSize: 12, color: "#fca5a5", marginBottom: 12 }}>
-          解約後も契約期間終了までは利用できます。
-        </div>
-        <button className="btn btn-danger">解約する</button>
-      </section>
-
-      {/* ===== サポート / アカウント操作 ===== */}
-      {[
-        { title: "サポート", label: "ご意見・不具合報告" },
-        { title: "アカウント操作", label: "ログアウト" },
-      ].map(({ title, label }) => (
-        <section
-          key={title}
-          style={{
-            marginBottom: 18,
-            padding: 16,
-            borderRadius: 14,
-            border: "1px solid rgba(148,163,184,.2)",
-            background: "rgba(2,6,23,.4)",
-          }}
-        >
-          <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>
-            {title}
-          </h3>
-          <button className="btn btn-secondary">{label}</button>
-        </section>
-      ))}
-
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <button className="btn btn-secondary" onClick={() => setShowSettings(false)}>
-          閉じる
-        </button>
       </div>
     </div>
   </div>
