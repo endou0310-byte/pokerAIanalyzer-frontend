@@ -5,7 +5,7 @@
   <title>Poker Analyzer | ログイン</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="./css/styles.css" />
-  <style>
+   <style>
     :root {
       --bg-color: #050910;
       --card-bg: rgba(10, 14, 25, 0.85);
@@ -220,6 +220,22 @@
     inset:0;
     pointer-events:none;
   }
+  .hero-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-visual {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 16px;
+  margin: 0 0 18px 0;
+  opacity: 0.95;
+  filter: saturate(1.1) contrast(1.05);
+  border: 1px solid rgba(120, 180, 255, 0.12);
+}
+
   </style>
 
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -238,7 +254,8 @@
           </div>
 
           <div class="hero">
-            <h1>プレイ直後に、ハンドを整理して次に活かす</h1>
+  <img class="hero-visual" src="./img/login-hero.png" alt="" />
+  <h1>プレイ直後に、ハンドを整理して次に活かす</h1>
             <p>
               Poker Analyzerは、ポーカーのハンドを時系列で入力し、AIが状況に応じた最適な思考プロセスを言語化する解析ツールです。
             </p>
