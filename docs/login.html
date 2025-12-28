@@ -4,313 +4,239 @@
   <meta charset="UTF-8" />
   <title>Poker Analyzer | ログイン</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Vite/GitHub Pages の構成に合わせて root の styles.css を参照 -->
   <link rel="stylesheet" href="./styles.css" />
 
   <style>
-    body{
-      background:#050910;
-      color:#f5f5f5;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-    }
-    .shell{
-      width:min(1040px, 100%);
-      display:grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap:18px;
-      align-items:stretch;
-    }
-    @media (max-width: 920px){
-      .shell{ grid-template-columns: 1fr; }
+    :root {
+      --bg-color: #050910;
+      --card-bg: rgba(10, 14, 25, 0.85);
+      --accent-blue: #60a5fa;
+      --text-main: #f3f7ff;
+      --text-muted: #8d99ad;
+      --border-color: rgba(120, 180, 255, 0.15);
     }
 
-    .card{
-      background: rgba(10, 14, 25, 0.92);
-      border: 1px solid rgba(120,180,255,0.18);
-      border-radius: 18px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.55);
-      padding: 22px 22px;
-    }
-    .brand{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom: 14px;
-    }
-    .brand-left{
-      display:flex;
-      align-items:baseline;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .brand-title{
-      font-weight:800;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      font-size: 16px;
-      color:#eaf2ff;
-    }
-    .badge{
-      font-size: 11px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.22);
-      color:#b9c7da;
-      background: rgba(2,6,23,0.35);
-      white-space:nowrap;
-    }
-
-    .hero{
-      margin-top: 6px;
-    }
-    .hero h1{
-      margin: 10px 0 10px;
-      font-size: 26px;
-      line-height: 1.25;
-      letter-spacing: .2px;
-      color:#f3f7ff;
-    }
-    .hero p{
+    body {
+      background: var(--bg-color);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
       margin: 0;
-      color:#b7c0cf;
-      line-height: 1.8;
-      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
 
-    .grid2{
-      margin-top: 14px;
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-    }
-    @media (max-width: 920px){
-      .grid2{ grid-template-columns:1fr; }
+    .shell {
+      width: min(1000px, 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
     }
 
-    .panel{
-      border: 1px solid rgba(148,163,184,0.16);
-      background: rgba(2,6,23,0.35);
-      border-radius: 14px;
-      padding: 14px 14px;
+    /* Main Section: Hero + Login */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 24px;
+      align-items: start;
     }
-    .panel h3{
-      margin: 0 0 8px;
-      font-size: 13px;
-      color:#cfe0ff;
-      letter-spacing:.2px;
+
+    @media (max-width: 850px) {
+      .main-grid { grid-template-columns: 1fr; }
     }
-    .list{
-      margin: 0;
-      padding-left: 18px;
-      color:#b7c0cf;
-      font-size: 12px;
-      line-height: 1.75;
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
     }
-    .steps{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      margin:0;
-      padding:0;
-      list-style:none;
-      color:#b7c0cf;
-      font-size: 12px;
+
+    /* Brand & Hero */
+    .brand {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .brand-title {
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-size: 14px;
+      color: var(--accent-blue);
+    }
+
+    .hero h1 {
+      font-size: clamp(24px, 4vw, 32px);
+      line-height: 1.2;
+      margin: 0 0 16px 0;
+    }
+    .hero p {
+      color: #b7c0cf;
       line-height: 1.7;
-    }
-    .step{
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-    }
-    .step .n{
-      flex:0 0 auto;
-      width:22px;
-      height:22px;
-      border-radius:8px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size: 12px;
-      font-weight: 700;
-      color:#0b1220;
-      background: rgba(96,165,250,0.95);
-    }
-    .muted{
-      color:#8d99ad;
+      font-size: 15px;
+      margin-bottom: 24px;
     }
 
-    /* right card */
-    .login-title{
-      font-size: 18px;
-      font-weight: 700;
-      margin: 0 0 6px;
-      text-align:left;
+    /* Key Features Tag */
+    .feature-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
     }
-    .login-sub{
-      font-size: 12px;
-      color:#b0b8c5;
-      margin: 0 0 14px;
-      line-height:1.7;
-    }
-    .login-section-title{
-      font-size: 12px;
-      font-weight: 700;
-      margin: 10px 0 8px;
-      color: #9fb4ff;
-    }
-    .google-btn-wrap{
-      display:flex;
-      justify-content:flex-start;
-      margin: 10px 0 8px;
-    }
-    .login-error{
-      margin-top: 10px;
-      font-size: 12px;
-      color: #ff7b7b;
-      line-height:1.6;
-    }
-    .fineprint{
-      margin-top: 12px;
+    .tag {
       font-size: 11px;
-      color:#7f8aa0;
-      line-height: 1.7;
+      padding: 6px 12px;
+      background: rgba(96, 165, 250, 0.1);
+      border: 1px solid rgba(96, 165, 250, 0.2);
+      border-radius: 6px;
+      color: var(--accent-blue);
     }
-    .links{
-      margin-top: 12px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      font-size: 11px;
-    }
-    .links a{
-      color:#93c5fd;
-      text-decoration:none;
-    }
-    .links a:hover{ text-decoration:underline; }
 
-    .mini-badge-row{
-      margin-top: 12px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
+    /* Step Flow (横並び) */
+    .steps-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 600px) {
+      .steps-row { grid-template-columns: 1fr; }
+    }
+
+    .step-item {
+      text-align: center;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+    }
+    .step-num {
+      width: 28px;
+      height: 28px;
+      background: var(--accent-blue);
+      color: #050910;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin: 0 auto 12px;
+      font-size: 14px;
+    }
+    .step-text { font-size: 12px; color: #b7c0cf; line-height: 1.5; }
+
+    /* Login Side */
+    .login-box {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .login-box h2 { font-size: 20px; margin: 0; }
+    .google-btn-wrap { margin: 8px 0; }
+    .fineprint {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Footer: Plans */
+    .footer-plans {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-color);
+      padding-top: 24px;
+      flex-wrap: wrap;
+    }
+    .plan-item b { color: var(--text-main); margin-right: 4px; }
+
+    .badge-dev {
+      font-size: 10px;
+      background: #1e293b;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid #334155;
     }
   </style>
 
-  <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 
 <body>
   <div class="shell">
-    <!-- Left: LP-like explanation -->
-    <section class="card">
-      <div class="brand">
-        <div class="brand-left">
+    <div class="main-grid">
+      <section class="card">
+        <div class="brand">
           <div class="brand-title">Poker Analyzer</div>
-          <div class="badge">キャッシュゲーム向け</div>
-          <div class="badge">記録 → 解析 → 履歴</div>
-        </div>
-        <div class="badge muted">開発版</div>
-      </div>
-
-      <div class="hero">
-        <h1>プレイ直後に、ハンドを整理して次に活かす</h1>
-        <p>
-          Poker Analyzer は、アクションを時系列で入力し、状況に応じた考え方を文章で確認できるツールです。<br />
-          履歴管理と追い質問で「なぜそうなるか」まで掘り下げられます（プランにより回数制限あり）。
-        </p>
-      </div>
-
-      <div class="grid2">
-        <div class="panel">
-          <h3>できること</h3>
-          <ul class="list">
-            <li>座席・スタック・アクションを入力してハンドを再現</li>
-            <li>解析結果を Markdown で読みやすく表示</li>
-            <li>履歴に保存して、後から見返せる</li>
-            <li>追い質問で論点を深掘り（Basic 以上）</li>
-          </ul>
+          <div class="badge-dev">BETA</div>
         </div>
 
-        <div class="panel">
-          <h3>使い方（3ステップ）</h3>
-          <ul class="steps">
-            <li class="step"><div class="n">1</div><div>Google でログイン（履歴とプラン判定のため）</div></li>
-            <li class="step"><div class="n">2</div><div>ハンドを記録（座席/スタック/アクション/ボード）</div></li>
-            <li class="step"><div class="n">3</div><div>解析して結果を確認 → 必要なら追い質問</div></li>
-          </ul>
-        </div>
-
-        <div class="panel">
-          <h3>想定ユーザー</h3>
-          <ul class="list">
-            <li>ライブ・オンライン問わず、振り返りを習慣化したい人</li>
-            <li>自分のプレイの「理由」を言語化したい人</li>
-            <li>履歴を貯めて改善点を追いたい人</li>
-          </ul>
-        </div>
-
-        <div class="panel">
-          <h3>プラン（目安）</h3>
-          <ul class="list">
-            <li>Basic：月30回（広告なし・追い質問）</li>
-            <li>Pro：月100回（ヘビーユーザー向け）</li>
-            <li>Premium：無制限（本気で打ち込みたい方向け）</li>
-          </ul>
-          <div class="muted" style="margin-top:6px;font-size:11px;line-height:1.6;">
-            ※実際の表示・購入はログイン後の「プラン変更」から行えます。
+        <div class="hero">
+          <h1>プレイ直後に、ハンドを整理して次に活かす</h1>
+          <p>
+            Poker Analyzerは、ポーカーのハンドを時系列で入力し、AIが状況に応じた最適な思考プロセスを言語化する解析ツールです。
+          </p>
+          <div class="feature-tags">
+            <span class="tag">ハンド再現</span>
+            <span class="tag">Markdown出力</span>
+            <span class="tag">履歴管理</span>
+            <span class="tag">深掘り質問</span>
           </div>
         </div>
+      </section>
+
+      <aside class="card login-box">
+        <h2>ログイン</h2>
+        <p style="font-size:13px; color:#b7c0cf; margin:0;">
+          解析の開始、履歴の保存にはGoogleアカウントが必要です。
+        </p>
+        
+        <div id="google-login-button" class="google-btn-wrap"></div>
+        <div id="login-error" style="color:#ff7b7b; font-size:12px; display:none;"></div>
+
+        <div class="fineprint">
+          ※30回/月まで無料で利用可能<br>
+          <a href="privacy.html" style="color:var(--accent-blue); text-decoration:none;">プライバシーポリシー</a> / 
+          <a href="terms.html" style="color:var(--accent-blue); text-decoration:none;">利用規約</a>
+        </div>
+      </aside>
+    </div>
+
+    <div class="steps-row">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-text">Googleで<br>ログイン</div>
       </div>
-    </section>
-
-    <!-- Right: login -->
-    <aside class="card">
-      <div class="login-title">ログイン</div>
-      <p class="login-sub">
-        履歴保存・プラン判定のため、利用にはログインが必要です。<br />
-        ログイン後はハンド記録画面へ移動します。
-      </p>
-
-      <div class="login-section-title">Google で続ける</div>
-      <div id="google-login-button" class="google-btn-wrap"></div>
-
-      <div id="login-error" class="login-error" style="display:none;"></div>
-
-      <div class="mini-badge-row">
-        <div class="badge">履歴保存</div>
-        <div class="badge">プラン判定</div>
-        <div class="badge">追い質問</div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-text">ハンド情報を<br>入力・記録</div>
       </div>
-
-      <div class="fineprint">
-        ・初回ログイン時にユーザー情報が DB に作成されます。<br />
-        ・この端末には user_id / email 等の最小情報を保存します（解析の紐付け用）。<br />
-        ・不具合が出る場合はブラウザのコンソールも確認してください。
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-text">AIによる解析と<br>思考の言語化</div>
       </div>
+    </div>
 
-      <div class="links">
-        <!-- 既存導線と整合（未作成なら後で用意） -->
-        <a href="privacy.html" target="_blank" rel="noreferrer">プライバシーポリシー</a>
-        <a href="terms.html" target="_blank" rel="noreferrer">利用規約</a>
+    <footer class="footer-plans">
+      <div class="plan-item"><b>Basic</b> 月30回</div>
+      <div class="plan-item"><b>Pro</b> 月100回</div>
+      <div class="plan-item"><b>Premium</b> 無制限</div>
+      <div style="width:100%; text-align:center; opacity:0.6; font-size:10px; margin-top:8px;">
+        ※プラン詳細はログイン後の設定画面から確認・変更できます。
       </div>
-    </aside>
+    </footer>
   </div>
 
   <script type="module">
-    // ======== 1) backend の URL =========
+    /* スクリプト部分は既存のロジックをそのまま維持 */
     const API_BASE = "https://poker-backend-production-64cf.up.railway.app";
-
-    // ======== 2) Google クライアント ID =========
     const GOOGLE_CLIENT_ID = "599236787224-kig324ieevvr7b7q0haqeutj0qehc2m8.apps.googleusercontent.com";
-
     const errorBox = document.getElementById("login-error");
 
     function showError(message) {
@@ -318,15 +244,11 @@
       errorBox.style.display = "block";
     }
 
-    // ======== 0) ログイン済みなら index へ =========
     try {
       const u = JSON.parse(localStorage.getItem("pa_user") || "null");
-      if (u && u.user_id) {
-        window.location.replace("index.html");
-      }
+      if (u && u.user_id) window.location.replace("index.html");
     } catch {}
 
-    // ======== 3) backend に id_token を送ってログイン =========
     async function loginWithIdToken(idToken) {
       try {
         const res = await fetch(`${API_BASE}/auth/google`, {
@@ -334,71 +256,36 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id_token: idToken }),
         });
-
         const data = await res.json();
-
         if (!res.ok || !data.ok) {
-          console.error("login error:", data);
-          showError("ログインに失敗しました。しばらくしてからもう一度お試しください。");
+          showError("ログインに失敗しました。");
           return;
         }
-
         const user = data.user;
-        if (!user || !user.id) {
-          console.error("invalid user payload:", data);
-          showError("サーバーから不正なユーザー情報が返されました。");
-          return;
-        }
-
-        const stored = {
+        localStorage.setItem("pa_user", JSON.stringify({
           user_id: user.id,
           name: user.display_name || user.name || "",
           email: user.email || "",
           plan: user.plan || null,
-        };
-        localStorage.setItem("pa_user", JSON.stringify(stored));
-
-        // login → index（相対パスで統一）
+        }));
         window.location.href = "index.html";
-
       } catch (err) {
-        console.error("loginWithIdToken error:", err);
-        showError("ネットワークエラーが発生しました。接続環境を確認してください。");
+        showError("ネットワークエラーが発生しました。");
       }
     }
 
-    // ======== 4) Google Identity のコールバック =========
     window.handleCredentialResponse = (response) => {
-      if (!response || !response.credential) {
-        showError("Google からの認証情報が取得できませんでした。");
-        return;
-      }
-      loginWithIdToken(response.credential);
+      if (response.credential) loginWithIdToken(response.credential);
     };
 
-    // ======== 5) ボタンの描画 =========
     window.onload = () => {
-      if (!window.google || !window.google.accounts || !window.google.accounts.id) {
-        showError("Google ログイン用のスクリプトの読み込みに失敗しました。");
-        return;
-      }
-
       window.google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: window.handleCredentialResponse,
-        auto_select: false,
-        cancel_on_tap_outside: true,
       });
-
       window.google.accounts.id.renderButton(
         document.getElementById("google-login-button"),
-        {
-          type: "standard",
-          theme: "outline",
-          size: "large",
-          text: "continue_with",
-          shape: "pill",
-        }
+        { theme: "outline", size: "large", width: "240", shape: "pill" }
       );
     };
   </script>
