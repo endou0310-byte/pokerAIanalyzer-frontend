@@ -424,8 +424,12 @@ useEffect(() => {
       if (!res.ok) return;
 
       const data = await res.json();
-      if (data?.ok && data?.userInfo?.default_stack != null) {
-        setDefaultStack(Number(data.userInfo.default_stack));
+
+      // ✅ サーバー返却は { ok, default_stack } なので userInfo を見ない
+      if (data?.ok && data?.default_stack != null) {
+        const v = Number(data.default_stack);
+        setDefaultStack(v);
+        lastSavedDefaultStackRef.current = v; // ✅ 読み込み直後の無駄保存を防ぐ
       }
     } catch {
       // 取得失敗時は何もしない（デフォルト値を維持）
@@ -433,7 +437,36 @@ useEffect(() => {
   })();
 }, [auth.loggedIn, auth.user?.user_id]);
 
+// ==== default_stack を DB に保存（②：ここに追加するのが適正）====
+useEffect(() => {
+  if (!auth.loggedIn || !auth.user?.user_id) return;
 
+  // 読み込み直後や同一値は保存しない
+  if (lastSavedDefaultStackRef.current === defaultStack) return;
+
+  const t = setTimeout(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/settings/update_default_stack`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: auth.user.user_id,
+          default_stack: Number(defaultStack),
+        }),
+      });
+      if (!res.ok) return;
+
+      const data = await res.json();
+      if (data?.ok && data?.default_stack != null) {
+        lastSavedDefaultStackRef.current = Number(data.default_stack);
+      }
+    } catch {
+      // 失敗時は何もしない（必要ならトースト表示に変更可）
+    }
+  }, 500);
+
+  return () => clearTimeout(t);
+}, [defaultStack, auth.loggedIn, auth.user?.user_id]);
 
   // プラン情報の取得
   useEffect(() => {
@@ -485,8 +518,12 @@ const [showSettings, setShowSettings] = useState(false);
 // default_stack（DB同期）
 const [defaultStack, setDefaultStack] = useState(100);
 
+// ★ 最後にDBへ保存できた default_stack を保持（無駄な再保存防止）
+const lastSavedDefaultStackRef = useRef(null);
+
   /* engine */
 const [recording, setRecording] = useState(false);
+
 const [S, setS] = useState(null);
 
 useEffect(() => {
