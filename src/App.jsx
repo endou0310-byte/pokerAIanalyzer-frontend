@@ -171,6 +171,9 @@ function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultS
       onChange={(e) => setDefaultStack(Number(e.target.value))}
       min={1}
     />
+        <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 10 }}>
+      全座席のデフォルトスタックを調整できます。個別に変更したい場合は、座席をクリックすることでスタックを変更できます。
+    </div>
   </>
 )}
 
@@ -526,7 +529,6 @@ const [heroStack, setHeroStack] = useState(null);
 
   /* engine */
 const [recording, setRecording] = useState(false);
-
 const [S, setS] = useState(null);
 
 useEffect(() => {
@@ -534,6 +536,28 @@ useEffect(() => {
   if (recording) return;
   setS(E.initialState(players, heroSeat, heroStack));
 }, [players, heroSeat, heroStack]); // ★ recording を依存から外す
+
+// ★ defaultStack を変更したら、全座席のスタックを一括更新
+useEffect(() => {
+  if (!S) return;
+
+  const v = Number(defaultStack);
+  if (!Number.isFinite(v)) return;
+
+  // 記録中に上書きしたくないならここで止める（必要ならONにします）
+  // if (recording) return;
+
+  setS((prev) => {
+    if (!prev) return prev;
+    const nx = structuredClone(prev);
+    const len = (nx.seats?.length ?? 0) || Math.max(2, players);
+    nx.stacks = Array.from({ length: len }, () => Math.max(0, +v.toFixed(2)));
+    return nx;
+  });
+
+  // heroStack（解析payload用）も合わせる
+  setHeroStack(Math.max(0, +v.toFixed(2)));
+}, [defaultStack]); 
 
   /* result */
   const [analyzing, setAnalyzing] = useState(false);
@@ -1264,11 +1288,18 @@ return (
               alert("数値で入力してください");
               return;
             }
-            setS((prev) => {
-              const nx = structuredClone(prev);
-              nx.stacks[i] = Math.max(0, +n.toFixed(2));
-              return nx;
-            });
+const nextStack = Math.max(0, +n.toFixed(2));
+
+setS((prev) => {
+  const nx = structuredClone(prev);
+  nx.stacks[i] = nextStack;
+  return nx;
+});
+
+// hero席を触った場合、解析payloadのstack_bbも一致させる
+if (s === heroSeat) {
+  setHeroStack(nextStack);
+}
           }}
           style={{
             cursor: "pointer",
