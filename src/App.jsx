@@ -7,20 +7,17 @@ import * as E from "./lib/engine.js";
 // バックエンドのベースURL（.env の VITE_API_BASE）
 const API_BASE = import.meta.env.VITE_API_BASE || "";
 
-function SettingsModal({
-  open,
-  onClose,
-  userInfo,
-  plan,
-  remainingMonth,
-  defaultStack,
-  setDefaultStack,
-}) {
-  const [activeTab, setActiveTab] = React.useState("account");
+function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultStack, setDefaultStack }) {
+  // 追加：このモーダル内で使うリンク先（public/ にある想定）
+  const PRIVACY_URL = "privacy.html";
+  const TERMS_URL = "terms.html";
+  const SUPPORT_FORM_URL = "https://forms.gle/"; // ←ここをあなたのフォームURLに置換
+
+  const [activeTab, setActiveTab] = useState("account");
 
   if (!open) return null;
-
   return (
+
     <div
       style={{
         position: "fixed",
@@ -130,17 +127,67 @@ function SettingsModal({
 </aside>
 
 {/* 右ペイン */}
-<main style={{ flex: 1, padding: 24, overflow: "auto" }}>
-  {activeTab === "account" && (
-    <>
-      <h3 style={{ marginTop: 0 }}>アカウント</h3>
-      <div style={{ color: "#cbd5e1", lineHeight: 1.9 }}>
-        <div>メール：{userInfo?.email || "-"}</div>
-        <div>プラン：{plan ? plan.toUpperCase() : "-"}</div>
-        <div>今月の残り解析：{remainingMonth === null ? "∞" : `${remainingMonth} 回`}</div>
+{activeTab === "account" && (
+  <>
+    <h3 style={{ marginTop: 0 }}>アカウント</h3>
+    <div style={{ color: "#cbd5e1", lineHeight: 1.9 }}>
+      <div>メール：{userInfo?.email || "-"}</div>
+      <div>プラン：{plan ? plan.toUpperCase() : "-"}</div>
+      <div>今月の残り解析：{remainingMonth === null ? "∞" : `${remainingMonth} 回`}</div>
+    </div>
+
+    {/* 追加：ポリシー/規約/お問い合わせ/ログアウト */}
+    <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ fontSize: 12 }}>
+        <a
+          href={PRIVACY_URL}
+          target="_blank"
+          rel="noreferrer"
+          style={{ color: "#93c5fd", textDecoration: "none" }}
+        >
+          プライバシーポリシー
+        </a>
+        {" / "}
+        <a
+          href={TERMS_URL}
+          target="_blank"
+          rel="noreferrer"
+          style={{ color: "#93c5fd", textDecoration: "none" }}
+        >
+          利用規約
+        </a>
       </div>
-    </>
-  )}
+
+      <a
+        href={SUPPORT_FORM_URL}
+        target="_blank"
+        rel="noreferrer"
+        style={{ color: "#93c5fd", textDecoration: "none", fontSize: 12 }}
+      >
+        お問い合わせ（Googleフォーム）
+      </a>
+
+      <button
+        type="button"
+        onClick={onLogout}
+        style={{
+          marginTop: 4,
+          width: "fit-content",
+          padding: "10px 14px",
+          borderRadius: 10,
+          border: "1px solid rgba(148,163,184,0.25)",
+          background: "rgba(2,6,23,0.4)",
+          color: "#e5e7eb",
+          cursor: "pointer",
+          fontSize: 12,
+        }}
+      >
+        ログアウト
+      </button>
+    </div>
+  </>
+)}
+
 
   {activeTab === "input" && (
     <>
@@ -181,11 +228,32 @@ function SettingsModal({
         <div>今月の残り解析：{remainingMonth === null ? "∞" : `${remainingMonth} 回`}</div>
       </div>
 
-      <div style={{ marginTop: 12, fontSize: 12, color: "#9ca3af" }}>
-        プラン変更は右上の「プラン変更」から行えます。
+    <div style={{ marginTop: 12, fontSize: 12, color: "#9ca3af" }}>
+      プラン変更は右上の「プラン変更」から行えます。
+    </div>
+
+    {typeof onLogout === "function" && (
+      <div style={{ marginTop: 18 }}>
+        <button
+          type="button"
+          onClick={onLogout}
+          style={{
+            width: "100%",
+            padding: "10px 12px",
+            borderRadius: 10,
+            border: "1px solid rgba(255,255,255,0.14)",
+            background: "rgba(255,80,80,0.12)",
+            color: "#ffd1d1",
+            cursor: "pointer",
+            fontWeight: 600,
+          }}
+        >
+          ログアウト
+        </button>
       </div>
-    </>
-  )}
+    )}
+  </>
+)}
 
   {activeTab === "support" && (
     <>
@@ -194,21 +262,40 @@ function SettingsModal({
         ご意見・不具合報告はお問い合わせからお願いします。
       </div>
 
-      <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
-        <a href="https://forms.gle/" target="_blank" rel="noreferrer" style={{ color: "#93c5fd", textDecoration: "none" }}>
+      <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
+        <a
+          href={SUPPORT_FORM_URL}
+          target="_blank"
+          rel="noreferrer"
+          style={{ color: "#93c5fd", textDecoration: "none" }}
+        >
           お問い合わせ（Googleフォーム）
         </a>
 
-        {/* 実ファイルを置くなら privacy.html / terms.html 等に差し替え */}
-        <a href="privacy.html" target="_blank" rel="noreferrer" style={{ color: "#93c5fd", textDecoration: "none" }}>
-          プライバシーポリシー
-        </a>
-        <a href="terms.html" target="_blank" rel="noreferrer" style={{ color: "#93c5fd", textDecoration: "none" }}>
-          利用規約
-        </a>
+        <div style={{ fontSize: 12, color: "#9ca3af" }}>
+          <a
+            href={PRIVACY_URL}
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: "#93c5fd", textDecoration: "none" }}
+          >
+            プライバシーポリシー
+          </a>
+          <span style={{ color: "#9ca3af" }}> / </span>
+          <a
+            href={TERMS_URL}
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: "#93c5fd", textDecoration: "none" }}
+          >
+            利用規約
+          </a>
+        </div>
       </div>
     </>
   )}
+
+
 
   {activeTab === "data" && (
     <>
@@ -223,12 +310,12 @@ function SettingsModal({
       </button>
     </>
   )}
-</main>
 
       </div>
     </div>
   );
 }
+
 
 /* ====== layout utils ====== */
 function useSize(){
@@ -352,20 +439,21 @@ useEffect(() => {
 
   (async () => {
     try {
-      const resp = await fetch(`${API_BASE}/settings/user_info?user_id=${u.user_id}`);
-      const json = await resp.json();
-      if (json.ok && json.user) {
-        const v = Number(json.user.default_stack);
-        if (Number.isFinite(v) && v > 0) {
-          setDefaultStack(v);
-          setHeroStack(v);
-        }
+      const res = await fetch(
+        `${API_BASE}/settings/user_info?user_id=${encodeURIComponent(auth.user.user_id)}`
+      );
+      if (!res.ok) return;
+
+      const data = await res.json();
+      if (data?.ok && data?.userInfo?.default_stack != null) {
+        setDefaultStack(Number(data.userInfo.default_stack));
       }
-    } catch (e) {
-      console.error("default_stack fetch failed:", e);
+    } catch {
+      // 取得失敗時は何もしない（デフォルト値を維持）
     }
   })();
-}, []);
+}, [auth.loggedIn, auth.user?.user_id]);
+
 
 
   // プラン情報の取得
@@ -1870,13 +1958,14 @@ return (
 
 {/* ===== 設定モーダル ===== */}
 <SettingsModal
-  open={showSettings}
-  onClose={() => setShowSettings(false)}
+  open={settingsOpen}
+  onClose={() => setSettingsOpen(false)}
   userInfo={userInfo}
   plan={plan}
   remainingMonth={remainingMonth}
   defaultStack={defaultStack}
   setDefaultStack={setDefaultStack}
+  onLogout={handleLogout}
 />
 
 {analyzing && (

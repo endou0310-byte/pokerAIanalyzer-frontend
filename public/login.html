@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <title>Poker Analyzer | ログイン</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="./css/styles.css" />
-  <style>
+  <!-- NOTE: ./css/styles.css が 404 になっているため、login.html は inline CSS のみに統一 -->
+   <style>
     :root {
       --bg-color: #050910;
       --card-bg: rgba(10, 14, 25, 0.85);
@@ -55,29 +55,10 @@
       backdrop-filter: blur(10px);
     }
 
-    /* === 追加：ヒーローカードに背景画像を差し込む === */
+    /* hero-card は dim（暗幕）用に position を持たせる */
     .hero-card{
       position: relative;
       overflow: hidden;
-    }
-
-    .hero-visual{
-      position: absolute;
-      right: -40px;
-      bottom: -30px;
-      width: min(520px, 60%);
-      height: auto;
-      opacity: 0.35;              /* 文字を邪魔しない濃さ */
-      filter: blur(0px);
-      pointer-events: none;
-      user-select: none;
-      z-index: 0;
-    }
-
-    /* 追加：文字を前面に出す（画像の上に載せる） */
-    .hero-content{
-      position: relative;
-      z-index: 1;
     }
 
     /* 追加：読みやすさ用のうっすら暗幕（必要なら） */
@@ -196,30 +177,33 @@
       border-radius: 4px;
       border: 1px solid #334155;
     }
-      /* ===== 追加：ヒーロー画像枠 ===== */
-  .hero-media{
-    margin-top: 18px;
-    border-radius: 16px;
-    overflow: hidden;
-    border: 1px solid rgba(120, 180, 255, 0.18);
-    background: rgba(2, 6, 23, 0.35);
-    box-shadow: 0 18px 46px rgba(0,0,0,0.45);
-  }
-  .hero-media img{
-    width: 100%;
-    height: auto;
-    display: block;
-    opacity: 0.92;
-    transform: scale(1.02); /* ほんの少しだけ面を埋める */
-  }
+    /* ===== ヒーロー画像枠（ここで表示を統一） ===== */
+    .hero-media{
+      position: relative;
+      margin: 0 0 18px 0;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(120, 180, 255, 0.18);
+      background: rgba(2, 6, 23, 0.35);
+      box-shadow: 0 18px 46px rgba(0,0,0,0.45);
+    }
+    .hero-media img{
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+      opacity: 0.92;
+      filter: saturate(1.1) contrast(1.05);
+    }
+    .hero-media::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background: linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0.35));
+    }
 
-  /* 画像の上に薄いグラデを重ねて文字の世界観に馴染ませる（任意） */
-  .hero-media::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-  }
+
   </style>
 
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -238,6 +222,10 @@
           </div>
 
           <div class="hero">
+            <div class="hero-media">
+              <img src="./img/login-hero.png" alt="" aria-hidden="true" />
+            </div>
+
             <h1>プレイ直後に、ハンドを整理して次に活かす</h1>
             <p>
               Poker Analyzerは、ポーカーのハンドを時系列で入力し、AIが状況に応じた最適な思考プロセスを言語化する解析ツールです。
@@ -249,9 +237,6 @@
               <span class="tag">深掘り質問</span>
             </div>
           </div>
-        </div>
-
-        <img class="hero-visual" src="img/login-hero.png" alt="" aria-hidden="true" />
       </section>
 
       <aside class="card login-box">
@@ -265,8 +250,15 @@
 
         <div class="fineprint">
           ※3回/月まで無料で利用可能<br>
-          <a href="privacy.html" style="color:var(--accent-blue); text-decoration:none;">プライバシーポリシー</a> / 
-          <a href="terms.html" style="color:var(--accent-blue); text-decoration:none;">利用規約</a>
+<a href="./privacy.html" target="_blank" rel="noopener"
+   style="color:var(--accent-blue); text-decoration:none;">
+  プライバシーポリシー
+</a>
+ /
+<a href="./terms.html" target="_blank" rel="noopener"
+   style="color:var(--accent-blue); text-decoration:none;">
+  利用規約
+</a>
         </div>
       </aside>
     </div>
