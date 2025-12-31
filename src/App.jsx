@@ -127,6 +127,7 @@ function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultS
 </aside>
 
 {/* 右ペイン */}
+<main style={{ flex: 1, padding: 16, overflow: "auto" }}>
 {activeTab === "account" && (
   <>
     <h3 style={{ marginTop: 0 }}>アカウント</h3>
@@ -136,7 +137,6 @@ function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultS
       <div>今月の残り解析：{remainingMonth === null ? "∞" : `${remainingMonth} 回`}</div>
     </div>
 
-    {/* ログアウト（アカウントにはこれだけ置く） */}
     {typeof onLogout === "function" && (
       <div style={{ marginTop: 16 }}>
         <button
@@ -160,45 +160,44 @@ function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultS
   </>
 )}
 
+{activeTab === "input" && (
+  <>
+    <h3 style={{ marginTop: 0 }}>入力設定</h3>
+    <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 10 }}>
+      新規ハンド作成時の初期スタック（BB）に反映されます。
+    </div>
+    <input
+      type="number"
+      value={defaultStack}
+      onChange={(e) => setDefaultStack(Number(e.target.value))}
+      min={1}
+    />
+  </>
+)}
 
-  {activeTab === "input" && (
-    <>
-      <h3 style={{ marginTop: 0 }}>入力設定</h3>
-      <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 10 }}>
-        新規ハンド作成時の初期スタック（BB）に反映されます。
-      </div>
-      <input
-        type="number"
-        value={defaultStack}
-        onChange={(e) => setDefaultStack(Number(e.target.value))}
-        min={1}
-      />
-    </>
-  )}
+{activeTab === "analysis" && (
+  <>
+    <h3 style={{ marginTop: 0 }}>解析設定</h3>
+    <div style={{ fontSize: 12, color: "#9ca3af", lineHeight: 1.8 }}>
+      現在はキャッシュゲーム専用です。解析ロジック自体は固定で、表示スタイルのみ今後調整できるようにします。
+    </div>
 
-  {activeTab === "analysis" && (
-    <>
-      <h3 style={{ marginTop: 0 }}>解析設定</h3>
-      <div style={{ fontSize: 12, color: "#9ca3af", lineHeight: 1.8 }}>
-        現在はキャッシュゲーム専用です。解析ロジック自体は固定で、表示スタイルのみ今後調整できるようにします。
+    <div style={{ marginTop: 14, padding: 12, borderRadius: 12, border: "1px solid rgba(148,163,184,0.18)", background: "rgba(2,6,23,0.35)" }}>
+      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>説明の詳しさ</div>
+      <div style={{ fontSize: 12, color: "#9ca3af" }}>
+        （準備中）短い / 標準 / 詳しい を選べるようにする予定です。
       </div>
+    </div>
+  </>
+)}
 
-      <div style={{ marginTop: 14, padding: 12, borderRadius: 12, border: "1px solid rgba(148,163,184,0.18)", background: "rgba(2,6,23,0.35)" }}>
-        <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>説明の詳しさ</div>
-        <div style={{ fontSize: 12, color: "#9ca3af" }}>
-          （準備中）短い / 標準 / 詳しい を選べるようにする予定です。
-        </div>
-      </div>
-    </>
-  )}
-
-  {activeTab === "plan" && (
-    <>
-      <h3 style={{ marginTop: 0 }}>プラン</h3>
-      <div style={{ color: "#cbd5e1", lineHeight: 1.9 }}>
-        <div>現在：{plan ? plan.toUpperCase() : "-"}</div>
-        <div>今月の残り解析：{remainingMonth === null ? "∞" : `${remainingMonth} 回`}</div>
-      </div>
+{activeTab === "plan" && (
+  <>
+    <h3 style={{ marginTop: 0 }}>プラン</h3>
+    <div style={{ color: "#cbd5e1", lineHeight: 1.9 }}>
+      <div>現在：{plan ? plan.toUpperCase() : "-"}</div>
+      <div>今月の残り解析：{remainingMonth === null ? "∞" : `${remainingMonth} 回`}</div>
+    </div>
 
     <div style={{ marginTop: 12, fontSize: 12, color: "#9ca3af" }}>
       プラン変更は右上の「プラン変更」から行えます。
@@ -227,66 +226,66 @@ function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultS
   </>
 )}
 
-  {activeTab === "support" && (
-    <>
-      <h3 style={{ marginTop: 0 }}>サポート</h3>
-      <div style={{ fontSize: 12, color: "#9ca3af", lineHeight: 1.9 }}>
-        ご意見・不具合報告はお問い合わせからお願いします。
-      </div>
+{activeTab === "support" && (
+  <>
+    <h3 style={{ marginTop: 0 }}>サポート</h3>
+    <div style={{ fontSize: 12, color: "#9ca3af", lineHeight: 1.9 }}>
+      ご意見・不具合報告はお問い合わせからお願いします。
+    </div>
 
-      <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
+    <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
+      <a
+        href={SUPPORT_FORM_URL}
+        target="_blank"
+        rel="noreferrer"
+        style={{ color: "#93c5fd", textDecoration: "none" }}
+      >
+        お問い合わせ（Googleフォーム）
+      </a>
+
+      <div style={{ fontSize: 12, color: "#9ca3af" }}>
         <a
-          href={SUPPORT_FORM_URL}
+          href={PRIVACY_URL}
           target="_blank"
           rel="noreferrer"
           style={{ color: "#93c5fd", textDecoration: "none" }}
         >
-          お問い合わせ（Googleフォーム）
+          プライバシーポリシー
         </a>
-
-        <div style={{ fontSize: 12, color: "#9ca3af" }}>
-          <a
-            href={PRIVACY_URL}
-            target="_blank"
-            rel="noreferrer"
-            style={{ color: "#93c5fd", textDecoration: "none" }}
-          >
-            プライバシーポリシー
-          </a>
-          <span style={{ color: "#9ca3af" }}> / </span>
-          <a
-            href={TERMS_URL}
-            target="_blank"
-            rel="noreferrer"
-            style={{ color: "#93c5fd", textDecoration: "none" }}
-          >
-            利用規約
-          </a>
-        </div>
+        <span style={{ color: "#9ca3af" }}> / </span>
+        <a
+          href={TERMS_URL}
+          target="_blank"
+          rel="noreferrer"
+          style={{ color: "#93c5fd", textDecoration: "none" }}
+        >
+          利用規約
+        </a>
       </div>
-    </>
-  )}
+    </div>
+  </>
+)}
 
+{activeTab === "data" && (
+  <>
+    <h3 style={{ marginTop: 0, color: "#fecaca" }}>データ管理</h3>
+    <div style={{ fontSize: 12, color: "#9ca3af", lineHeight: 1.8 }}>
+      データ削除は元に戻せません。
+    </div>
 
-
-  {activeTab === "data" && (
-    <>
-      <h3 style={{ marginTop: 0, color: "#fecaca" }}>データ管理</h3>
-      <div style={{ fontSize: 12, color: "#9ca3af", lineHeight: 1.8 }}>
-        データ削除は元に戻せません。
-      </div>
-
-      {/* ここは “本当に削除する機能” になるので、まずは無効化を推奨 */}
-      <button className="btn btn-danger" disabled style={{ marginTop: 12, opacity: 0.6, cursor: "not-allowed" }}>
-        履歴をすべて削除（準備中）
-      </button>
-    </>
-  )}
+    {/* ここは “本当に削除する機能” になるので、まずは無効化を推奨 */}
+    <button className="btn btn-danger" disabled style={{ marginTop: 12, opacity: 0.6, cursor: "not-allowed" }}>
+      履歴をすべて削除（準備中）
+    </button>
+  </>
+)}
+</main>
 
       </div>
     </div>
   );
 }
+
 
 
 /* ====== layout utils ====== */
