@@ -11,8 +11,7 @@ function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultS
   // 追加：このモーダル内で使うリンク先（public/ にある想定）
   const PRIVACY_URL = "privacy.html";
   const TERMS_URL = "terms.html";
-  const SUPPORT_FORM_URL = "https://forms.gle/"; // ←ここをあなたのフォームURLに置換
-
+  const SUPPORT_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdCmr7yabVudrcoQ6VtIBnTua3r8GffCvTZgSArG4bMbNCQ_w/viewform?usp=dialog"; 
   const [activeTab, setActiveTab] = useState("account");
 
   if (!open) return null;
