@@ -136,55 +136,27 @@ function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultS
       <div>今月の残り解析：{remainingMonth === null ? "∞" : `${remainingMonth} 回`}</div>
     </div>
 
-    {/* 追加：ポリシー/規約/お問い合わせ/ログアウト */}
-    <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 10 }}>
-      <div style={{ fontSize: 12 }}>
-        <a
-          href={PRIVACY_URL}
-          target="_blank"
-          rel="noreferrer"
-          style={{ color: "#93c5fd", textDecoration: "none" }}
+    {/* ログアウト（アカウントにはこれだけ置く） */}
+    {typeof onLogout === "function" && (
+      <div style={{ marginTop: 16 }}>
+        <button
+          type="button"
+          onClick={onLogout}
+          style={{
+            width: "fit-content",
+            padding: "10px 14px",
+            borderRadius: 10,
+            border: "1px solid rgba(148,163,184,0.25)",
+            background: "rgba(2,6,23,0.4)",
+            color: "#e5e7eb",
+            cursor: "pointer",
+            fontSize: 12,
+          }}
         >
-          プライバシーポリシー
-        </a>
-        {" / "}
-        <a
-          href={TERMS_URL}
-          target="_blank"
-          rel="noreferrer"
-          style={{ color: "#93c5fd", textDecoration: "none" }}
-        >
-          利用規約
-        </a>
+          ログアウト
+        </button>
       </div>
-
-      <a
-        href={SUPPORT_FORM_URL}
-        target="_blank"
-        rel="noreferrer"
-        style={{ color: "#93c5fd", textDecoration: "none", fontSize: 12 }}
-      >
-        お問い合わせ（Googleフォーム）
-      </a>
-
-      <button
-        type="button"
-        onClick={onLogout}
-        style={{
-          marginTop: 4,
-          width: "fit-content",
-          padding: "10px 14px",
-          borderRadius: 10,
-          border: "1px solid rgba(148,163,184,0.25)",
-          background: "rgba(2,6,23,0.4)",
-          color: "#e5e7eb",
-          cursor: "pointer",
-          fontSize: 12,
-        }}
-      >
-        ログアウト
-      </button>
-    </div>
+    )}
   </>
 )}
 
