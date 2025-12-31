@@ -437,12 +437,14 @@ useEffect(() => {
 
       const data = await res.json();
 
-      // ✅ サーバー返却は { ok, default_stack } なので userInfo を見ない
-      if (data?.ok && data?.default_stack != null) {
-        const v = Number(data.default_stack);
-        setDefaultStack(v);
-        lastSavedDefaultStackRef.current = v; // ✅ 読み込み直後の無駄保存を防ぐ
-      }
+if (data?.ok && data?.default_stack != null) {
+  const v = Number(data.default_stack);
+  setDefaultStack(v);
+  lastSavedDefaultStackRef.current = v;
+
+  // heroStack が未設定なら初期表示も合わせる
+  setHeroStack((prev) => (prev == null ? v : prev));
+}
     } catch {
       // 取得失敗時は何もしない（デフォルト値を維持）
     }
@@ -519,7 +521,8 @@ useEffect(() => {
   /* 左ペイン */
 const [players, setPlayers] = useState(6);
 const [heroSeat, setHeroSeat] = useState("UTG");
-const [heroStack, setHeroStack] = useState(100);
+// 新規ハンドの初期値は defaultStack を使いたいので null 開始にする
+const [heroStack, setHeroStack] = useState(null);
 
   /* engine */
 const [recording, setRecording] = useState(false);
@@ -641,13 +644,16 @@ function begin(){
     setRecording(false);
     setShowPost(true); // 終了ポップアップ
   }
-  function resetAll(){
-    setS(null); setRecording(false);
-    setHeroCards([]);
-    setVillainCards([]);  
-   setBoard({FLOP:[],TURN:[],RIVER:[]});
-    setResult(null); setAnalyzing(false);
-  }
+function resetAll(){
+  setS(null); setRecording(false);
+  setHeroCards([]);
+  setVillainCards([]);  
+  setBoard({FLOP:[],TURN:[],RIVER:[]});
+  setResult(null); setAnalyzing(false);
+
+  // 新規ハンド用に初期スタックを設定値へ戻す
+  setHeroStack(defaultStack);
+}
 
   /* engine ops */
   const legal = S ? E.legal(S) : { fold:false, check:false, call:false, bet:false, raise:false };
@@ -718,7 +724,7 @@ function buildPayload() {
     hero: {
       seat: heroSeat,
       cards: heroCards,
-      stack_bb: Number(heroStack) || 100,
+      stack_bb: Number(heroStack ?? defaultStack) || 100,
     },
     board,
     actions: S?.actions || { PRE: [], FLOP: [], TURN: [], RIVER: [] },
