@@ -390,6 +390,18 @@ export default function App(){
 // 認証状態（B案：未ログインでも画面に入れる）
 const [auth, setAuth] = useState({ loggedIn: false, user: null });
 
+// ユーザー情報（メール表示用）
+const [userInfo, setUserInfo] = useState(null);
+
+// 設定モーダル
+const [showSettings, setShowSettings] = useState(false);
+
+// default_stack（DB同期）
+const [defaultStack, setDefaultStack] = useState(100);
+
+// ★ 最後にDBへ保存できた default_stack を保持（無駄な再保存防止）
+const lastSavedDefaultStackRef = useRef(null);
+
 useEffect(() => {
   try {
     const u = JSON.parse(localStorage.getItem("pa_user") || "null");
@@ -508,18 +520,6 @@ useEffect(() => {
 const [players, setPlayers] = useState(6);
 const [heroSeat, setHeroSeat] = useState("UTG");
 const [heroStack, setHeroStack] = useState(100);
-
-// ユーザー情報（メール表示用）
-const [userInfo, setUserInfo] = useState(null);
-
-// 設定モーダル
-const [showSettings, setShowSettings] = useState(false);
-
-// default_stack（DB同期）
-const [defaultStack, setDefaultStack] = useState(100);
-
-// ★ 最後にDBへ保存できた default_stack を保持（無駄な再保存防止）
-const lastSavedDefaultStackRef = useRef(null);
 
   /* engine */
 const [recording, setRecording] = useState(false);
