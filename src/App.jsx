@@ -7,7 +7,7 @@ import * as E from "./lib/engine.js";
 // バックエンドのベースURL（.env の VITE_API_BASE）
 const API_BASE = import.meta.env.VITE_API_BASE || "";
 
-function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultStack, setDefaultStack }) {
+function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultStack, setDefaultStack, onLogout }) {
   // 追加：このモーダル内で使うリンク先（public/ にある想定）
   const PRIVACY_URL = "privacy.html";
   const TERMS_URL = "terms.html";
@@ -403,6 +403,15 @@ const buildSeatsList = (S, players) =>
 
 /* ====== main ====== */
 export default function App(){
+
+  // ログアウト（localStorage をクリアしてログインへ）
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem("pa_user");
+    } finally {
+      window.location.href = "login.html";
+    }
+  };
 
   // プラン変更モーダル用
   const [showPlanModal, setShowPlanModal] = useState(false);
@@ -1958,8 +1967,8 @@ return (
 
 {/* ===== 設定モーダル ===== */}
 <SettingsModal
-  open={settingsOpen}
-  onClose={() => setSettingsOpen(false)}
+  open={showSettings}
+  onClose={() => setShowSettings(false)}
   userInfo={userInfo}
   plan={plan}
   remainingMonth={remainingMonth}
