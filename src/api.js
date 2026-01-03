@@ -173,3 +173,44 @@ export async function createCheckoutSession({ user_id, email, plan }) {
   return json;
 }
 
+/**
+ * Stripe Billing Portal セッション作成
+ * POST /stripe/create-portal-session
+ *
+ * 返り値: { ok:true, url:"https://billing.stripe.com/..." }
+ */
+export async function createPortalSession({ user_id }) {
+  const res = await fetch(`${BASE}/stripe/create-portal-session`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ user_id }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`createPortalSession failed: ${res.status} ${text}`);
+  }
+
+  return res.json();
+}
+
+/**
+ * サブスク解約（Netflix型：次回更新で停止）
+ * POST /plan/cancel
+ *
+ * 返り値: { ok:true, cancel_at: ISOString|null }
+ */
+export async function cancelPlan({ user_id }) {
+  const res = await fetch(`${BASE}/plan/cancel`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ user_id }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`cancelPlan failed: ${res.status} ${text}`);
+  }
+
+  return res.json();
+}

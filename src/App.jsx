@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import {analyzeHand,followupQuestion,saveHistory,fetchPlan,createCheckoutSession,updateHistoryConversation,} from "./api.js";
+import {analyzeHand,followupQuestion,saveHistory,fetchPlan,createCheckoutSession,createPortalSession,cancelPlan,updateHistoryConversation,} from "./api.js";
 import CardPickerModal from "./components/CardPickerModal.jsx";
 import BoardPickerModal from "./components/BoardPickerModal.jsx";
 import ResultModal from "./components/ResultModal.jsx";  
@@ -13,6 +13,57 @@ function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultS
   const TERMS_URL = "terms.html";
   const SUPPORT_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdCmr7yabVudrcoQ6VtIBnTua3r8GffCvTZgSArG4bMbNCQ_w/viewform?usp=dialog"; 
   const [activeTab, setActiveTab] = useState("account");
+
+  const resolveUserId = () => {
+    if (userInfo?.user_id) return userInfo.user_id;
+    try {
+      const u = JSON.parse(localStorage.getItem("pa_user") || "null");
+      return u?.user_id || null;
+    } catch {
+      return null;
+    }
+  };
+
+  const handleOpenPortal = async () => {
+    const user_id = resolveUserId();
+    if (!user_id) {
+      alert("ユーザー情報が見つかりません。再ログインしてください。");
+      return;
+    }
+    try {
+      const resp = await createPortalSession({ user_id });
+      if (resp?.ok && resp?.url) {
+        window.location.href = resp.url;
+      } else {
+        alert("管理画面のURLを取得できませんでした。");
+      }
+    } catch (e) {
+      console.error(e);
+      alert(`管理画面を開けませんでした: ${String(e?.message || e)}`);
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    const user_id = resolveUserId();
+    if (!user_id) {
+      alert("ユーザー情報が見つかりません。再ログインしてください。");
+      return;
+    }
+    const ok = window.confirm("定期購入を解約します。次回更新日までは利用できます。よろしいですか？");
+    if (!ok) return;
+
+    try {
+      const resp = await cancelPlan({ user_id });
+      const cancelAt = resp?.cancel_at ? new Date(resp.cancel_at).toLocaleString() : null;
+      alert(cancelAt ? `解約を受け付けました。利用期限: ${cancelAt}` : "解約を受け付けました。");
+      // 反映待ちでも、今の表示を更新しておく
+      onClose?.();
+      window.location.reload();
+    } catch (e) {
+      console.error(e);
+      alert(`解約に失敗しました: ${String(e?.message || e)}`);
+    }
+  };
 
   if (!open) return null;
   return (
@@ -205,6 +256,42 @@ function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultS
       プラン変更は右上の「プラン変更」から行えます。
     </div>
 
+    <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 8 }}>
+      <button
+        type="button"
+        onClick={handleOpenPortal}
+        style={{
+          width: "fit-content",
+          padding: "6px 10px",
+          borderRadius: 10,
+          border: "1px solid rgba(148,163,184,0.22)",
+          background: "rgba(2,6,23,0.28)",
+          color: "#cbd5e1",
+          cursor: "pointer",
+          fontSize: 12,
+        }}
+      >
+        プラン管理（変更・カード・領収書）
+      </button>
+
+      <button
+        type="button"
+        onClick={handleCancelSubscription}
+        style={{
+          width: "fit-content",
+          padding: "6px 10px",
+          borderRadius: 10,
+          border: "1px solid rgba(148,163,184,0.18)",
+          background: "transparent",
+          color: "rgba(203,213,225,0.65)",
+          cursor: "pointer",
+          fontSize: 12,
+        }}
+      >
+        定期購入を解約
+      </button>
+    </div>
+
     {typeof onLogout === "function" && (
       <div style={{ marginTop: 18 }}>
         <button
@@ -287,8 +374,6 @@ function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultS
     </div>
   );
 }
-
-
 
 /* ====== layout utils ====== */
 function useSize(){
