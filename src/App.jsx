@@ -256,40 +256,41 @@ function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultS
       プラン変更は右上の「プラン変更」から行えます。
     </div>
 
-    <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 8 }}>
+    <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 6 }}>
       <button
         type="button"
         onClick={handleOpenPortal}
         style={{
           width: "fit-content",
-          padding: "6px 10px",
-          borderRadius: 10,
-          border: "1px solid rgba(148,163,184,0.22)",
-          background: "rgba(2,6,23,0.28)",
-          color: "#cbd5e1",
+          padding: 0,
+          border: "none",
+          background: "transparent",
+          color: "#93c5fd",
           cursor: "pointer",
           fontSize: 12,
         }}
       >
-        プラン管理（変更・カード・領収書）
+        プラン管理（変更・支払い方法・領収書）
       </button>
 
-      <button
-        type="button"
-        onClick={handleCancelSubscription}
-        style={{
-          width: "fit-content",
-          padding: "6px 10px",
-          borderRadius: 10,
-          border: "1px solid rgba(148,163,184,0.18)",
-          background: "transparent",
-          color: "rgba(203,213,225,0.65)",
-          cursor: "pointer",
-          fontSize: 12,
-        }}
-      >
-        定期購入を解約
-      </button>
+      {plan && String(plan).toLowerCase() !== "free" && (
+        <button
+          type="button"
+          onClick={handleCancelSubscription}
+          style={{
+            width: "fit-content",
+            padding: 0,
+            border: "none",
+            background: "transparent",
+            color: "rgba(203,213,225,0.65)",
+            cursor: "pointer",
+            fontSize: 11,
+            textDecoration: "underline",
+          }}
+        >
+          定期購入を解約（次回更新で停止）
+        </button>
+      )}
     </div>
 
     {typeof onLogout === "function" && (
@@ -2056,39 +2057,49 @@ if (s === heroSeat) {
         >
           閉じる
         </button>
-        <button
-          className="btn glow btn-accent"
-          onClick={async () => {
-            try {
-              const u = JSON.parse(
-                localStorage.getItem("pa_user") || "null"
-              );
-              if (!u || !u.user_id) {
-                alert("ログイン情報が見つかりません。再ログインしてください。");
-                return;
-              }
+<button
+  className="btn glow btn-accent"
+  onClick={async () => {
+    try {
+      const u = JSON.parse(localStorage.getItem("pa_user") || "null");
+      if (!u || !u.user_id) {
+        alert("ログイン情報が見つかりません。再ログインしてください。");
+        return;
+      }
 
-              const resp = await createCheckoutSession({
-                user_id: u.user_id,
-                email: u.email || "",
-                plan: planForCheckout,
-              });
+      const currentPlan = String(plan || "free").toLowerCase();
 
-              if (resp && resp.ok && resp.url) {
-                window.location.href = resp.url;
-              } else if (resp && resp.url) {
-                window.location.href = resp.url;
-              } else {
-                alert("決済画面のURLを取得できませんでした。");
-              }
-            } catch (e) {
-              console.error(e);
-              alert(`決済の開始に失敗しました: ${String(e?.message || e)}`);
-            }
-          }}
-        >
-          決済へ進む
-        </button>
+      // すでに有料プランの人は Billing Portal で変更（アップ/ダウン/支払い方法）
+      if (currentPlan !== "free") {
+        const portal = await createPortalSession({ user_id: u.user_id });
+        if (portal?.url) {
+          window.location.href = portal.url;
+          return;
+        }
+        alert("管理画面のURLを取得できませんでした。");
+        return;
+      }
+
+      // 無料 → Checkout で新規加入
+      const resp = await createCheckoutSession({
+        user_id: u.user_id,
+        email: u.email || "",
+        plan: planForCheckout,
+      });
+
+      if (resp?.url) {
+        window.location.href = resp.url;
+      } else {
+        alert("決済画面のURLを取得できませんでした。");
+      }
+    } catch (e) {
+      console.error(e);
+      alert(`処理に失敗しました: ${String(e?.message || e)}`);
+    }
+  }}
+>
+  {plan && String(plan).toLowerCase() !== "free" ? "管理画面へ" : "決済へ進む"}
+</button>
       </div>
     </div>
   </div>
