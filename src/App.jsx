@@ -1977,6 +1977,13 @@ if (s === heroSeat) {
         })}
       </div>
 
+      <div style={{ marginTop: 12, fontSize: 12, color: "#9ca3af", lineHeight: 1.6 }}>
+        <div>・既に課金中の方は、登録済みの支払い方法でプラン変更が反映されます。</div>
+        <div>・アップグレードは即時反映され、差額が日割りで請求される場合があります。</div>
+        <div>・ダウングレードは次回更新日から反映されます。</div>
+        <div>・解約／支払い方法変更／領収書は「設定 ＞ プラン ＞ プラン管理」から行えます。</div>
+      </div>
+
       <div
         style={{
           display: "flex",
@@ -2010,32 +2017,43 @@ if (s === heroSeat) {
         return;
       }
 
-      // 既存課金ユーザー：アプリ内で /plan/change を叩く（Portalではない）
-      if (currentPlan !== "free") {
-        // changePlan は api.js 側に追加する（後述）
-        const resp = await changePlan({
-          user_id: u.user_id,
-          new_plan: nextPlan,
-        });
+// 既存課金ユーザー：アプリ内で /plan/change を叩く（Portalではない）
+if (currentPlan !== "free") {
+  // プランの大小関係（free < basic < pro < premium）
+  const rank = { free: 0, basic: 1, pro: 2, premium: 3 };
+  const isUpgrade = (rank[nextPlan] ?? 0) > (rank[currentPlan] ?? 0);
+  const isDowngrade = (rank[nextPlan] ?? 0) < (rank[currentPlan] ?? 0);
 
-        if (!resp?.ok) {
-          alert(resp?.error || "プラン変更に失敗しました。");
-          return;
-        }
+  const msg = isUpgrade
+    ? `【確認】プランを ${currentPlan.toUpperCase()} → ${nextPlan.toUpperCase()} に変更します。\n登録済みの支払い方法で直ちにアップグレードされ、差額が日割りで請求される場合があります。\n続行しますか？`
+    : isDowngrade
+      ? `【確認】プランを ${currentPlan.toUpperCase()} → ${nextPlan.toUpperCase()} に変更します。\nダウングレードは次回更新日から反映されます（通常、今すぐは安くなりません）。\n続行しますか？`
+      : `【確認】プランを変更します。続行しますか？`;
 
-if (resp.action === "upgraded") {
-  alert("アップグレードしました（差額が日割りで請求されます）。");
-} else if (resp.action === "downgrade_scheduled") {
-  alert("ダウングレードを予約しました（次回更新日から反映されます）。");
-} else if (resp.action === "noop") {
-  alert("すでに現在のプランが選択されています。");
-} else {
-  alert("プラン変更を受け付けました。");
+  const ok = window.confirm(msg);
+  if (!ok) return;
+
+  const resp = await changePlan({
+    user_id: u.user_id,
+    new_plan: nextPlan,
+  });
+
+  if (!resp?.ok) {
+    alert(resp?.error || "プラン変更に失敗しました。");
+    return;
+  }
+
+  if (resp.action === "upgrade") {
+    alert("アップグレードしました。登録済みの支払い方法で課金が発生します（差額は日割りの場合あり）。");
+  } else if (resp.action === "downgrade_scheduled") {
+    alert("ダウングレードを予約しました（次回更新日から反映されます）。");
+  } else {
+    alert("プラン変更を受け付けました。");
+  }
+
+  window.location.reload();
+  return;
 }
-        // 表示更新（plan/remaining の取り直し）
-        window.location.reload();
-        return;
-      }
 
       // 無料 → Checkout で新規加入
       const checkout = await createCheckoutSession({
