@@ -1,35 +1,52 @@
-const BASE = "https://poker-backend-production-64cf.up.railway.app";
+// Vite: .env に VITE_API_BASE=... を設定（未設定時は従来URLにフォールバック）
+const BASE =
+  import.meta?.env?.VITE_API_BASE ||
+  "https://poker-backend-production-64cf.up.railway.app";
+
+// 共通リクエスト（JSON/テキストどっちが返ってきても落ちにくくする）
+async function requestJson(path, options = {}) {
+  const res = await fetch(`${BASE}${path}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    },
+  });
+
+  const raw = await res.text().catch(() => "");
+  let data = null;
+  try {
+    data = raw ? JSON.parse(raw) : null;
+  } catch {
+    // 502などでHTMLが返ってもここでは落とさない
+  }
+
+  if (!res.ok) {
+    const detail = data ? JSON.stringify(data) : raw;
+    throw new Error(`${path} failed: ${res.status} ${detail}`);
+  }
+
+  // 成功時：JSONが取れたらJSON、取れなければ raw を返す
+  return data ?? { ok: true, raw };
+}
 
 /**
  * メイン解析API
  */
-export async function analyzeHand(payload) {
-  const res = await fetch(`${BASE}/analyze`, {
+export function analyzeHand(payload) {
+  return requestJson("/analyze", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`analyze failed: ${res.status} ${text}`);
-  }
-  return res.json();
 }
-
 /**
  * 追い質問API
  */
-export async function followupQuestion(payload) {
-  const res = await fetch(`${BASE}/followup`, {
+export function followupQuestion(payload) {
+  return requestJson("/followup", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`followup failed: ${res.status} ${text}`);
-  }
-  return res.json();
 }
 
 /**
