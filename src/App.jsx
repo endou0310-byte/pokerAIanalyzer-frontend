@@ -2023,15 +2023,15 @@ if (s === heroSeat) {
           return;
         }
 
-        // 返却の action に応じて表示（backendの実装に合わせる）
-        if (resp.action === "upgrade") {
-          alert("アップグレードしました（差額が日割りで請求されます）。");
-        } else if (resp.action === "downgrade_scheduled") {
-          alert("ダウングレードを予約しました（次回更新日から反映されます）。");
-        } else {
-          alert("プラン変更を受け付けました。");
-        }
-
+if (resp.action === "upgraded") {
+  alert("アップグレードしました（差額が日割りで請求されます）。");
+} else if (resp.action === "downgrade_scheduled") {
+  alert("ダウングレードを予約しました（次回更新日から反映されます）。");
+} else if (resp.action === "noop") {
+  alert("すでに現在のプランが選択されています。");
+} else {
+  alert("プラン変更を受け付けました。");
+}
         // 表示更新（plan/remaining の取り直し）
         window.location.reload();
         return;
