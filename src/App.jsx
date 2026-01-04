@@ -1005,12 +1005,16 @@ async function sendFollowup() {
 
   setSendingFU(true);
   try {
-    const body = {
-      snapshot: result.snapshot,
-      evaluation: result.evaluation,
-      question: q,
-    };
-    const res = await followupQuestion(body);
+const u = JSON.parse(localStorage.getItem("pa_user") || "{}");
+
+const body = {
+  snapshot: result.snapshot,
+  evaluation: result.evaluation,
+  question: q,
+  user_id: u.user_id || null,
+  hand_id: historyHandId || result?.evaluation?.handId || null,
+};
+const res = await followupQuestion(body);
     const fu = res.result || res;
 
     // アシスタント側のテキストを取り出し
@@ -2027,7 +2031,7 @@ if (currentPlan !== "free") {
   const msg = isUpgrade
     ? `【確認】プランを ${currentPlan.toUpperCase()} → ${nextPlan.toUpperCase()} に変更します。\n登録済みの支払い方法で直ちにアップグレードされ、差額が日割りで請求される場合があります。\n続行しますか？`
     : isDowngrade
-      ? `【確認】プランを ${currentPlan.toUpperCase()} → ${nextPlan.toUpperCase()} に変更します。\nダウングレードは次回更新日から反映されます（通常、今すぐは安くなりません）。\n続行しますか？`
+      ? `【確認】プランを ${currentPlan.toUpperCase()} → ${nextPlan.toUpperCase()} に変更します。\nダウングレードは次回更新日から反映されます。\n続行しますか？`
       : `【確認】プランを変更します。続行しますか？`;
 
   const ok = window.confirm(msg);

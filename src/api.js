@@ -71,7 +71,7 @@ export async function updateHistoryConversation(a, b, c) {
       ? a
       : { user_id: a, hand_id: b, conversation: c };
 
-  const res = await fetch(`${BASE}/history/update_conversation`, {
+  const res = await fetch(`${BASE}/history/update-conversation`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
