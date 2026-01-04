@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import {analyzeHand,followupQuestion,saveHistory,fetchPlan,createCheckoutSession,createPortalSession,cancelPlan,updateHistoryConversation,} from "./api.js";
+import {analyzeHand,followupQuestion,saveHistory,fetchPlan,createCheckoutSession,createPortalSession,updateHistoryConversation,} from "./api.js";
 import CardPickerModal from "./components/CardPickerModal.jsx";
 import BoardPickerModal from "./components/BoardPickerModal.jsx";
 import ResultModal from "./components/ResultModal.jsx";  
@@ -40,28 +40,6 @@ function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultS
     } catch (e) {
       console.error(e);
       alert(`管理画面を開けませんでした: ${String(e?.message || e)}`);
-    }
-  };
-
-  const handleCancelSubscription = async () => {
-    const user_id = resolveUserId();
-    if (!user_id) {
-      alert("ユーザー情報が見つかりません。再ログインしてください。");
-      return;
-    }
-    const ok = window.confirm("定期購入を解約します。次回更新日までは利用できます。よろしいですか？");
-    if (!ok) return;
-
-    try {
-      const resp = await cancelPlan({ user_id });
-      const cancelAt = resp?.cancel_at ? new Date(resp.cancel_at).toLocaleString() : null;
-      alert(cancelAt ? `解約を受け付けました。利用期限: ${cancelAt}` : "解約を受け付けました。");
-      // 反映待ちでも、今の表示を更新しておく
-      onClose?.();
-      window.location.reload();
-    } catch (e) {
-      console.error(e);
-      alert(`解約に失敗しました: ${String(e?.message || e)}`);
     }
   };
 
