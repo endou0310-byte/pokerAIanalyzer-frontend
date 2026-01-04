@@ -256,65 +256,21 @@ function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultS
       プラン変更は右上の「プラン変更」から行えます。
     </div>
 
-    <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 6 }}>
-      <button
-        type="button"
-        onClick={handleOpenPortal}
-        style={{
-          width: "fit-content",
-          padding: 0,
-          border: "none",
-          background: "transparent",
-          color: "#93c5fd",
-          cursor: "pointer",
-          fontSize: 12,
+    <div style={{ marginTop: 12 }}>
+      <a
+        href="#"
+        onClick={async (e) => {
+          e.preventDefault();
+          await handleOpenPortal();
         }}
+        style={{ color: "#93c5fd", textDecoration: "none" }}
       >
         プラン管理（変更・支払い方法・領収書）
-      </button>
-
-      {plan && String(plan).toLowerCase() !== "free" && (
-        <button
-          type="button"
-          onClick={handleCancelSubscription}
-          style={{
-            width: "fit-content",
-            padding: 0,
-            border: "none",
-            background: "transparent",
-            color: "rgba(203,213,225,0.65)",
-            cursor: "pointer",
-            fontSize: 11,
-            textDecoration: "underline",
-          }}
-        >
-          定期購入を解約（次回更新で停止）
-        </button>
-      )}
+      </a>
     </div>
-
-    {typeof onLogout === "function" && (
-      <div style={{ marginTop: 18 }}>
-        <button
-          type="button"
-          onClick={onLogout}
-          style={{
-            width: "100%",
-            padding: "10px 12px",
-            borderRadius: 10,
-            border: "1px solid rgba(255,255,255,0.14)",
-            background: "rgba(255,80,80,0.12)",
-            color: "#ffd1d1",
-            cursor: "pointer",
-            fontWeight: 600,
-          }}
-        >
-          ログアウト
-        </button>
-      </div>
-    )}
   </>
 )}
+
 
 {activeTab === "support" && (
   <>
