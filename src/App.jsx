@@ -2002,27 +2002,50 @@ if (s === heroSeat) {
       }
 
       const currentPlan = String(plan || "free").toLowerCase();
+      const nextPlan = String(planForCheckout || "free").toLowerCase();
 
-      // すでに有料プランの人は Billing Portal で変更（アップ/ダウン/支払い方法）
+      // 現在と同じプランを選んでいる場合は何もしない
+      if (currentPlan === nextPlan) {
+        alert("すでに現在のプランが選択されています。");
+        return;
+      }
+
+      // 既存課金ユーザー：アプリ内で /plan/change を叩く（Portalではない）
       if (currentPlan !== "free") {
-        const portal = await createPortalSession({ user_id: u.user_id });
-        if (portal?.url) {
-          window.location.href = portal.url;
+        // changePlan は api.js 側に追加する（後述）
+        const resp = await changePlan({
+          user_id: u.user_id,
+          new_plan: nextPlan,
+        });
+
+        if (!resp?.ok) {
+          alert(resp?.error || "プラン変更に失敗しました。");
           return;
         }
-        alert("管理画面のURLを取得できませんでした。");
+
+        // 返却の action に応じて表示（backendの実装に合わせる）
+        if (resp.action === "upgrade") {
+          alert("アップグレードしました（差額が日割りで請求されます）。");
+        } else if (resp.action === "downgrade_scheduled") {
+          alert("ダウングレードを予約しました（次回更新日から反映されます）。");
+        } else {
+          alert("プラン変更を受け付けました。");
+        }
+
+        // 表示更新（plan/remaining の取り直し）
+        window.location.reload();
         return;
       }
 
       // 無料 → Checkout で新規加入
-      const resp = await createCheckoutSession({
+      const checkout = await createCheckoutSession({
         user_id: u.user_id,
         email: u.email || "",
-        plan: planForCheckout,
+        plan: nextPlan,
       });
 
-      if (resp?.url) {
-        window.location.href = resp.url;
+      if (checkout?.url) {
+        window.location.href = checkout.url;
       } else {
         alert("決済画面のURLを取得できませんでした。");
       }
@@ -2032,7 +2055,7 @@ if (s === heroSeat) {
     }
   }}
 >
-  {plan && String(plan).toLowerCase() !== "free" ? "管理画面へ" : "決済へ進む"}
+  {plan && String(plan).toLowerCase() !== "free" ? "プランを変更する" : "決済へ進む"}
 </button>
       </div>
     </div>
