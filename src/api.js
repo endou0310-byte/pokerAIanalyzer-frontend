@@ -63,16 +63,25 @@ export async function fetchPlan(user_id) {
 /**
  * 会話（followup）の更新
  */
-export async function updateHistoryConversation(payload) {
+export async function updateHistoryConversation(a, b, c) {
+  // 互換：updateHistoryConversation(payload) でも
+  //       updateHistoryConversation(user_id, hand_id, conversation) でも動くようにする
+  const payload =
+    typeof a === "object" && a !== null
+      ? a
+      : { user_id: a, hand_id: b, conversation: c };
+
   const res = await fetch(`${BASE}/history/update_conversation`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
+
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(`updateHistoryConversation failed: ${res.status} ${text}`);
   }
+
   return res.json();
 }
 
@@ -131,6 +140,27 @@ export async function cancelPlan({ user_id }) {
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(`cancelPlan failed: ${res.status} ${text}`);
+  }
+
+  return res.json();
+}
+
+/**
+ * プラン変更（既存課金ユーザーの upgrade / downgrade予約）
+ * POST /plan/change
+ * body: { user_id, new_plan }
+ * 返り値例: { ok:true, action:"upgrade"|"downgrade_scheduled"|... }
+ */
+export async function changePlan({ user_id, new_plan }) {
+  const res = await fetch(`${BASE}/plan/change`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ user_id, new_plan }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`changePlan failed: ${res.status} ${text}`);
   }
 
   return res.json();

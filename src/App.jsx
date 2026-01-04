@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import {analyzeHand,followupQuestion,saveHistory,fetchPlan,createCheckoutSession,createPortalSession,updateHistoryConversation,} from "./api.js";
+import {analyzeHand,followupQuestion,saveHistory,fetchPlan,createCheckoutSession,createPortalSession,updateHistoryConversation,changePlan,} from "./api.js";
 import CardPickerModal from "./components/CardPickerModal.jsx";
 import BoardPickerModal from "./components/BoardPickerModal.jsx";
 import ResultModal from "./components/ResultModal.jsx";  
