@@ -232,6 +232,15 @@ function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultS
                       const d = await res.json();
                       if (d.ok) {
                         setDefaultStack(Number(localStack));
+                        // ★ 保存成功時に localStorage も更新
+                        try {
+                          const u = JSON.parse(localStorage.getItem("pa_user") || "null");
+                          if (u) {
+                            u.default_stack = Number(localStack);
+                            localStorage.setItem("pa_user", JSON.stringify(u));
+                          }
+                        } catch { }
+
                         alert("設定を保存しました");
                       } else {
                         alert("保存に失敗しました: " + (d.error || "unknown"));
@@ -513,6 +522,15 @@ export default function App() {
           const v = Number(data.user.default_stack);
           setDefaultStack(v);
           lastSavedDefaultStackRef.current = v;
+
+          // ★ DBから最新値を取れたら localStorage も更新（F5対策）
+          try {
+            const u = JSON.parse(localStorage.getItem("pa_user") || "null");
+            if (u) {
+              u.default_stack = v;
+              localStorage.setItem("pa_user", JSON.stringify(u));
+            }
+          } catch { }
 
           // heroStack が未設定なら初期表示も合わせる
           setHeroStack((prev) => (prev == null ? v : prev));
