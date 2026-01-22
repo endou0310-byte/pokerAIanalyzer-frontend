@@ -1,14 +1,14 @@
 // 移植元準拠：to方式 / 最小レイズ / アクター遷移 / ストリート遷移
 export const STREETS = ["PRE", "FLOP", "TURN", "RIVER"];
-const R10 = ["UTG","UTG+1","UTG+2","LJ","HJ","CO","BTN","SB","BB"];
-const R9  = ["UTG","UTG+1","UTG+2","LJ","HJ","CO","BTN","SB","BB"];
-const R8  = ["UTG","UTG+1","LJ","HJ","CO","BTN","SB","BB"];
-const R7  = ["UTG","UTG+1","HJ","CO","BTN","SB","BB"];
-const R6  = ["UTG","HJ","CO","BTN","SB","BB"];
-const R4  = ["UTG","BTN","SB","BB"];
-const R3  = ["BTN","SB","BB"];
-const R2  = ["BTN","BB"];
-const ringByPlayers = (n)=> n<=2?R2:n===3?R3:n===4?R4:n===6?R6:n===7?R7:n===8?R8:n===9?R9:R10;
+const R10 = ["UTG", "UTG+1", "UTG+2", "LJ", "HJ", "CO", "BTN", "SB", "BB"];
+const R9 = ["UTG", "UTG+1", "UTG+2", "LJ", "HJ", "CO", "BTN", "SB", "BB"];
+const R8 = ["UTG", "UTG+1", "LJ", "HJ", "CO", "BTN", "SB", "BB"];
+const R7 = ["UTG", "UTG+1", "HJ", "CO", "BTN", "SB", "BB"];
+const R6 = ["UTG", "HJ", "CO", "BTN", "SB", "BB"];
+const R4 = ["UTG", "BTN", "SB", "BB"];
+const R3 = ["BTN", "SB", "BB"];
+const R2 = ["BTN", "BB"];
+const ringByPlayers = (n) => n <= 2 ? R2 : n === 3 ? R3 : n === 4 ? R4 : n === 6 ? R6 : n === 7 ? R7 : n === 8 ? R8 : n === 9 ? R9 : R10;
 
 export function initialState(players, heroSeat, heroStack) {
   const seats = ringByPlayers(players);
@@ -16,20 +16,23 @@ export function initialState(players, heroSeat, heroStack) {
   const sb = seats.indexOf("SB");
   const bb = seats.indexOf("BB");
 
-  const stacks = Array(players).fill(100);
-  const h = seats.indexOf(heroSeat);
-  if (h >= 0) stacks[h] = Number(heroStack) || 100;
+  // 全員のスタックを user設定値 (=heroStack引数) で初期化
+  const startStack = Number(heroStack) || 100;
+  const stacks = Array(players).fill(startStack);
+
+  // const h = seats.indexOf(heroSeat);
+  // if (h >= 0) stacks[h] = startStack; // 既にfill済みなので不要だが念のため残すならこうなる
 
   const bets = Array(players).fill(0);
   const committed = Array(players).fill(0);
   const folded = Array(players).fill(false);
 
   if (players === 2) {
-    stacks[btn] = Math.max(0, stacks[btn] - 0.5); bets[btn]+=0.5; committed[btn]+=0.5;
-    stacks[bb]  = Math.max(0, stacks[bb]  - 1.0); bets[bb] +=1.0; committed[bb] +=1.0;
+    stacks[btn] = Math.max(0, stacks[btn] - 0.5); bets[btn] += 0.5; committed[btn] += 0.5;
+    stacks[bb] = Math.max(0, stacks[bb] - 1.0); bets[bb] += 1.0; committed[bb] += 1.0;
   } else {
-    stacks[sb] = Math.max(0, stacks[sb] - 0.5); bets[sb]+=0.5; committed[sb]+=0.5;
-    stacks[bb] = Math.max(0, stacks[bb] - 1.0); bets[bb]+=1.0; committed[bb]+=1.0;
+    stacks[sb] = Math.max(0, stacks[sb] - 0.5); bets[sb] += 0.5; committed[sb] += 0.5;
+    stacks[bb] = Math.max(0, stacks[bb] - 1.0); bets[bb] += 1.0; committed[bb] += 1.0;
   }
 
   return {
@@ -48,25 +51,25 @@ export function initialState(players, heroSeat, heroStack) {
 
     actor: (players === 2) ? btn : seats.indexOf("UTG"),
 
-    actions: { PRE:[], FLOP:[], TURN:[], RIVER:[] },
-    board: { FLOP:[], TURN:[], RIVER:[] },
+    actions: { PRE: [], FLOP: [], TURN: [], RIVER: [] },
+    board: { FLOP: [], TURN: [], RIVER: [] },
   };
 }
 
-const aliveIdx = (S)=> [...Array(S.players).keys()].filter(i => !S.folded[i] && (S.stacks[i]??0) > 0);
+const aliveIdx = (S) => [...Array(S.players).keys()].filter(i => !S.folded[i] && (S.stacks[i] ?? 0) > 0);
 
-export function legal(S){
-  if (S.actor < 0) return { fold:false, check:false, call:false, bet:false, raise:false };
+export function legal(S) {
+  if (S.actor < 0) return { fold: false, check: false, call: false, bet: false, raise: false };
   return {
     fold: !S.folded[S.actor],
     check: S.currentBet === S.committed[S.actor],
-    call:  S.currentBet >  S.committed[S.actor],
-    bet:   S.currentBet === 0,
-    raise: S.currentBet  >  0,
+    call: S.currentBet > S.committed[S.actor],
+    bet: S.currentBet === 0,
+    raise: S.currentBet > 0,
   };
 }
 
-function nextIdx(S, i){
+function nextIdx(S, i) {
   const start = (i + 1) % S.players;
   let k = start;
   let tried = 0;
@@ -78,24 +81,24 @@ function nextIdx(S, i){
   return -1;
 }
 
-function pushAction(S, obj){
+function pushAction(S, obj) {
   S.actions[S.street] = [...S.actions[S.street], obj];
 }
 
-export function actFold(S){
+export function actFold(S) {
   S.folded = S.folded.slice(); S.folded[S.actor] = true;
-  pushAction(S, { actor: S.seats[S.actor], type:"FOLD" });
+  pushAction(S, { actor: S.seats[S.actor], type: "FOLD" });
   S.acted = new Set([...S.acted, S.actor]);
   rotateOrStreet(S);
 }
 
-export function actCheck(S){
-  pushAction(S, { actor: S.seats[S.actor], type:"CHECK" });
+export function actCheck(S) {
+  pushAction(S, { actor: S.seats[S.actor], type: "CHECK" });
   S.acted = new Set([...S.acted, S.actor]);
   rotateOrStreet(S);
 }
 
-export function actCall(S){
+export function actCall(S) {
   const need = Math.max(0, S.currentBet - S.committed[S.actor]);
   const put = Math.min(need, S.stacks[S.actor] ?? 0);
 
@@ -104,13 +107,13 @@ export function actCall(S){
   const nb = S.bets.slice(); nb[S.actor] += put;
 
   S.stacks = ns; S.committed = nc; S.bets = nb;
-  pushAction(S, { actor: S.seats[S.actor], type:"CALL", put });
+  pushAction(S, { actor: S.seats[S.actor], type: "CALL", put });
 
   S.acted = new Set([...S.acted, S.actor]);
   rotateOrStreet(S);
 }
 
-export function actTo(S, to){
+export function actTo(S, to) {
   // 直前レイズ増分に基づく最小 To
   const minRaiseSize = S.currentBet === 0 ? 1.0 : Math.max(1.0, S.lastRaiseSize || 1.0);
   const minTo = S.currentBet === 0 ? to : (S.lastBetTo + minRaiseSize);
@@ -126,7 +129,7 @@ export function actTo(S, to){
   const prevBet = S.currentBet;
 
   S.stacks = ns; S.committed = nc; S.bets = nb;
-  pushAction(S, { actor: S.seats[S.actor], type: (S.currentBet===0?"BET":"RAISE"), to: toFixed, put: need });
+  pushAction(S, { actor: S.seats[S.actor], type: (S.currentBet === 0 ? "BET" : "RAISE"), to: toFixed, put: need });
 
   // ここが修正点：直前レイズの「増加分」を保持
   S.lastRaiseSize = Math.max(1.0, +(toFixed - prevBet).toFixed(2));
@@ -138,8 +141,8 @@ export function actTo(S, to){
   rotateOrStreet(S);
 }
 
-function settleStreetAndMaybeNext(S){
-  const sum = S.bets.reduce((a,b)=>a+b,0);
+function settleStreetAndMaybeNext(S) {
+  const sum = S.bets.reduce((a, b) => a + b, 0);
   if (sum > 0) S.pot = +(S.pot + sum).toFixed(2);
   S.bets = Array(S.players).fill(0);
 
@@ -159,7 +162,7 @@ function settleStreetAndMaybeNext(S){
   }
 }
 
-function rotateOrStreet(S){
+function rotateOrStreet(S) {
   const actives = aliveIdx(S);
 
   if (actives.length <= 1) {
@@ -177,7 +180,7 @@ function rotateOrStreet(S){
       settleStreetAndMaybeNext(S);
       S.actor = -1;
     } else {
-      const nextStreet = { PRE:"FLOP", FLOP:"TURN", TURN:"RIVER" }[S.street];
+      const nextStreet = { PRE: "FLOP", FLOP: "TURN", TURN: "RIVER" }[S.street];
       S.street = nextStreet;
       settleStreetAndMaybeNext(S);
     }
@@ -187,7 +190,7 @@ function rotateOrStreet(S){
   S.actor = nextIdx(S, S.actor);
 }
 
-export function presets(S){
+export function presets(S) {
   if (S.currentBet === 0) {
     const opens = [2, 2.5, 3, 3.5, 4];
     return opens.map(v => ({ label: `${v}x (${v.toFixed(2)}bb)`, to: +v.toFixed(2) }));
