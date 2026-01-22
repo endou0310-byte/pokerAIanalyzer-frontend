@@ -204,11 +204,45 @@ function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultS
                 type="number"
                 value={localStack}
                 onChange={(e) => setLocalStack(e.target.value)}
-                onBlur={() => setDefaultStack(Number(localStack))}
                 min={1}
+                style={{ width: "100%", padding: "8px", borderRadius: 6, border: "1px solid #334", background: "rgba(0,0,0,0.2)", color: "#fff" }}
               />
-              <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 10 }}>
+              <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 16, marginTop: 8 }}>
                 全座席のデフォルトスタックを調整できます。個別に変更したい場合は、座席をクリックすることでスタックを変更できます。
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <button
+                  className="btn btn--primary"
+                  disabled={Number(localStack) === Number(defaultStack)}
+                  style={{
+                    opacity: Number(localStack) === Number(defaultStack) ? 0.5 : 1,
+                    cursor: Number(localStack) === Number(defaultStack) ? "not-allowed" : "pointer"
+                  }}
+                  onClick={async () => {
+                    const uid = resolveUserId();
+                    if (!uid) return alert("ユーザーIDが見つかりません");
+
+                    try {
+                      const res = await fetch(`${API_BASE}/auth/settings`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ user_id: uid, default_stack: Number(localStack) })
+                      });
+                      const d = await res.json();
+                      if (d.ok) {
+                        setDefaultStack(Number(localStack));
+                        alert("設定を保存しました");
+                      } else {
+                        alert("保存に失敗しました: " + (d.error || "unknown"));
+                      }
+                    } catch (e) {
+                      alert("エラー: " + e.message);
+                    }
+                  }}
+                >
+                  変更を保存
+                </button>
               </div>
             </>
           )}
@@ -461,14 +495,14 @@ export default function App() {
     (async () => {
       try {
         const res = await fetch(
-          `${API_BASE}/settings/user_info?user_id=${encodeURIComponent(auth.user.user_id)}`
+          `${API_BASE}/auth/me?user_id=${encodeURIComponent(auth.user.user_id)}`
         );
         if (!res.ok) return;
 
         const data = await res.json();
 
-        if (data?.ok && data?.default_stack != null) {
-          const v = Number(data.default_stack);
+        if (data?.ok && data?.user?.default_stack != null) {
+          const v = Number(data.user.default_stack);
           setDefaultStack(v);
           lastSavedDefaultStackRef.current = v;
 
@@ -476,41 +510,12 @@ export default function App() {
           setHeroStack((prev) => (prev == null ? v : prev));
         }
       } catch {
-        // 取得失敗時は何もしない（デフォルト値を維持）
+        // 取得失敗時は何もしない
       }
     })();
   }, [auth.loggedIn, auth.user?.user_id]);
 
-  // ==== default_stack を DB に保存（②：ここに追加するのが適正）====
-  useEffect(() => {
-    if (!auth.loggedIn || !auth.user?.user_id) return;
-
-    // 読み込み直後や同一値は保存しない
-    if (lastSavedDefaultStackRef.current === defaultStack) return;
-
-    const t = setTimeout(async () => {
-      try {
-        const res = await fetch(`${API_BASE}/settings/update_default_stack`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            user_id: auth.user.user_id,
-            default_stack: Number(defaultStack),
-          }),
-        });
-        if (!res.ok) return;
-
-        const data = await res.json();
-        if (data?.ok && data?.default_stack != null) {
-          lastSavedDefaultStackRef.current = Number(data.default_stack);
-        }
-      } catch {
-        // 失敗時は何もしない（必要ならトースト表示に変更可）
-      }
-    }, 500);
-
-    return () => clearTimeout(t);
-  }, [defaultStack, auth.loggedIn, auth.user?.user_id]);
+  // ※ auto-save was removed. SettingsModal now handles manual save.
 
   // プラン情報の取得
   useEffect(() => {
