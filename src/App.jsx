@@ -582,8 +582,8 @@ export default function App() {
   /* 左ペイン */
   const [players, setPlayers] = useState(6);
   const [heroSeat, setHeroSeat] = useState("UTG");
-  // 新規ハンドの初期値は defaultStack を使いたいので null 開始にする
-  const [heroStack, setHeroStack] = useState(null);
+  // 新規ハンドの初期値は defaultStack を使い、即座に反映させる
+  const [heroStack, setHeroStack] = useState(defaultStack);
 
   /* engine */
   const [recording, setRecording] = useState(false);
