@@ -288,18 +288,41 @@ input[type="range"].bb-slider::-webkit-slider-thumb {
   flex-wrap: wrap;
 }
 
+/* Improve Chip Contrast */
 .chip {
   padding: 6px 14px;
   border-radius: 99px;
   font-size: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.12);
+  /* Slightly lighter for visibility */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  /* Brighter text than muted */
   cursor: pointer;
   transition: 0.2s;
 }
 
 .chip:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Limit the width of the Raise Bar */
+.raise-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 500px;
+  /* Limit width */
+  margin-top: 8px;
+  /* Space from chips */
+}
+
+.raise-fixed {
+  min-width: 140px;
+  /* Ensure button text fits */
 }
 
 .chip.active {
