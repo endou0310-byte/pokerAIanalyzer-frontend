@@ -35,47 +35,61 @@
       min-height: 100vh;
     }
 
-    /* Nav - Glass Pill */
-    .nav {
+    /* Topbar matching App.jsx */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: 64px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      max-width: 960px;
-      margin: 24px auto 0;
-      padding: 8px 12px;
-      border-radius: 999px;
-
+      justify-content: space-between;
+      padding: 0 24px;
       background: rgba(5, 9, 16, 0.6);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .nav a {
-      color: var(--muted);
-      text-decoration: none;
+    .logo-pill {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+      margin-right: 12px;
+    }
+
+    .top-title {
       font-size: 13px;
-      font-weight: 500;
+      color: var(--muted);
+      opacity: 0.8;
+      border-left: 1px solid rgba(255,255,255,0.15);
+      padding-left: 12px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .btn-nav {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #e2e8f0;
       padding: 8px 16px;
       border-radius: 999px;
-      transition: all 0.2s ease;
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
-
-    .nav a:hover {
+    .btn-nav:hover {
+      background: rgba(255, 255, 255, 0.2);
       color: #fff;
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .nav a[aria-current="page"] {
-      color: #fff;
-      background: linear-gradient(135deg, rgba(60, 100, 180, 0.9), rgba(60, 130, 210, 0.9));
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    }
-    
-    .nav-right {
-      margin-left: auto;
+      border-color: rgba(255, 255, 255, 0.4);
     }
 
     .page {
@@ -334,11 +348,21 @@
 </head>
 <body>
   <!-- ヘッダー -->
-  <div class="nav">
-<a href="index.html">ハンド記録</a>
-<a href="history.html" aria-current="page">履歴</a>
-<a href="#" id="logoutLink" class="nav-right">ログアウト</a>
-  </div>
+  <header class="topbar">
+    <div style="display: flex; align-items: center;">
+      <div class="logo-pill">Poker Analyzer</div>
+      <div class="top-title">履歴</div>
+    </div>
+    
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <a href="index.html" class="btn-nav">
+        <span>ハンド記録</span>
+      </a>
+      <a href="#" id="logoutLink" class="btn-nav">
+        <span>ログアウト</span>
+      </a>
+    </div>
+  </header>
 
   <main class="page">
     <h1>解析履歴</h1>
