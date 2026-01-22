@@ -4,206 +4,184 @@
   <meta charset="UTF-8" />
   <title>Poker Analyzer | ログイン</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- NOTE: ./css/styles.css が 404 になっているため、login.html は inline CSS のみに統一 -->
-   <style>
+  
+  <style>
+    /* 
+     * Login Page Style - Premium Glassmorphism
+     */
     :root {
-      --bg-color: #050910;
-      --card-bg: rgba(10, 14, 25, 0.85);
-      --accent-blue: #60a5fa;
-      --text-main: #f3f7ff;
-      --text-muted: #8d99ad;
-      --border-color: rgba(120, 180, 255, 0.15);
+      --bg-color: #020408;
+      --card-bg: rgba(13, 22, 35, 0.65);
+      --border-color: rgba(100, 149, 237, 0.15);
+      
+      --text-main: #eef4ff;
+      --text-muted: #94a3b8;
+      --accent-cyan: #00d4ff;
+      --accent-glow: rgba(0, 212, 255, 0.4);
+      
+      --radius: 20px;
     }
 
     body {
-      background: var(--bg-color);
+      background-color: var(--bg-color);
+      /* ノイズ + グラデーション */
+      background-image: 
+        url('./noise.svg'),
+        radial-gradient(circle at 30% 20%, #0f2240 0%, transparent 60%),
+        radial-gradient(circle at 80% 80%, #0a1120 0%, transparent 60%);
+      background-repeat: repeat, no-repeat, no-repeat;
+      background-size: 100px 100px, 100% 100%, 100% 100%;
+      
       color: var(--text-main);
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
       min-height: 100vh;
       margin: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 24px;
     }
 
     .shell {
-      width: min(1000px, 100%);
+      width: min(1080px, 100%);
       display: flex;
       flex-direction: column;
-      gap: 32px;
+      gap: 40px;
     }
 
-    /* Main Section: Hero + Login */
+    /* Main Grid */
     .main-grid {
       display: grid;
-      grid-template-columns: 1.3fr 0.7fr;
-      gap: 24px;
-      align-items: start;
+      grid-template-columns: 1.4fr 0.8fr;
+      gap: 32px;
+      align-items: center;
     }
-
     @media (max-width: 850px) {
       .main-grid { grid-template-columns: 1fr; }
     }
 
+    /* Glass Cards */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 24px;
-      padding: 32px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(10px);
+      border-top-color: rgba(100, 149, 237, 0.3); /* 光の反射 */
+      border-radius: var(--radius);
+      padding: 40px;
+      
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
+        0 25px 60px rgba(0, 0, 0, 0.6);
     }
 
-    /* hero-card は dim（暗幕）用に position を持たせる */
-    .hero-card{
+    /* Hero Section */
+    .hero-card {
       position: relative;
       overflow: hidden;
+      padding: 48px;
     }
-
-    /* 追加：読みやすさ用のうっすら暗幕（必要なら） */
-    .hero-dim{
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 20% 20%, rgba(0,0,0,0.0), rgba(0,0,0,0.35));
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    /* Brand & Hero */
-    .brand {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 24px;
-    }
-    .brand-title {
+    
+    .logo-area {
+      letter-spacing: 0.15em;
       font-weight: 800;
-      letter-spacing: .1em;
+      font-size: 18px;
       text-transform: uppercase;
-      font-size: 14px;
-      color: var(--accent-blue);
+      color: var(--accent-cyan);
+      text-shadow: 0 0 15px var(--accent-glow);
+      margin-bottom: 24px;
     }
 
     .hero h1 {
-      font-size: clamp(24px, 4vw, 32px);
-      line-height: 1.2;
-      margin: 0 0 16px 0;
+      font-size: clamp(32px, 5vw, 44px);
+      font-weight: 800;
+      line-height: 1.1;
+      margin: 0 0 24px 0;
+      
+      /* テキストグラデーション */
+      background: linear-gradient(135deg, #fff 30%, #a4c8ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
+    
     .hero p {
-      color: #b7c0cf;
-      line-height: 1.7;
-      font-size: 15px;
-      margin-bottom: 24px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      font-size: 16px;
+      margin-bottom: 32px;
     }
 
-    /* Key Features Tag */
-    .feature-tags {
+    .feature-list {
       display: flex;
-      gap: 8px;
+      gap: 12px;
       flex-wrap: wrap;
     }
     .tag {
-      font-size: 11px;
-      padding: 6px 12px;
-      background: rgba(96, 165, 250, 0.1);
-      border: 1px solid rgba(96, 165, 250, 0.2);
-      border-radius: 6px;
-      color: var(--accent-blue);
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: 99px;
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      background: rgba(0, 212, 255, 0.08);
+      color: #7dd3fc;
+      box-shadow: 0 0 10px rgba(0, 212, 255, 0.1);
     }
 
-    /* Step Flow (横並び) */
+    /* Login Form */
+    .login-box {
+      text-align: center;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+    .login-box h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .login-desc {
+      font-size: 13px; color: var(--text-muted);
+    }
+
+    .fineprint {
+      font-size: 11px; color: #556; line-height: 1.6;
+    }
+    .fineprint a { color: var(--accent-cyan); text-decoration: none; }
+
+    /* Steps */
     .steps-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
     }
-    @media (max-width: 600px) {
-      .steps-row { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 600px) { .steps-row { grid-template-columns: 1fr; } }
 
     .step-item {
-      text-align: center;
-      padding: 20px;
       background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: 16px;
-      border: 1px solid var(--border-color);
+      padding: 24px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .step-item:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.05);
     }
     .step-num {
-      width: 28px;
-      height: 28px;
-      background: var(--accent-blue);
-      color: #050910;
+      width: 32px; height: 32px;
+      margin: 0 auto 16px;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
       font-weight: bold;
-      margin: 0 auto 12px;
-      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
-    .step-text { font-size: 12px; color: #b7c0cf; line-height: 1.5; }
+    .step-text { font-size: 13px; color: #cbd5e1; }
 
-    /* Login Side */
-    .login-box {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    .login-box h2 { font-size: 20px; margin: 0; }
-    .google-btn-wrap { margin: 8px 0; }
-    .fineprint {
-      font-size: 11px;
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
-
-    /* Footer: Plans */
-    .footer-plans {
-      display: flex;
-      justify-content: center;
-      gap: 24px;
-      font-size: 12px;
-      color: var(--text-muted);
-      border-top: 1px solid var(--border-color);
+    /* Footer */
+    footer {
+      text-align: center;
       padding-top: 24px;
-      flex-wrap: wrap;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      color: #64748b; font-size: 12px;
     }
-    .plan-item b { color: var(--text-main); margin-right: 4px; }
-
-    .badge-dev {
-      font-size: 10px;
-      background: #1e293b;
-      padding: 2px 8px;
-      border-radius: 4px;
-      border: 1px solid #334155;
-    }
-    /* ===== ヒーロー画像枠（ここで表示を統一） ===== */
-    .hero-media{
-      position: relative;
-      margin: 0 0 18px 0;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid rgba(120, 180, 255, 0.18);
-      background: rgba(2, 6, 23, 0.35);
-      box-shadow: 0 18px 46px rgba(0,0,0,0.45);
-    }
-    .hero-media img{
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
-      display: block;
-      opacity: 0.92;
-      filter: saturate(1.1) contrast(1.05);
-    }
-    .hero-media::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      background: linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0.35));
-    }
-
-
   </style>
 
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -211,85 +189,68 @@
 
 <body>
   <div class="shell">
+    
     <div class="main-grid">
+      <!-- Left: Story -->
       <section class="card hero-card">
-        <div class="hero-dim"></div>
-
-        <div class="hero-content">
-          <div class="brand">
-            <div class="brand-title">Poker Analyzer</div>
-            <div class="badge-dev">Ver1.00</div>
+        <div class="logo-area">Poker Analyzer</div>
+        
+        <div class="hero">
+          <h1>思考を言語化し、<br>勝利の再現性を高める</h1>
+          <p>
+            あなたのポーカーハンドをAIが数学的根拠(Equity)と理論(GTO)に基づいて分析。<br>
+            感覚に頼らない「正しい思考プロセス」をインストールしましょう。
+          </p>
+          
+          <div class="feature-list">
+            <span class="tag">AIコーチング</span>
+            <span class="tag">勝率計算</span>
+            <span class="tag">思考ログ保存</span>
           </div>
-
-          <div class="hero">
-            <div class="hero-media">
-              <img src="./img/login-hero.png" alt="" aria-hidden="true" />
-            </div>
-
-            <h1>プレイ直後に、ハンドを整理して次に活かす</h1>
-            <p>
-              Poker Analyzerは、ポーカーのハンドを時系列で入力し、AIが状況に応じた最適な思考プロセスを言語化する解析ツールです。
-            </p>
-            <div class="feature-tags">
-              <span class="tag">ハンド再現</span>
-              <span class="tag">AI解析</span>
-              <span class="tag">履歴管理</span>
-              <span class="tag">深掘り質問</span>
-            </div>
-          </div>
+        </div>
       </section>
 
+      <!-- Right: Login -->
       <aside class="card login-box">
-        <h2>ログイン</h2>
-        <p style="font-size:13px; color:#b7c0cf; margin:0;">
-          解析の開始、履歴の保存にはGoogleアカウントが必要です。
-        </p>
+        <div>
+          <h2>アカウント作成 / ログイン</h2>
+          <p class="login-desc">Googleアカウントですぐに始められます</p>
+        </div>
         
-        <div id="google-login-button" class="google-btn-wrap"></div>
+        <div id="google-login-button" style="display:flex; justify-content:center;"></div>
         <div id="login-error" style="color:#ff7b7b; font-size:12px; display:none;"></div>
 
         <div class="fineprint">
-          ※3回/月まで無料で利用可能<br>
-<a href="./privacy.html" target="_blank" rel="noopener"
-   style="color:var(--accent-blue); text-decoration:none;">
-  プライバシーポリシー
-</a>
- /
-<a href="./terms.html" target="_blank" rel="noopener"
-   style="color:var(--accent-blue); text-decoration:none;">
-  利用規約
-</a>
+          まずは無料プランからお試しいただけます。<br>
+          <a href="./privacy.html" target="_blank">プライバシーポリシー</a> &
+          <a href="./terms.html" target="_blank">利用規約</a>
         </div>
       </aside>
     </div>
 
+    <!-- Steps -->
     <div class="steps-row">
       <div class="step-item">
         <div class="step-num">1</div>
-        <div class="step-text">Googleで<br>ログイン</div>
+        <div class="step-text">Googleで安全に<br>サインイン</div>
       </div>
       <div class="step-item">
         <div class="step-num">2</div>
-        <div class="step-text">ハンド情報を<br>入力・記録</div>
+        <div class="step-text">ハンド履歴を入力して<br>AI解析を実行</div>
       </div>
       <div class="step-item">
         <div class="step-num">3</div>
-        <div class="step-text">AIによる解析と<br>思考の言語化</div>
+        <div class="step-text">フィードバックを得て<br>スキルアップ</div>
       </div>
     </div>
 
-    <footer class="footer-plans">
-      <div class="plan-item"><b>Basic</b> 月30回</div>
-      <div class="plan-item"><b>Pro</b> 月100回</div>
-      <div class="plan-item"><b>Premium</b> 無制限</div>
-      <div style="width:100%; text-align:center; opacity:0.6; font-size:10px; margin-top:8px;">
-        ※プラン詳細はログイン後の設定画面から確認・変更できます。
-      </div>
+    <footer>
+      &copy; 2024 Poker Analyzer. All rights reserved.
     </footer>
   </div>
 
   <script type="module">
-    /* スクリプト部分は既存のロジックをそのまま維持 */
+    // Logic (Unchanged)
     const API_BASE = "https://poker-backend-production-64cf.up.railway.app";
     const GOOGLE_CLIENT_ID = "599236787224-kig324ieevvr7b7q0haqeutj0qehc2m8.apps.googleusercontent.com";
     const errorBox = document.getElementById("login-error");
@@ -340,7 +301,7 @@
       });
       window.google.accounts.id.renderButton(
         document.getElementById("google-login-button"),
-        { theme: "outline", size: "large", width: "240", shape: "pill" }
+        { theme: "outline", size: "large", width: "250", shape: "pill" }
       );
     };
   </script>
