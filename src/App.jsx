@@ -461,7 +461,15 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
 
   // default_stack（DB同期）
-  const [defaultStack, setDefaultStack] = useState(100);
+  // 初期値は localStorage から取得（F5対策）
+  const [defaultStack, setDefaultStack] = useState(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem("pa_user") || "null");
+      return u?.default_stack != null ? Number(u.default_stack) : 100;
+    } catch {
+      return 100;
+    }
+  });
 
   // ★ 最後にDBへ保存できた default_stack を保持（無駄な再保存防止）
   const lastSavedDefaultStackRef = useRef(null);
