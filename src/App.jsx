@@ -1663,7 +1663,7 @@ export default function App() {
                 textAlign: "center",
               }}
             >
-              ハンドの保存 / 解析
+              解析を実行
             </h2>
 
             <div
@@ -1671,16 +1671,13 @@ export default function App() {
                 fontSize: 13,
                 color: "#d1d5db",
                 lineHeight: 1.8,
-                marginBottom: 16,
+                marginBottom: 20,
               }}
             >
-              ・このハンドを解析する
+              入力したハンド情報をもとに、AIによる詳細な分析を行います。<br />
+              （解析結果は自動的に履歴に保存されます）
               <br />
-              ・履歴に保存して後で解析
-              <br />
-              ・保存して解析
-              <br />
-              ・ショーダウンまで進んだ場合は相手のハンドも任意で入力できます。
+              ショーダウンまで進んだ場合は、相手のハンドも入力することでより正確な勝率計算が可能です。
             </div>
 
             {/* 相手ハンド入力（任意） */}
@@ -1689,66 +1686,57 @@ export default function App() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                marginBottom: 16,
-                padding: "8px 0",
+                marginBottom: 24,
+                padding: "8px 12px",
+                background: "rgba(255,255,255,0.03)",
+                borderRadius: 8,
+                border: "1px solid rgba(255,255,255,0.05)"
               }}
             >
               <div style={{ fontSize: 13, color: "#d1d5db" }}>
-                相手ハンド（任意）：
+                相手ハンド（任意）
               </div>
-              <div style={{ fontSize: 13, color: "#9ca3af" }}>
-                {villainCards.length === 2
-                  ? villainCards.join(" ")
-                  : "未入力"}
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ fontSize: 14, color: villainCards.length === 2 ? "#fff" : "#6b7280", fontWeight: "bold" }}>
+                  {villainCards.length === 2
+                    ? villainCards.join(" ")
+                    : "未入力"}
+                </div>
+                <button
+                  className="btn btn--primary"
+                  style={{ height: 32, padding: "0 12px", fontSize: 12 }}
+                  onClick={() => setShowVillain(true)}
+                >
+                  入力
+                </button>
               </div>
-              <button
-                className="btn glow"
-                onClick={() => setShowVillain(true)}
-                style={{ marginLeft: 12 }}
-              >
-                入力 / 編集
-              </button>
             </div>
 
             {/* ボタン群 */}
             <div
               style={{
                 display: "flex",
-                justifyContent: "space-between",
-                gap: 8,
+                justifyContent: "flex-end",
+                gap: 12,
               }}
             >
               <button
                 className="btn"
-                style={{ flex: 1 }}
-                onClick={() => {
-                  setShowPost(false);
-                  doAnalyze();
-                }}
+                style={{ width: 100 }}
+                onClick={() => setShowPost(false)}
               >
-                解析
+                キャンセル
               </button>
 
               <button
-                className="btn glow"
-                style={{ flex: 1 }}
+                className="btn glow btn--primary"
+                style={{ width: 140 }}
                 onClick={() => {
-                  saveOnly();
+                  saveAndAnalyze(); // ユーザーの意図通り「保存＋解析」を実行
                   setShowPost(false);
                 }}
               >
-                履歴に保存
-              </button>
-
-              <button
-                className="btn"
-                style={{ flex: 1 }}
-                onClick={() => {
-                  saveAndAnalyze();
-                  setShowPost(false);
-                }}
-              >
-                保存して解析
+                解析開始
               </button>
             </div>
           </div>
@@ -1756,340 +1744,346 @@ export default function App() {
       )}
 
       {/* ===== ヒーローカード選択モーダル ===== */}
-      {showHero && (
-        <CardPickerModal
-          open={showHero}
-          initialCards={heroCards}
-          exclude={[
-            ...board.FLOP,
-            ...board.TURN,
-            ...board.RIVER,
-            ...villainCards,
-          ]}
-          onConfirm={onPickHero}
-          onCancel={() => setShowHero(false)}
-        />
-      )}
+      {
+        showHero && (
+          <CardPickerModal
+            open={showHero}
+            initialCards={heroCards}
+            exclude={[
+              ...board.FLOP,
+              ...board.TURN,
+              ...board.RIVER,
+              ...villainCards,
+            ]}
+            onConfirm={onPickHero}
+            onCancel={() => setShowHero(false)}
+          />
+        )
+      }
 
       {/* ===== 相手ハンド入力モーダル ===== */}
-      {showVillain && (
-        <CardPickerModal
-          open={showVillain}
-          initialCards={villainCards}
-          exclude={[
-            ...board.FLOP,
-            ...board.TURN,
-            ...board.RIVER,
-            ...heroCards,
-          ]}
-          onConfirm={(cs) => {
-            setVillainCards(cs.slice(0, 2)); // 2枚まで
-            setShowVillain(false);
-          }}
-          onCancel={() => setShowVillain(false)}
-        />
-      )}
+      {
+        showVillain && (
+          <CardPickerModal
+            open={showVillain}
+            initialCards={villainCards}
+            exclude={[
+              ...board.FLOP,
+              ...board.TURN,
+              ...board.RIVER,
+              ...heroCards,
+            ]}
+            onConfirm={(cs) => {
+              setVillainCards(cs.slice(0, 2)); // 2枚まで
+              setShowVillain(false);
+            }}
+            onCancel={() => setShowVillain(false)}
+          />
+        )
+      }
 
       {/* ===== プラン変更モーダル ===== */}
-      {showPlanModal && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,.55)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1100,
-          }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setShowPlanModal(false);
-          }}
-        >
+      {
+        showPlanModal && (
           <div
             style={{
-              width: 520,                // ★ すこし広めに
-              maxWidth: "92vw",
-              background: "#0b1621",
-              border: "1px solid #203040",
-              borderRadius: 12,
-              padding: 20,               // ★ 余白も増やす
-              boxShadow: "0 12px 40px rgba(0,0,0,.45)",
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,.55)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1100,
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setShowPlanModal(false);
+            }}
           >
-            <h2
-              style={{
-                fontSize: 18,
-                color: "#e5e7eb",
-                marginBottom: 12,
-                textAlign: "center",
-              }}
-            >
-              プランの変更
-            </h2>
-
-            <p
-              style={{
-                fontSize: 13,
-                color: "#d1d5db",
-                lineHeight: 1.6,
-                marginBottom: 12,
-              }}
-            >
-              以下から希望のプランを選び、
-              決済へお進みください。
-            </p>
-
             <div
               style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 12,
+                width: 520,                // ★ すこし広めに
+                maxWidth: "92vw",
+                background: "#0b1621",
+                border: "1px solid #203040",
+                borderRadius: 12,
+                padding: 20,               // ★ 余白も増やす
+                boxShadow: "0 12px 40px rgba(0,0,0,.45)",
               }}
+              onClick={(e) => e.stopPropagation()}
             >
-              {[
-                {
-                  id: "basic",
-                  label: "Basic（月30回）",
-                  note: "広告なし・追い質問つき",
-                  price: "月額 980円",
-                  tag: "おすすめ",
-                },
-                {
-                  id: "pro",
-                  label: "Pro（月100回）",
-                  note: "ヘビーユーザー向け",
-                  price: "月額 1,480円",
-                  tag: "たくさん解析したい方",
-                },
-                {
-                  id: "premium",
-                  label: "Premium（回数無制限）",
-                  note: "プロ志向の方向け",
-                  price: "月額 2,480円",
-                  tag: "本気で打ち込みたい方",
-                },
-              ].map((p) => {
+              <h2
+                style={{
+                  fontSize: 18,
+                  color: "#e5e7eb",
+                  marginBottom: 12,
+                  textAlign: "center",
+                }}
+              >
+                プランの変更
+              </h2>
 
-                const selected = planForCheckout === p.id;
-                return (
-                  <label
-                    key={p.id}
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: 12,
-                      padding: "12px 16px",
-                      borderRadius: 10,
-                      width: "100%",
-                      border: selected ? "1px solid #60a5fa" : "1px solid #1f2933",
-                      background: selected
-                        ? "radial-gradient(circle at top left, rgba(96,165,250,0.18), #030712)"
-                        : "#050910",
-                      boxShadow: selected
-                        ? "0 0 0 1px rgba(96,165,250,0.35), 0 4px 12px rgba(0,0,0,0.45)"
-                        : "0 2px 6px rgba(0,0,0,0.35)",
-                      cursor: "pointer",
-                      transition: "all .18s ease-out",
-                    }}
-                    onClick={() => setPlanForCheckout(p.id)}
-                  >
-                    {/* 左カラム：ラジオボタンだけ（固定幅） */}
-                    <div
+              <p
+                style={{
+                  fontSize: 13,
+                  color: "#d1d5db",
+                  lineHeight: 1.6,
+                  marginBottom: 12,
+                }}
+              >
+                以下から希望のプランを選び、
+                決済へお進みください。
+              </p>
+
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12,
+                }}
+              >
+                {[
+                  {
+                    id: "basic",
+                    label: "Basic（月30回）",
+                    note: "広告なし・追い質問つき",
+                    price: "月額 980円",
+                    tag: "おすすめ",
+                  },
+                  {
+                    id: "pro",
+                    label: "Pro（月100回）",
+                    note: "ヘビーユーザー向け",
+                    price: "月額 1,480円",
+                    tag: "たくさん解析したい方",
+                  },
+                  {
+                    id: "premium",
+                    label: "Premium（回数無制限）",
+                    note: "プロ志向の方向け",
+                    price: "月額 2,480円",
+                    tag: "本気で打ち込みたい方",
+                  },
+                ].map((p) => {
+
+                  const selected = planForCheckout === p.id;
+                  return (
+                    <label
+                      key={p.id}
                       style={{
-                        width: 32,
                         display: "flex",
+                        flexDirection: "row",
                         alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
+                        gap: 12,
+                        padding: "12px 16px",
+                        borderRadius: 10,
+                        width: "100%",
+                        border: selected ? "1px solid #60a5fa" : "1px solid #1f2933",
+                        background: selected
+                          ? "radial-gradient(circle at top left, rgba(96,165,250,0.18), #030712)"
+                          : "#050910",
+                        boxShadow: selected
+                          ? "0 0 0 1px rgba(96,165,250,0.35), 0 4px 12px rgba(0,0,0,0.45)"
+                          : "0 2px 6px rgba(0,0,0,0.35)",
+                        cursor: "pointer",
+                        transition: "all .18s ease-out",
                       }}
+                      onClick={() => setPlanForCheckout(p.id)}
                     >
-                      <input
-                        type="radio"
-                        name="plan"
-                        value={p.id}
-                        checked={selected}
-                        onChange={() => setPlanForCheckout(p.id)}
-                        style={{
-                          width: 18,
-                          height: 18,
-                          margin: 0,
-                        }}
-                      />
-                    </div>
-
-                    {/* 中央：プラン名＋料金＋説明（広めのスペース） */}
-                    <div
-                      style={{
-                        flex: 1,
-                        minWidth: 0,
-                        display: "flex",
-                        flexDirection: "column",
-                      }}
-                    >
+                      {/* 左カラム：ラジオボタンだけ（固定幅） */}
                       <div
                         style={{
-                          fontSize: 14,
-                          color: "#e5e7eb",
-                          fontWeight: 600,
-                          marginBottom: 2,
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
-                        {p.label}
-                      </div>
-
-                      {p.price && (
-                        <div
-                          style={{
-                            fontSize: 12,
-                            color: "#f97316", // ちょっと目立つオレンジ
-                            fontWeight: 600,
-                            marginBottom: 2,
-                          }}
-                        >
-                          {p.price}
-                        </div>
-                      )}
-
-                      <div
-                        style={{
-                          fontSize: 12,
-                          color: "#9ca3af",
-                          lineHeight: 1.5,
-                        }}
-                      >
-                        {p.note}
-                      </div>
-                    </div>
-
-                    {/* 右端：タグ（小さめバッジ） */}
-                    {p.tag && (
-                      <span
-                        style={{
-                          fontSize: 10,
-                          padding: "4px 8px",
-                          borderRadius: 999,
-                          backgroundColor: selected ? "#1d4ed8" : "#111827",
-                          color: "#e5e7eb",
-                          whiteSpace: "nowrap",
+                          width: 32,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
                           flexShrink: 0,
                         }}
                       >
-                        {p.tag}
-                      </span>
-                    )}
-                  </label>
-                );
-              })}
-            </div>
+                        <input
+                          type="radio"
+                          name="plan"
+                          value={p.id}
+                          checked={selected}
+                          onChange={() => setPlanForCheckout(p.id)}
+                          style={{
+                            width: 18,
+                            height: 18,
+                            margin: 0,
+                          }}
+                        />
+                      </div>
 
-            <div style={{ marginTop: 12, fontSize: 12, color: "#9ca3af", lineHeight: 1.6 }}>
-              <div>・既に課金中の方は、登録済みの支払い方法でプラン変更が反映されます。</div>
-              <div>・アップグレードは即時反映され、差額が日割りで請求される場合があります。</div>
-              <div>・ダウングレードは次回更新日から反映されます。</div>
-              <div>・解約／支払い方法変更／領収書は「設定 ＞ プラン ＞ プラン管理」から行えます。</div>
-            </div>
+                      {/* 中央：プラン名＋料金＋説明（広めのスペース） */}
+                      <div
+                        style={{
+                          flex: 1,
+                          minWidth: 0,
+                          display: "flex",
+                          flexDirection: "column",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: 14,
+                            color: "#e5e7eb",
+                            fontWeight: 600,
+                            marginBottom: 2,
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {p.label}
+                        </div>
 
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 8,
-                marginTop: 16,
-              }}
-            >
-              <button
-                className="btn"
-                onClick={() => setShowPlanModal(false)}
+                        {p.price && (
+                          <div
+                            style={{
+                              fontSize: 12,
+                              color: "#f97316", // ちょっと目立つオレンジ
+                              fontWeight: 600,
+                              marginBottom: 2,
+                            }}
+                          >
+                            {p.price}
+                          </div>
+                        )}
+
+                        <div
+                          style={{
+                            fontSize: 12,
+                            color: "#9ca3af",
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          {p.note}
+                        </div>
+                      </div>
+
+                      {/* 右端：タグ（小さめバッジ） */}
+                      {p.tag && (
+                        <span
+                          style={{
+                            fontSize: 10,
+                            padding: "4px 8px",
+                            borderRadius: 999,
+                            backgroundColor: selected ? "#1d4ed8" : "#111827",
+                            color: "#e5e7eb",
+                            whiteSpace: "nowrap",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {p.tag}
+                        </span>
+                      )}
+                    </label>
+                  );
+                })}
+              </div>
+
+              <div style={{ marginTop: 12, fontSize: 12, color: "#9ca3af", lineHeight: 1.6 }}>
+                <div>・既に課金中の方は、登録済みの支払い方法でプラン変更が反映されます。</div>
+                <div>・アップグレードは即時反映され、差額が日割りで請求される場合があります。</div>
+                <div>・ダウングレードは次回更新日から反映されます。</div>
+                <div>・解約／支払い方法変更／領収書は「設定 ＞ プラン ＞ プラン管理」から行えます。</div>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: 8,
+                  marginTop: 16,
+                }}
               >
-                閉じる
-              </button>
-              <button
-                className="btn glow btn-accent"
-                onClick={async () => {
-                  try {
-                    const u = JSON.parse(localStorage.getItem("pa_user") || "null");
-                    if (!u || !u.user_id) {
-                      alert("ログイン情報が見つかりません。再ログインしてください。");
-                      return;
-                    }
-
-                    const currentPlan = String(plan || "free").toLowerCase();
-                    const nextPlan = String(planForCheckout || "free").toLowerCase();
-
-                    // 現在と同じプランを選んでいる場合は何もしない
-                    if (currentPlan === nextPlan) {
-                      alert("すでに現在のプランが選択されています。");
-                      return;
-                    }
-
-                    // 既存課金ユーザー：アプリ内で /plan/change を叩く（Portalではない）
-                    if (currentPlan !== "free") {
-                      // プランの大小関係（free < basic < pro < premium）
-                      const rank = { free: 0, basic: 1, pro: 2, premium: 3 };
-                      const isUpgrade = (rank[nextPlan] ?? 0) > (rank[currentPlan] ?? 0);
-                      const isDowngrade = (rank[nextPlan] ?? 0) < (rank[currentPlan] ?? 0);
-
-                      const msg = isUpgrade
-                        ? `【確認】プランを ${currentPlan.toUpperCase()} → ${nextPlan.toUpperCase()} に変更します。\n登録済みの支払い方法で直ちにアップグレードされ、差額が日割りで請求される場合があります。\n続行しますか？`
-                        : isDowngrade
-                          ? `【確認】プランを ${currentPlan.toUpperCase()} → ${nextPlan.toUpperCase()} に変更します。\nダウングレードは次回更新日から反映されます。\n続行しますか？`
-                          : `【確認】プランを変更します。続行しますか？`;
-
-                      const ok = window.confirm(msg);
-                      if (!ok) return;
-
-                      const resp = await changePlan({
-                        user_id: u.user_id,
-                        new_plan: nextPlan,
-                      });
-
-                      if (!resp?.ok) {
-                        alert(resp?.error || "プラン変更に失敗しました。");
+                <button
+                  className="btn"
+                  onClick={() => setShowPlanModal(false)}
+                >
+                  閉じる
+                </button>
+                <button
+                  className="btn glow btn-accent"
+                  onClick={async () => {
+                    try {
+                      const u = JSON.parse(localStorage.getItem("pa_user") || "null");
+                      if (!u || !u.user_id) {
+                        alert("ログイン情報が見つかりません。再ログインしてください。");
                         return;
                       }
 
-                      if (resp.action === "upgrade") {
-                        alert("アップグレードしました。登録済みの支払い方法で課金が発生します（差額は日割りの場合あり）。");
-                      } else if (resp.action === "downgrade_scheduled") {
-                        alert("ダウングレードを予約しました（次回更新日から反映されます）。");
-                      } else {
-                        alert("プラン変更を受け付けました。");
+                      const currentPlan = String(plan || "free").toLowerCase();
+                      const nextPlan = String(planForCheckout || "free").toLowerCase();
+
+                      // 現在と同じプランを選んでいる場合は何もしない
+                      if (currentPlan === nextPlan) {
+                        alert("すでに現在のプランが選択されています。");
+                        return;
                       }
 
-                      window.location.reload();
-                      return;
-                    }
+                      // 既存課金ユーザー：アプリ内で /plan/change を叩く（Portalではない）
+                      if (currentPlan !== "free") {
+                        // プランの大小関係（free < basic < pro < premium）
+                        const rank = { free: 0, basic: 1, pro: 2, premium: 3 };
+                        const isUpgrade = (rank[nextPlan] ?? 0) > (rank[currentPlan] ?? 0);
+                        const isDowngrade = (rank[nextPlan] ?? 0) < (rank[currentPlan] ?? 0);
 
-                    // 無料 → Checkout で新規加入
-                    const checkout = await createCheckoutSession({
-                      user_id: u.user_id,
-                      email: u.email || "",
-                      plan: nextPlan,
-                    });
+                        const msg = isUpgrade
+                          ? `【確認】プランを ${currentPlan.toUpperCase()} → ${nextPlan.toUpperCase()} に変更します。\n登録済みの支払い方法で直ちにアップグレードされ、差額が日割りで請求される場合があります。\n続行しますか？`
+                          : isDowngrade
+                            ? `【確認】プランを ${currentPlan.toUpperCase()} → ${nextPlan.toUpperCase()} に変更します。\nダウングレードは次回更新日から反映されます。\n続行しますか？`
+                            : `【確認】プランを変更します。続行しますか？`;
 
-                    if (checkout?.url) {
-                      window.location.href = checkout.url;
-                    } else {
-                      alert("決済画面のURLを取得できませんでした。");
+                        const ok = window.confirm(msg);
+                        if (!ok) return;
+
+                        const resp = await changePlan({
+                          user_id: u.user_id,
+                          new_plan: nextPlan,
+                        });
+
+                        if (!resp?.ok) {
+                          alert(resp?.error || "プラン変更に失敗しました。");
+                          return;
+                        }
+
+                        if (resp.action === "upgrade") {
+                          alert("アップグレードしました。登録済みの支払い方法で課金が発生します（差額は日割りの場合あり）。");
+                        } else if (resp.action === "downgrade_scheduled") {
+                          alert("ダウングレードを予約しました（次回更新日から反映されます）。");
+                        } else {
+                          alert("プラン変更を受け付けました。");
+                        }
+
+                        window.location.reload();
+                        return;
+                      }
+
+                      // 無料 → Checkout で新規加入
+                      const checkout = await createCheckoutSession({
+                        user_id: u.user_id,
+                        email: u.email || "",
+                        plan: nextPlan,
+                      });
+
+                      if (checkout?.url) {
+                        window.location.href = checkout.url;
+                      } else {
+                        alert("決済画面のURLを取得できませんでした。");
+                      }
+                    } catch (e) {
+                      console.error(e);
+                      alert(`処理に失敗しました: ${String(e?.message || e)}`);
                     }
-                  } catch (e) {
-                    console.error(e);
-                    alert(`処理に失敗しました: ${String(e?.message || e)}`);
-                  }
-                }}
-              >
-                {plan && String(plan).toLowerCase() !== "free" ? "プランを変更する" : "決済へ進む"}
-              </button>
+                  }}
+                >
+                  {plan && String(plan).toLowerCase() !== "free" ? "プランを変更する" : "決済へ進む"}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* ===== 設定モーダル ===== */}
       <SettingsModal
@@ -2103,42 +2097,44 @@ export default function App() {
         onLogout={handleLogout}
       />
 
-      {analyzing && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.65)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1500,
-          }}
-        >
+      {
+        analyzing && (
           <div
             style={{
-              minWidth: 260,
-              maxWidth: 320,
-              padding: "16px 20px",
-              borderRadius: 12,
-              background:
-                "radial-gradient(circle at top, rgba(59,130,246,0.35), #020617 55%)",
-              boxShadow: "0 18px 45px rgba(0,0,0,0.7)",
-              border: "1px solid rgba(148,163,184,0.4)",
-              textAlign: "center",
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.65)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1500,
             }}
           >
-            <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
-              解析中...
-            </div>
-            <div style={{ fontSize: 12, color: "#cbd5f5", lineHeight: 1.6 }}>
-              数秒〜十数秒ほどかかる場合があります。
-              <br />
-              そのままお待ちください。
+            <div
+              style={{
+                minWidth: 260,
+                maxWidth: 320,
+                padding: "16px 20px",
+                borderRadius: 12,
+                background:
+                  "radial-gradient(circle at top, rgba(59,130,246,0.35), #020617 55%)",
+                boxShadow: "0 18px 45px rgba(0,0,0,0.7)",
+                border: "1px solid rgba(148,163,184,0.4)",
+                textAlign: "center",
+              }}
+            >
+              <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
+                解析中...
+              </div>
+              <div style={{ fontSize: 12, color: "#cbd5f5", lineHeight: 1.6 }}>
+                数秒〜十数秒ほどかかる場合があります。
+                <br />
+                そのままお待ちください。
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
     </>
   );
