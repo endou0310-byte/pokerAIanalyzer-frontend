@@ -283,6 +283,7 @@
           name: user.display_name || user.name || "",
           email: user.email || "",
           plan: user.plan || null,
+          default_stack: user.default_stack || 100, // ★ 追加
         }));
         window.location.href = "index.html";
       } catch (err) {
