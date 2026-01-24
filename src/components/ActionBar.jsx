@@ -114,25 +114,45 @@ export default function ActionBar({
                 {/* Right: Betting */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
                     {/* Presets Row */}
+                    {/* Presets Row */}
                     <div style={{ display: "flex", gap: 6, justifyContent: "center" }}>
-                        {raisePresets.map((p, i) => (
-                            <button key={i} onClick={() => onTo(p.amount)} style={{
-                                fontSize: 11, padding: "4px 10px", borderRadius: 20,
-                                background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
-                                color: "#cbd5e1", cursor: "pointer", transition: "0.2s"
-                            }}>
-                                {p.label}
-                            </button>
-                        ))}
-                        {showBetPct && [0.33, 0.5, 0.75, 1.0, 1.5].map(pctVal => (
-                            <button key={pctVal} onClick={() => handleBetPct(pctVal)} style={{
-                                fontSize: 11, padding: "4px 10px", borderRadius: 20,
-                                background: "rgba(0, 212, 255, 0.1)", border: "1px solid rgba(0, 212, 255, 0.2)",
-                                color: "#7dd3fc", cursor: "pointer"
-                            }}>
-                                {pctVal * 100}%
-                            </button>
-                        ))}
+                        {(() => {
+                            if (S.street === "PRE") {
+                                const minToVal = +(base + inc).toFixed(2);
+                                return [2, 2.5, 3, 4, 5].map((k) => {
+                                    const cand = +(base * k).toFixed(2);
+                                    const to = Math.max(cand, minToVal);
+                                    return (
+                                        <button key={`pc-pre-${k}`} onClick={() => onTo(to)} style={{
+                                            fontSize: 11, padding: "4px 10px", borderRadius: 20,
+                                            background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+                                            color: "#cbd5e1", cursor: "pointer", transition: "0.2s"
+                                        }}>
+                                            {`${k}x (${fmtBB(to)})`}
+                                        </button>
+                                    );
+                                });
+                            } else {
+                                // Post-flop: 33%, 50%, 75%, 100%, 125%
+                                const pctList = [0.33, 0.5, 0.75, 1.0, 1.25];
+                                return pctList.map((p) => {
+                                    const sumBets = (S.bets || []).reduce((a, b) => a + b, 0);
+                                    const potBase = (S.pot || 0) + sumBets;
+                                    const want = +(potBase * p).toFixed(2);
+                                    const already = S.committed[S.actor] ?? 0;
+                                    const to = +(already + want).toFixed(2);
+                                    return (
+                                        <button key={`pc-post-${p}`} onClick={() => onTo(to)} style={{
+                                            fontSize: 11, padding: "4px 10px", borderRadius: 20,
+                                            background: "rgba(0, 212, 255, 0.1)", border: "1px solid rgba(0, 212, 255, 0.2)",
+                                            color: "#7dd3fc", cursor: "pointer"
+                                        }}>
+                                            {p >= 1 ? "POT" : `${Math.round(p * 100)}%`} ({fmtBB(to)})
+                                        </button>
+                                    );
+                                });
+                            }
+                        })()}
                         <button onClick={() => onTo(maxTo)} style={{
                             fontSize: 11, padding: "4px 10px", borderRadius: 20,
                             background: "rgba(255, 75, 92, 0.15)", border: "1px solid rgba(255, 75, 92, 0.3)",
