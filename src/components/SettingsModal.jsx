@@ -95,7 +95,7 @@ export default function SettingsModal({ open, onClose, userInfo, plan, remaining
       <div
         style={{
           width: 800, maxWidth: "94vw",
-          height: isMobile ? "85vh" : "auto", 
+          height: isMobile ? "85vh" : "auto",
           maxHeight: "90vh",
           background: "#0f1723",
           border: "1px solid #1e293b",
@@ -121,24 +121,22 @@ export default function SettingsModal({ open, onClose, userInfo, plan, remaining
                 key={id}
                 onClick={() => setActiveTab(id)}
                 style={isMobile ? {
-                    // Mobile Tab Style
-                    padding: "10px 16px",
-                    background: "transparent",
-                    color: activeTab === id ? "#fff" : "#94a3b8",
-                    borderBottom: activeTab === id ? "2px solid #6366f1" : "2px solid transparent",
-                    fontSize: 13,
-                    whiteSpace: "nowrap",
-                    border: "none", // Reset default border
-                    borderBottom: activeTab === id ? "2px solid #6366f1" : "2px solid transparent",
-                    flexShrink: 0
+                  // Mobile Tab Style
+                  padding: "10px 16px",
+                  background: "transparent",
+                  color: activeTab === id ? "#fff" : "#94a3b8",
+                  borderBottom: activeTab === id ? "2px solid #6366f1" : "2px solid transparent",
+                  whiteSpace: "nowrap",
+                  border: "none", // Reset default border
+                  flexShrink: 0
                 } : {
-                    // Desktop Tab Style
-                    width: "100%", padding: "10px 12px", textAlign: "left", borderRadius: 10,
-                    border: "1px solid transparent",
-                    background: activeTab === id ? "rgba(99,102,241,.15)" : "transparent",
-                    color: id === "data" ? "#fca5a5" : (activeTab === id ? "#fff" : "#94a3b8"),
-                    marginBottom: 6,
-                    fontSize: 14
+                  // Desktop Tab Style
+                  width: "100%", padding: "10px 12px", textAlign: "left", borderRadius: 10,
+                  border: "1px solid transparent",
+                  background: activeTab === id ? "rgba(99,102,241,.15)" : "transparent",
+                  color: id === "data" ? "#fca5a5" : (activeTab === id ? "#fff" : "#94a3b8"),
+                  marginBottom: 6,
+                  fontSize: 14
                 }}
               >
                 {label}
@@ -157,7 +155,7 @@ export default function SettingsModal({ open, onClose, userInfo, plan, remaining
                   <div>今月の残り解析：{remainingMonth === null ? "∞" : `${remainingMonth} 回`}</div>
                 </div>
                 {typeof onLogout === "function" && (
-                    <button onClick={onLogout} className="btn" style={{ marginTop: 16, fontSize: 12 }}>ログアウト</button>
+                  <button onClick={onLogout} className="btn" style={{ marginTop: 16, fontSize: 12 }}>ログアウト</button>
                 )}
               </>
             )}
@@ -197,41 +195,41 @@ export default function SettingsModal({ open, onClose, userInfo, plan, remaining
             )}
 
             {activeTab === "analysis" && (
-               /* ... Analysis content ... */
-               <>
-                 <h3 style={{ marginTop: 0 }}>解析設定</h3>
-                 <p style={{fontSize: 12, color: "#94a3b8"}}>現在は設定項目はありません。</p>
-               </>
+              /* ... Analysis content ... */
+              <>
+                <h3 style={{ marginTop: 0 }}>解析設定</h3>
+                <p style={{ fontSize: 12, color: "#94a3b8" }}>現在は設定項目はありません。</p>
+              </>
             )}
-            
+
             {activeTab === "plan" && (
-                <>
-                    <h3 style={{ marginTop: 0 }}>プラン</h3>
-                    <div style={{ color: "#cbd5e1", lineHeight: 1.9, fontSize: 13, marginBottom: 12 }}>
-                        <div>現在：{plan ? plan.toUpperCase() : "-"}</div>
-                    </div>
-                    <a href="#" onClick={(e)=> { e.preventDefault(); handleOpenPortal(); }} style={{ color: "#6366f1" }}>プラン管理画面へ</a>
-                </>
+              <>
+                <h3 style={{ marginTop: 0 }}>プラン</h3>
+                <div style={{ color: "#cbd5e1", lineHeight: 1.9, fontSize: 13, marginBottom: 12 }}>
+                  <div>現在：{plan ? plan.toUpperCase() : "-"}</div>
+                </div>
+                <a href="#" onClick={(e) => { e.preventDefault(); handleOpenPortal(); }} style={{ color: "#6366f1" }}>プラン管理画面へ</a>
+              </>
             )}
 
             {activeTab === "support" && (
-                <>
-                    <h3 style={{ marginTop: 0 }}>サポート</h3>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 12, fontSize: 13 }}>
-                        <a href={SUPPORT_FORM_URL} target="_blank" style={{ color: "#6366f1" }}>お問い合わせ</a>
-                        <div style={{ display: "flex", gap: 8 }}>
-                            <a href={PRIVACY_URL} target="_blank" style={{ color: "#94a3b8" }}>プライバシー</a>
-                            <a href={TERMS_URL} target="_blank" style={{ color: "#94a3b8" }}>利用規約</a>
-                        </div>
-                    </div>
-                </>
+              <>
+                <h3 style={{ marginTop: 0 }}>サポート</h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12, fontSize: 13 }}>
+                  <a href={SUPPORT_FORM_URL} target="_blank" style={{ color: "#6366f1" }}>お問い合わせ</a>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <a href={PRIVACY_URL} target="_blank" style={{ color: "#94a3b8" }}>プライバシー</a>
+                    <a href={TERMS_URL} target="_blank" style={{ color: "#94a3b8" }}>利用規約</a>
+                  </div>
+                </div>
+              </>
             )}
-            
+
             {activeTab === "data" && (
-                <>
-                  <h3 style={{ marginTop: 0, color: "#f87171" }}>データ管理</h3>
-                  <button className="btn btn-danger" disabled style={{ opacity: 0.5 }}>履歴削除 (準備中)</button>
-                </>
+              <>
+                <h3 style={{ marginTop: 0, color: "#f87171" }}>データ管理</h3>
+                <button className="btn btn-danger" disabled style={{ opacity: 0.5 }}>履歴削除 (準備中)</button>
+              </>
             )}
           </main>
         </div>
