@@ -1723,9 +1723,10 @@ export default function App() {
                             });
                           })()}
                         </div>
+                      )}
 
 
-                        {/* 下段：固定幅の「Raise To …BB」＋充填スライダー */}
+                      {/* 下段：固定幅の「Raise To …BB」＋充填スライダー */}
                       {(() => {
                         const inc = Math.max(1.0, S.lastRaiseSize || 1.0);
                         const base = S.lastBetTo || S.currentBet || 0;
