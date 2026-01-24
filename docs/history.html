@@ -523,17 +523,25 @@
 
     // ===== カード変換ユーティリティ =====
     // 例: "Ah" -> "A♥"
+    // 例: "Ah" -> "<span style='color:...'>A♥</span>"
     function convertCard(card) {
       if (!card || typeof card !== "string" || card.length < 2) return card;
       const rank = card.slice(0, card.length - 1);
       const suit = card.slice(-1).toLowerCase();
-      const suitMap = {
-        h: "♥",
-        s: "♠",
-        d: "♦",
-        c: "♣",
-      };
-      return rank + (suitMap[suit] || suit);
+      
+      let color = "#e2e8f0"; // Default (Spades)
+      let suitChar = suit;
+      
+      if (suit === 'h') { suitChar = "♥"; color = "#ff5f5f"; } // Red
+      else if (suit === 'd') { suitChar = "♦"; color = "#3b82f6"; } // Blue (often used for Diamond in 4-color deck) or Red
+      else if (suit === 'c') { suitChar = "♣"; color = "#10b981"; } // Green
+      else if (suit === 's') { suitChar = "♠"; color = "#94a3b8"; } // Slate (Spades)
+
+      // Let's stick to 2-color common or 4-color if preferred. 
+      // User asked for "Pictures", so 4-color is clearer.
+      // H=Red, D=Blue, C=Green, S=Black(DarkGray)
+      
+      return `<span style="color:${color}; font-weight:bold;">${rank}${suitChar}</span>`;
     }
 
     // 例: ["Ah","Kd"] -> "A♥ K♦"
