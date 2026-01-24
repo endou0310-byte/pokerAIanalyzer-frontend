@@ -3,6 +3,7 @@ import { analyzeHand, followupQuestion, saveHistory, fetchPlan, createCheckoutSe
 import CardPickerModal from "./components/CardPickerModal.jsx";
 import BoardPickerModal from "./components/BoardPickerModal.jsx";
 import ResultModal from "./components/ResultModal.jsx";
+import ActionBar from "./components/ActionBar.jsx";
 import * as E from "./lib/engine.js";
 // バックエンドのベースURL（.env の VITE_API_BASE）
 const API_BASE = import.meta.env.VITE_API_BASE || "";
@@ -593,6 +594,7 @@ export default function App() {
     // 記録中は座席を作り直さない
     if (recording) return;
     setS(E.initialState(players, heroSeat, heroStack));
+    setHistoryStack([]); // Reset history on new hand
   }, [players, heroSeat, heroStack]); // ★ recording を依存から外す
 
   // ★ defaultStack を変更したら、全座席のスタックを一括更新
@@ -648,6 +650,16 @@ export default function App() {
 
   /* 任意レイズ入力用 */
   const [raiseTo, setRaiseTo] = useState("");  // 例: "12.5"
+
+  /* Undo History */
+  const [historyStack, setHistoryStack] = useState([]);
+  const pushHistory = (st) => setHistoryStack(p => [...p, structuredClone(st)]);
+  const onUndo = () => {
+    if (historyStack.length === 0) return;
+    const prev = historyStack[historyStack.length - 1];
+    setS(prev);
+    setHistoryStack(p => p.slice(0, -1));
+  };
 
   /* modals */
   const [showHero, setShowHero] = useState(false);
@@ -753,10 +765,10 @@ export default function App() {
 
   /* engine ops */
   const legal = S ? E.legal(S) : { fold: false, check: false, call: false, bet: false, raise: false };
-  const onFold = () => { if (!S) return; const n = structuredClone(S); E.actFold(n); setS(n); };
-  const onCheck = () => { if (!S) return; const n = structuredClone(S); E.actCheck(n); setS(n); };
-  const onCall = () => { if (!S) return; const n = structuredClone(S); E.actCall(n); setS(n); };
-  const onTo = (to) => { if (!S) return; const n = structuredClone(S); E.actTo(n, to); setS(n); };
+  const onFold = () => { if (!S) return; pushHistory(S); const n = structuredClone(S); E.actFold(n); setS(n); };
+  const onCheck = () => { if (!S) return; pushHistory(S); const n = structuredClone(S); E.actCheck(n); setS(n); };
+  const onCall = () => { if (!S) return; pushHistory(S); const n = structuredClone(S); E.actCall(n); setS(n); };
+  const onTo = (to) => { if (!S) return; pushHistory(S); const n = structuredClone(S); E.actTo(n, to); setS(n); };
 
   /* postflop bet% */
   function onBetPct(pct) {
@@ -1273,37 +1285,22 @@ export default function App() {
             </div>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {/* 上段: Fold/Check/Call */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-              <button className="btn btn-danger" disabled={!legal.fold} onClick={onFold}>Fold</button>
-              <button className="btn" disabled={!legal.check} onClick={onCheck}>Check</button>
-              <button className="btn" disabled={!legal.call} onClick={onCall}>Call</button>
-            </div>
-
-            {/* 下段: Raise/Bet */}
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <div style={{ flex: 1 }}>
-                {/* 簡易スライダー */}
-                <input type="range" className="bb-slider"
-                  min={S?.street === "PRE" ? 2 : 1} max={100} step={0.5}
-                  value={raiseTo} onChange={e => setRaiseTo(Number(e.target.value))}
-                />
-                <div style={{ textAlign: 'center', fontSize: 12, marginTop: 4 }}>
-                  {raiseTo} BB
-                </div>
-              </div>
-              <button className="btn btn--primary" disabled={!legal.raise && !legal.bet} onClick={() => onTo(Number(raiseTo))}>
-                {S?.currentBet === 0 ? "BET" : "RAISE"}
-              </button>
-            </div>
-
-            {canAnalyze && (
-              <button className="btn glow btn-accent" onClick={doAnalyze} style={{ marginTop: 8 }}>
-                解析する
-              </button>
-            )}
-          </div>
+          <ActionBar
+            S={S}
+            legal={legal}
+            onFold={onFold}
+            onCheck={onCheck}
+            onCall={onCall}
+            onTo={onTo}
+            raiseTo={raiseTo}
+            setRaiseTo={setRaiseTo}
+            canAnalyze={canAnalyze}
+            doAnalyze={doAnalyze}
+            onUndo={onUndo}
+            isMobile={true}
+            onReset={resetAll}
+            analyzing={analyzing}
+          />
         )}
       </div>
     </div>
@@ -1601,27 +1598,7 @@ export default function App() {
                   </div>
 
 
-                  {/* ボード入力 */}
-                  {showBoard && S && (
 
-                    <BoardPickerModal
-                      open={showBoard}
-                      street={S.street}
-                      used={[...heroCards, ...board.FLOP, ...board.TURN, ...board.RIVER]}
-                      initial={S.street === "FLOP" ? board.FLOP : S.street === "TURN" ? board.TURN : board.RIVER}
-                      onClose={() => setShowBoard(false)}
-                      onPick={(cards) => {
-                        setBoard((prev) => {
-                          const next = { ...prev };
-                          if (S.street === "FLOP") next.FLOP = cards.slice(0, 3);
-                          else if (S.street === "TURN") next.TURN = cards.slice(0, 1);
-                          else if (S.street === "RIVER") next.RIVER = cards.slice(0, 1);
-                          return next;
-                        });
-                        setShowBoard(false);
-                      }}
-                    />
-                  )}
                   {/* ステータスバー（テーブル左下） */}
                   {S && (
                     <div
@@ -1662,118 +1639,25 @@ export default function App() {
               {/* アクションバー */}
               <div className="panel" style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                 {recording && S && S.actor >= 0 ? (
-                  <>
-                    <div className="action-bar" style={{ marginTop: 24, justifyContent: "center" }}>
-                      <button className="btn btn-danger" disabled={!legal.fold} onClick={onFold}>
-                        Fold
-                      </button>
-                      <button className="btn" disabled={!legal.check} onClick={onCheck}>
-                        Check
-                      </button>
-                      <button className="btn" disabled={!legal.call} onClick={onCall}>
-                        Call
-                      </button>
-                    </div>
-
-                    <div style={{ marginTop: 16 }}>
-                      {/* ベット額プリセット */}
-                      {raisePresets.length > 0 && (
-                        <div className="chip-group" style={{ marginBottom: 12, justifyContent: "center" }}>
-                          {showBetPct && (
-                            <button key="pct-33" className="chip" onClick={() => onBetPct(0.33)}>33%</button>
-                          )}
-                          {(() => {
-                            const currentToCall = (S.lastBetTo || 0) - (S.committed[S.actor] || 0);
-                            const remainingStack = S.stacks[S.actor] || 0;
-                            const canRaise = remainingStack > currentToCall + 0.01;
-                            if (!canRaise) return null;
-                            const inc = Math.max(1.0, S.lastRaiseSize || 1.0);
-                            const base = S.lastBetTo || S.currentBet || 0;
-
-                            // プリフロップ (2x, 2.5x, 3x, etc.)
-                            if (S.street === "PRE") {
-                              // 再レイズ（k倍、最小尊重）
-                              const minTo = +(base + inc).toFixed(2);
-                              return [2, 2.5, 3, 4, 5].map((k) => {
-                                const cand = +(base * k).toFixed(2);
-                                const to = Math.max(cand, minTo);
-                                const active = Number(raiseTo) === to;
-                                return (
-                                  <button key={`rr-${k}`} className={`chip ${active ? "active" : ""}`} onClick={() => setRaiseTo(to)}>
-                                    {`${k}x(${fmtBB(to)})`}
-                                  </button>
-                                );
-                              });
-                            }
-
-                            // ポストフロップ（Pot％）
-                            const sumBets = (S.bets || []).reduce((a, b) => a + b, 0);
-                            const potBase = (S.pot || 0) + sumBets;
-                            const pctList = [0.25, 0.33, 0.5, 0.66, 0.75, 1.0, 1.25];
-                            return pctList.map((p) => {
-                              const want = +(potBase * p).toFixed(2);
-                              const already = S.committed[S.actor] ?? 0;
-                              const to = +(already + want).toFixed(2);
-                              const active = Number(raiseTo) === to;
-                              return (
-                                <button key={`pct-${p}`} className={`chip ${active ? "active" : ""}`} onClick={() => setRaiseTo(to)}>
-                                  {`${Math.round(p * 100)}% (${fmtBB(to)})`}
-                                </button>
-                              );
-                            });
-                          })()}
-                        </div>
-                      )}
-
-
-                      {/* 下段：固定幅の「Raise To …BB」＋充填スライダー */}
-                      {(() => {
-                        const inc = Math.max(1.0, S.lastRaiseSize || 1.0);
-                        const base = S.lastBetTo || S.currentBet || 0;
-                        const minTo =
-                          S.currentBet === 0 ? (S.street === "PRE" ? 2 : 1) : +(base + inc).toFixed(2);
-                        const maxTo = +((S.committed?.[S.actor] || 0) + (S.stacks?.[S.actor] || 0)).toFixed(2);
-                        const value = Number.isFinite(raiseTo) ? raiseTo : minTo;
-                        const pct = ((value - minTo) / Math.max(1e-9, (maxTo - minTo))) * 100;
-
-                        return (
-                          <>
-                            <div className="raise-wrap">
-                              <button
-                                className="btn btn--primary raise-fixed"
-                                onClick={() => { if (Number.isFinite(value)) onTo(+Number(value).toFixed(2)); }}
-                                title="決定"
-                              >
-                                {`Raise To ${fmtBB(value)}`}
-                              </button>
-
-                              <input
-                                type="range"
-                                className="bb-slider"
-                                style={{ flex: 1, ["--pct"]: pct }}
-                                min={minTo}
-                                max={Math.max(minTo, maxTo)}
-                                step={0.5}
-                                value={value}
-                                onChange={(e) => setRaiseTo(+e.target.value)}
-                              />
-                            </div>
-                            <div className="bb-ticks"><span /><span /><span /></div>
-                          </>
-                        );
-                      })()}
-                    </div>
-
-
-                    <button
-                      className="btn glow btn-danger"
-                      onClick={() => onTo((S?.committed?.[S.actor] ?? 0) + (S?.stacks?.[S.actor] ?? 0))}
-                    >
-                      All-in
-                    </button>
-                  </>
-
+                  <ActionBar
+                    S={S}
+                    legal={legal}
+                    onFold={onFold}
+                    onCheck={onCheck}
+                    onCall={onCall}
+                    onTo={onTo}
+                    raiseTo={raiseTo}
+                    setRaiseTo={setRaiseTo}
+                    canAnalyze={canAnalyze}
+                    doAnalyze={doAnalyze}
+                    onUndo={onUndo}
+                    isMobile={false}
+                    // Desktop has explicit Reset button on left, but can add here if needed. 
+                    // Not adding onReset here to keep Desktop clean as per design unless user asked.
+                    analyzing={analyzing}
+                  />
                 ) : (
+
                   <div style={{ opacity: .7 }}>「記録開始」で進行。座席をクリックすることでスタックを調整できます。</div>
                 )}
               </div>{/* 右カラム end */}
@@ -1787,6 +1671,28 @@ export default function App() {
   return (
     <>
       {isMobile ? renderMobile() : renderDesktop()}
+
+      {/* Shared Modals */}
+      {showBoard && S && (
+        <BoardPickerModal
+          open={showBoard}
+          street={S.street}
+          used={[...heroCards, ...board.FLOP, ...board.TURN, ...board.RIVER]}
+          initial={S.street === "FLOP" ? board.FLOP : S.street === "TURN" ? board.TURN : board.RIVER}
+          onClose={() => setShowBoard(false)}
+          onPick={(cards) => {
+            setBoard((prev) => {
+              const next = { ...prev };
+              if (S.street === "FLOP") next.FLOP = cards.slice(0, 3);
+              else if (S.street === "TURN") next.TURN = cards.slice(0, 1);
+              else if (S.street === "RIVER") next.RIVER = cards.slice(0, 1);
+              return next;
+            });
+            setShowBoard(false);
+          }}
+        />
+      )}
+
       {showResultModal && result && (
         <ResultModal
           open={showResultModal}
