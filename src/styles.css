@@ -106,7 +106,37 @@ body {
 
 @media (max-width: 1100px) {
   .grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column-reverse;
+    /* Table on top, Controls below */
+    gap: 16px;
+  }
+
+  /* Table stage minimum height adjustment for mobile */
+  .table-stage {
+    min-height: 480px;
+  }
+}
+
+@media (max-width: 600px) {
+  .table-stage {
+    min-height: 360px;
+    /* Even smaller for phones */
+    padding: 8px;
+    /* Less padding */
+    border-width: 2px;
+  }
+
+  .seat {
+    min-width: 70px;
+    /* Allow shrinking */
+    padding: 6px 4px;
+    font-size: 11px;
+    border-radius: 8px;
+  }
+
+  .cardpicker-card {
+    border-radius: 4px;
   }
 }
 

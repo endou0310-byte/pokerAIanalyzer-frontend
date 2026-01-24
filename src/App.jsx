@@ -656,26 +656,30 @@ export default function App() {
   const [showPost, setShowPost] = useState(false);
   /* stage */
   const [stageRef, stage] = useSize();
-  const width = Math.max(stage.w, 900);
-  const height = Math.max(stage.h, 620);
+  // スマホ(350px程度)でも破綻しないよう、最小幅制限を緩和
+  const width = Math.max(stage.w, 340);
+  const height = Math.max(stage.h, 400);
 
   const seatGeom = useMemo(() => {
     const seatsList = buildSeatsList(S, players);
     const n = seatsList.length;
     if (n <= 0) return { rx: 0, ry: 0, points: [] };
 
-    // 座席カードの見込みサイズ＋安全余白
-    const SEAT_W = 130;  // 横
-    const SEAT_H = 84;   // 縦
-    const PAD = 40;   // テーブル縁からの安全距離
+    // 画面幅に応じてサイズを動的に変える
+    const isMobile = width < 600;
+
+    // 座席カードの見込みサイズ＋安全余白 (スマホ時は小さく)
+    const SEAT_W = isMobile ? 80 : 130;
+    const SEAT_H = isMobile ? 56 : 84;
+    const PAD = isMobile ? 12 : 40;
 
     // ステージ実寸の中心
     const cx = width / 2;
     const cy = height / 2;
 
     // はみ出しを確実に避ける半径（座席サイズと余白を控除）
-    const rx = Math.max(120, Math.floor((width - SEAT_W - 2 * PAD) / 2) - 6);
-    const ry = Math.max(90, Math.floor((height - SEAT_H - 2 * PAD) / 2) - 6);
+    const rx = Math.max(isMobile ? 80 : 120, Math.floor((width - SEAT_W - 2 * PAD) / 2) - 6);
+    const ry = Math.max(isMobile ? 60 : 90, Math.floor((height - SEAT_H - 2 * PAD) / 2) - 6);
 
     // ヒーローを常に最下部（BTN位置）に回転オフセットで固定
     const heroIdx = Math.max(0, seatsList.findIndex(s => s === heroSeat));
@@ -686,7 +690,7 @@ export default function App() {
       return { x: cx + rx * Math.cos(t), y: cy + ry * Math.sin(t) };
     });
 
-    return { rx, ry, points };
+    return { rx, ry, points, seatW: SEAT_W, seatH: SEAT_H, isMobile };
   }, [S, players, width, height, heroSeat]);
 
   // ストリート/アクター/ベット変更時にスライダー初期位置を最小レイズへ同期
@@ -1369,9 +1373,9 @@ export default function App() {
                           left: p.x,
                           top: p.y,
                           transform: "translate(-50%,-50%)",
-                          width: 120,
-                          height: 80,
-                          borderRadius: 12,
+                          width: seatGeom.seatW ?? 120,
+                          height: seatGeom.seatH ?? 80,
+                          borderRadius: seatGeom.isMobile ? 8 : 12,
                           background: active ? "#14263b" : "#0e1d2e",
                           border: active ? "2px solid #ffe08a" : "1px solid #29425c",
                           color: active ? "#ffe08a" : "#d7e7ff",
@@ -1379,10 +1383,10 @@ export default function App() {
                           flexDirection: "column",
                           alignItems: "center",
                           justifyContent: "center",
-                          fontSize: 12,
+                          fontSize: seatGeom.isMobile ? 10 : 12,
                         }}
                       >
-                        <div style={{ fontWeight: 700, marginBottom: 2 }}>
+                        <div style={{ fontWeight: 700, marginBottom: seatGeom.isMobile ? 0 : 2 }}>
                           {isHero ? `${s} (YOU)` : s}
                         </div>
                         <div>
