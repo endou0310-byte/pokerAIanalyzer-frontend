@@ -211,7 +211,7 @@ body {
 .table-stage {
   position: relative;
   min-height: 640px;
-  max-width: 960px;
+  max-width: 750px;
   /* Limit maximum width to prevent excessive stretching */
   margin: 0 auto;
   /* Center the table */
