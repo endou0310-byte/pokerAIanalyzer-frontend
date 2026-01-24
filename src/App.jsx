@@ -1781,6 +1781,12 @@ export default function App() {
           </div>{/* page内レイアウトwrapper（存在する場合） */}
         </section>
       </main>
+    </>
+  );
+
+  return (
+    <>
+      {isMobile ? renderMobile() : renderDesktop()}
       {showResultModal && result && (
         <ResultModal
           open={showResultModal}
