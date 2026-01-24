@@ -231,7 +231,40 @@ export default function SettingsModal({ open, onClose, userInfo, plan, remaining
             {activeTab === "data" && (
               <>
                 <h3 style={{ marginTop: 0, color: "#f87171" }}>データ管理</h3>
-                <button className="btn btn-danger" disabled style={{ opacity: 0.5 }}>履歴削除 (準備中)</button>
+                <p style={{ fontSize: 12, color: "#f87171", marginBottom: 16 }}>
+                  注意：この操作は元に戻せません。すべての解析履歴が完全に削除されます。
+                </p>
+                <button
+                  className="btn btn-danger"
+                  onClick={async () => {
+                    if (!window.confirm("本当にすべての履歴を削除しますか？\nこの操作は取り消せません。")) return;
+
+                    const uid = resolveUserId();
+                    if (!uid) return alert("ユーザーIDが見つかりません");
+
+                    try {
+                      // 念のためもう一度確認
+                      if (!window.confirm("最終確認：全データを削除してよろしいですか？")) return;
+
+                      const res = await fetch(`${API_BASE}/history/delete_all`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ user_id: uid })
+                      });
+                      const json = await res.json();
+                      if (json.ok) {
+                        alert("履歴を全て削除しました。");
+                        window.location.reload();
+                      } else {
+                        alert("削除に失敗しました: " + (json.error || "Unknown"));
+                      }
+                    } catch (e) {
+                      alert("エラーが発生しました: " + e.message);
+                    }
+                  }}
+                >
+                  履歴をすべて削除する
+                </button>
               </>
             )}
           </main>
