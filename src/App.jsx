@@ -94,6 +94,82 @@ const buildSeatsList = (S, players) =>
 
 
 /* ====== main ====== */
+// Helper: Get point on rounded rectangle perimeter
+// cx, cy: Center
+// w, h: Full width/height of the rect
+// r: Corner radius
+// t: 0..1 (0 = Bottom Center, clockwise)
+function getPointOnRect(cx, cy, w, h, r, t) {
+  // Effective dimensions of the rectangle formed by corner centers
+  const rw = w / 2 - r;
+  const rh = h / 2 - r;
+
+  // Perimeter total
+  const lineH = rh * 2;
+  const lineW = rw * 2;
+  const circle = 2 * Math.PI * r;
+  const P = (2 * lineW) + (2 * lineH) + circle;
+
+  let d = t * P; // distance to travel
+
+  // 1. Bottom Line (Left-ward from center)
+  // (0, rh+r) to (-rw, rh+r)
+  if (d < rw) {
+    return { x: cx - d, y: cy + (rh + r) };
+  }
+  d -= rw;
+
+  // 2. Bottom-Left Arc (90 deg to 180 deg)
+  const qArc = (Math.PI * r) / 2;
+  if (d < qArc) {
+    const angle = Math.PI / 2 + (d / r);
+    return { x: cx - rw + r * Math.cos(angle), y: cy + rh + r * Math.sin(angle) };
+  }
+  d -= qArc;
+
+  // 3. Left Line (Upward)
+  if (d < lineH) {
+    return { x: cx - (rw + r), y: cy + (rh - d) };
+  }
+  d -= lineH;
+
+  // 4. Top-Left Arc (180 to 270)
+  if (d < qArc) {
+    const angle = Math.PI + (d / r);
+    return { x: cx - rw + r * Math.cos(angle), y: cy - rh + r * Math.sin(angle) };
+  }
+  d -= qArc;
+
+  // 5. Top Line (Right-ward)
+  if (d < lineW) {
+    return { x: cx - rw + d, y: cy - (rh + r) };
+  }
+  d -= lineW;
+
+  // 6. Top-Right Arc (270 to 360/0)
+  if (d < qArc) {
+    const angle = 1.5 * Math.PI + (d / r);
+    return { x: cx + rw + r * Math.cos(angle), y: cy - rh + r * Math.sin(angle) };
+  }
+  d -= qArc;
+
+  // 7. Right Line (Downward)
+  if (d < lineH) {
+    return { x: cx + (rw + r), y: cy - rh + d };
+  }
+  d -= lineH;
+
+  // 8. Bottom-Right Arc (0 to 90)
+  if (d < qArc) {
+    const angle = (d / r);
+    return { x: cx + rw + r * Math.cos(angle), y: cy + rh + r * Math.sin(angle) };
+  }
+  d -= qArc;
+
+  // 9. Bottom Line (Remaining to center)
+  return { x: cx + rw - d, y: cy + (rh + r) };
+}
+
 export default function App() {
 
   // ログアウト（localStorage をクリアしてログインへ）
@@ -345,23 +421,43 @@ export default function App() {
 
     // ステージ実寸の中心
     const cx = width / 2;
-    // Mobile tweak: Shift down more (+35)
+    // Mobile tweak: Shift down slightly
     const cy = height / 2 + (isMobile ? 35 : 0);
 
-    // Mobile tweak: "More Round" & "Maximize Width"
-    // Restore some padding (was 4, now 16) to avoid "tight" look
-    const _mobPad = isMobile ? 16 : 40;
-    const _mobSeatW = isMobile ? 80 : 130;
+    // Mobile: Rounded Rectangle Logic
+    if (isMobile) {
+      const _mobPad = 16;
+      // Dimensions of the rectangle
+      const rectW = width - _mobPad * 2;
+      const rectH = height - PAD * 2 - 40; // Subtract extra for header/footer clearance
+      const radius = 60; // Corner radius
 
-    // rx: calculated with more padding
-    const safeRx = Math.floor((width - _mobSeatW - 2 * _mobPad) / 2);
-    const rx = isMobile ? Math.max(120, safeRx) : Math.max(120, safeRx - 6);
+      // Hero index
+      const heroIdx = Math.max(0, seatsList.findIndex(s => s === heroSeat));
 
-    // ry: Use vertical space, but reduce slightly to avoid top cutoff
+      const points = Array.from({ length: n }, (_, i) => {
+        // Hero at t=0 (Bottom Center). Clockwise distribution.
+        // i increases clockwise.
+        // t = 0 -> Hero. t increasing -> Hero+1...
+        // Index offset: (i - heroIdx + n) % n
+        const tick = (i - heroIdx + n) % n;
+        const t = tick / n;
+        return getPointOnRect(cx, cy, rectW, rectH, radius, t);
+      });
+
+      return {
+        isRect: true, cx, cy, rectW, rectH, radius,
+        points, seatW: SEAT_W, seatH: SEAT_H, isMobile
+      };
+    }
+
+    // --- Desktop: Ellipse Logic (unchanged) ---
+    const safeRx = Math.floor((width - SEAT_W - 2 * PAD) / 2);
+    const rx = Math.max(120, safeRx - 6);
+
     const safeRy = Math.floor((height - SEAT_H - 2 * PAD) / 2);
-    const ry = isMobile ? Math.max(130, safeRy - 25) : Math.max(90, safeRy - 6);
+    const ry = Math.max(90, safeRy - 6);
 
-    // ヒーローを常に最下部（BTN位置）に回転オフセットで固定
     const heroIdx = Math.max(0, seatsList.findIndex(s => s === heroSeat));
     const offset = Math.PI / 2 - (2 * Math.PI * heroIdx) / n;
 
@@ -371,7 +467,7 @@ export default function App() {
     });
 
     return { rx, ry, points, seatW: SEAT_W, seatH: SEAT_H, isMobile, cx, cy };
-  }, [S, players, width, height, heroSeat]);
+  }, [S, players, width, height, heroSeat, isMobile]);
 
   // ストリート/アクター/ベット変更時にスライダー初期位置を最小レイズへ同期
   useEffect(() => {
@@ -843,9 +939,35 @@ export default function App() {
         >
           {/* SVG Table Background */}
           <svg viewBox={`0 0 ${width} ${height}`} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
-            {/* テーブル外形 */}
-            <ellipse cx={seatGeom.cx || width / 2} cy={seatGeom.cy || height / 2} rx={seatGeom.rx + 60} ry={seatGeom.ry + 60} fill="rgba(0,0,0,0.3)" />
-            <ellipse cx={seatGeom.cx || width / 2} cy={seatGeom.cy || height / 2} rx={seatGeom.rx + 40} ry={seatGeom.ry + 40} stroke="#1f2f46" strokeWidth="4" fill="none" />
+            {seatGeom.isRect ? (
+              <>
+                {/* Rounded Rectangle */}
+                <rect
+                  x={seatGeom.cx - seatGeom.rectW / 2}
+                  y={seatGeom.cy - seatGeom.rectH / 2}
+                  width={seatGeom.rectW}
+                  height={seatGeom.rectH}
+                  rx={seatGeom.radius}
+                  fill="rgba(0,0,0,0.3)"
+                />
+                <rect
+                  x={seatGeom.cx - seatGeom.rectW / 2}
+                  y={seatGeom.cy - seatGeom.rectH / 2}
+                  width={seatGeom.rectW}
+                  height={seatGeom.rectH}
+                  rx={seatGeom.radius}
+                  stroke="#1f2f46"
+                  strokeWidth="4"
+                  fill="none"
+                />
+              </>
+            ) : (
+              <>
+                {/* Ellipse */}
+                <ellipse cx={seatGeom.cx || width / 2} cy={seatGeom.cy || height / 2} rx={seatGeom.rx + 60} ry={seatGeom.ry + 60} fill="rgba(0,0,0,0.3)" />
+                <ellipse cx={seatGeom.cx || width / 2} cy={seatGeom.cy || height / 2} rx={seatGeom.rx + 40} ry={seatGeom.ry + 40} stroke="#1f2f46" strokeWidth="4" fill="none" />
+              </>
+            )}
           </svg>
 
           {/* Seats */}
