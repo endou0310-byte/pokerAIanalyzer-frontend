@@ -233,43 +233,55 @@ export default function App() {
 
   // ==== default_stack を DB から取得 ====
   useEffect(() => {
-    if (!auth.loggedIn || !auth.user?.user_id) return;
+    // ログインチェック (user_id or id)
+    const uid = auth.user?.user_id || auth.user?.id;
+    if (!auth.loggedIn || !uid) return;
 
     (async () => {
       try {
         const res = await fetch(
-          `${API_BASE}/auth/me?user_id=${encodeURIComponent(auth.user.user_id)}`
+          `${API_BASE}/auth/me?user_id=${encodeURIComponent(uid)}`
         );
-        if (!res.ok) return;
+        if (!res.ok) {
+          console.warn("Fetch default_stack failed:", res.status);
+          return;
+        }
 
         const data = await res.json();
+        console.log("Fetched auth/me:", data);
 
         if (data?.ok && data?.user?.default_stack != null) {
           const raw = Number(data.user.default_stack);
           const v = Number.isFinite(raw) ? raw : 100;
-          setDefaultStack(v);
+
+          setDefaultStack(prev => {
+            if (prev !== v) {
+              try {
+                const u = JSON.parse(localStorage.getItem("pa_user") || "null");
+                if (u) {
+                  u.default_stack = v;
+                  localStorage.setItem("pa_user", JSON.stringify(u));
+                }
+              } catch { }
+              return v;
+            }
+            return prev;
+          });
+
           lastSavedDefaultStackRef.current = v;
 
-          // ★ DBから最新値を取れたら localStorage も更新（F5対策）
-          try {
-            const u = JSON.parse(localStorage.getItem("pa_user") || "null");
-            if (u) {
-              u.default_stack = v;
-              localStorage.setItem("pa_user", JSON.stringify(u));
-            }
-          } catch { }
-
-          // heroStack が未設定、またはNaN、または初期値(100)のままならDB値で上書き
           setHeroStack((prev) => {
+            // 100 or default or NaN should be overwritten
             if (prev == null || !Number.isFinite(prev) || prev === 100) return v;
             return prev;
           });
         }
-      } catch {
-        // 取得失敗時は何もしない
+      } catch (e) {
+        console.error("Error fetching default_stack:", e);
       }
     })();
-  }, [auth.loggedIn, auth.user?.user_id]);
+  }, [auth.loggedIn, auth.user]);
+
 
   // ※ auto-save was removed. SettingsModal now handles manual save.
 
