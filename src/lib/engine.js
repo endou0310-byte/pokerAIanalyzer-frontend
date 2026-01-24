@@ -162,18 +162,69 @@ function settleStreetAndMaybeNext(S) {
   }
 }
 
-function rotateOrStreet(S) {
-  const actives = aliveIdx(S);
+const notFoldedIdx = (S) => [...Array(S.players).keys()].filter(i => !S.folded[i]);
+const canActIdx = (S) => notFoldedIdx(S).filter(i => (S.stacks[i] ?? 0) > 0);
 
-  if (actives.length <= 1) {
+function rotateOrStreet(S) {
+  const notFolded = notFoldedIdx(S);
+
+  // 1. All folded except one -> Winner
+  if (notFolded.length <= 1) {
     settleStreetAndMaybeNext(S);
     S.actor = -1;
     return;
   }
 
+  const actives = canActIdx(S);
+
+  // 2. Everyone All-In (or only 1 left and matched bet)
+  if (actives.length === 0) {
+    // Proceed to showdown (simulate streets)
+    while (S.street !== "RIVER" && S.street !== "SHOWDOWN") { // "SHOWDOWN" isn't a street? logic says RIVER.
+      if (S.street === "RIVER") break;
+      const nextStreet = { PRE: "FLOP", FLOP: "TURN", TURN: "RIVER" }[S.street];
+      S.street = nextStreet;
+      settleStreetAndMaybeNext(S);
+    }
+    settleStreetAndMaybeNext(S);
+    S.actor = -1;
+    return;
+  }
+
+  // 3. One player left with chips
+  if (actives.length === 1) {
+    const hero = actives[0];
+    // If Hero is facing a bet (currentBet > committed), Hero MUST act.
+    if (S.currentBet > S.committed[hero]) {
+      // Continue to find next actor (which should be Hero)
+    } else {
+      // Hero matched the bet (or checked) against All-Ins. Street End.
+      if (S.street === "RIVER") {
+        settleStreetAndMaybeNext(S);
+        S.actor = -1;
+      } else {
+        const nextStreet = { PRE: "FLOP", FLOP: "TURN", TURN: "RIVER" }[S.street];
+        S.street = nextStreet;
+        settleStreetAndMaybeNext(S);
+      }
+      return;
+    }
+  }
+
+  // 4. Normal Rotation
+  // Check if anyone on this street still needs to act?
+  // "pend" logic:
+  // - If currentBet==0: anyone who hasn't acted (checked).
+  // - If currentBet>0: anyone who hasn't matched bet OR (if matched) hasn't acted yet?
+  //   Actually, if matched and acted, they are done.
+  //   If matched but NOT acted? (e.g. BB option?).
+  //   Engine logic uses `S.acted` set.
+  //   Reset `acted` on Raise.
   const pend = S.currentBet === 0
     ? actives.filter(i => !S.acted.has(i))
-    : actives.filter(i => S.committed[i] !== S.currentBet || !S.acted.has(i));
+    : actives.filter(i => S.committed[i] < S.currentBet || !S.acted.has(i));
+  // FIXED: committed[i] !== currentBet -> committed[i] < currentBet. 
+  // If committed > currentBet (impossible unless bug), treat as done.
 
   if (pend.length === 0) {
     if (S.street === "RIVER") {

@@ -571,12 +571,53 @@ export default function App() {
       return;
     }
 
-    // ストリートごとの必要枚数
-    const need = S.street === "FLOP" ? 3 : (S.street === "TURN" ? 1 : (S.street === "RIVER" ? 1 : 0));
-    const cur = S.street === "FLOP" ? board.FLOP.length : (S.street === "TURN" ? board.TURN.length : (S.street === "RIVER" ? board.RIVER.length : 0));
+    // ストリートごとの必要枚数 (Showdownなら5枚揃っているべき)
+    let need = 0;
+    if (S.street === "FLOP") need = 3;
+    else if (S.street === "TURN") need = 4;
+    else if (S.street === "RIVER") need = 5;
 
-    // まだ足りていなければボード入力を開く
-    if (need > 0 && cur < need && !showBoard) {
+    // Actor < 0 (End of Hand / Showdown)
+    if (S.actor < 0) {
+      if (recording) setRecording(false);
+
+      // Showdown check: >1 active players? (Not Folded)
+      // (engine.js sets actor=-1 on fold-win too, need to distinguish)
+      const notFolded = (S.folded || []).filter(f => !f).length;
+      if (notFolded > 1) {
+        // Showdown: Need ALL 5 cards eventually
+        // But for now, just ensure we have enough for the *current* street?
+        // Actually, if it's All-In Showdown, we want the user to input ALL cards until River.
+        // So we force need=5 if it's Showdown.
+        need = 5;
+      } else {
+        // Fold Win: No more cards needed.
+        need = 0;
+      }
+
+      const cur = board.FLOP.length + board.TURN.length + board.RIVER.length;
+      if (need > 0 && cur < need) {
+        if (!showBoard) setShowBoard(true);
+        // Do NOT show Post yet. Wait until user inputs board.
+        return;
+      }
+
+      // All cards input done (or not needed) -> Show Analysis
+      if (!showBoard) setShowPost(true); // Don't popup if Board Picker is open
+      return;
+    }
+
+    // Normal Street Logic (while actor >= 0)
+    // Here we need "current street" cards.
+    // engine.js uses FLOP=3, TURN=4, RIVER=5 concept?
+    // App.jsx logic was: FLOP=3, TURN=1, RIVER=1 (diff).
+    const curLen = S.street === "FLOP" ? board.FLOP.length
+      : (S.street === "TURN" ? board.TURN.length
+        : (S.street === "RIVER" ? board.RIVER.length : 0));
+
+    const streetNeed = S.street === "FLOP" ? 3 : (S.street === "TURN" ? 1 : (S.street === "RIVER" ? 1 : 0));
+
+    if (streetNeed > 0 && curLen < streetNeed && !showBoard) {
       setShowBoard(true);
     }
   }, [
