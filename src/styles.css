@@ -853,8 +853,11 @@ input[type="range"].bb-slider::-webkit-slider-thumb {
     text-overflow: ellipsis;
     border-left: 2px solid var(--accent);
   }
-} 
- /* ===== CardPickerModal Styles ===== */
+}
+
+   
+
+/* ===== CardPickerModal Styles ===== */
 .cardpicker-backdrop {
   position: fixed;
   inset: 0;
@@ -869,26 +872,29 @@ input[type="range"].bb-slider::-webkit-slider-thumb {
   background: #0b1621;
   border: 1px solid #203040;
   border-radius: 12px;
-  padding: 20px;
-  width: 90%;
+  padding: 16px;
+  width: 95%;
   max-width: 500px;
-  max-height: 90vh;
+  max-height: 92vh;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .cardpicker-header {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
 }
 
 .cardpicker-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: #e5e7eb;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .cardpicker-current {
-  font-size: 14px;
+  font-size: 13px;
   color: #94a3b8;
 }
 
@@ -903,13 +909,14 @@ input[type="range"].bb-slider::-webkit-slider-thumb {
 .cardpicker-grid {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 5px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
 }
 
 .cardpicker-row {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   justify-content: center;
 }
 
@@ -918,13 +925,14 @@ input[type="range"].bb-slider::-webkit-slider-thumb {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 48px;
+  width: 28px;
+  height: 40px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+  border-radius: 3px;
   background: #1a2332;
   cursor: pointer;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .cardpicker-card:hover:not(.cardpicker-card--disabled) {
@@ -935,8 +943,8 @@ input[type="range"].bb-slider::-webkit-slider-thumb {
 .cardpicker-card--active {
   background: #6366f1 !important;
   border-color: #818cf8 !important;
-  box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
-  transform: scale(1.05);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.6);
+  transform: scale(1.02);
 }
 
 .cardpicker-card--disabled {
@@ -946,13 +954,15 @@ input[type="range"].bb-slider::-webkit-slider-thumb {
 }
 
 .cardpicker-rank {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   color: #fff;
+  line-height: 1;
 }
 
 .cardpicker-suit {
-  font-size: 12px;
+  font-size: 10px;
+  line-height: 1;
 }
 
 .cardpicker-suit[data-suit="h"],
@@ -969,4 +979,6 @@ input[type="range"].bb-slider::-webkit-slider-thumb {
   display: flex;
   gap: 12px;
   justify-content: flex-end;
+  flex-shrink: 0;
+  margin-top: auto;
 }
