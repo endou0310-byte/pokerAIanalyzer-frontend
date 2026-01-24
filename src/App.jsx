@@ -594,8 +594,10 @@ export default function App() {
       if (recording) setRecording(false);
 
       // Showdown check: >1 active players? (Not Folded)
-      // (engine.js sets actor=-1 on fold-win too, need to distinguish)
-      const notFolded = (S.folded || []).filter(f => !f).length;
+      const notFolded = (S.folded || []).reduce((count, folded) => folded ? count : count + 1, 0);
+
+      console.log("[App] Hand End. Actor:", S.actor, "NotFolded:", notFolded, "FoldedArr:", S.folded);
+
       if (notFolded > 1) {
         // Showdown: Need ALL 5 cards eventually
         // But for now, just ensure we have enough for the *current* street?
@@ -608,6 +610,8 @@ export default function App() {
       }
 
       const cur = board.FLOP.length + board.TURN.length + board.RIVER.length;
+      console.log("[App] Board Need:", need, "Cur:", cur, "ShowBoard:", showBoard);
+
       if (need > 0 && cur < need) {
         if (!showBoard) setShowBoard(true);
         // Do NOT show Post yet. Wait until user inputs board.
