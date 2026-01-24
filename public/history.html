@@ -300,6 +300,38 @@
       margin-top: 0;
     }
 
+    /* Modal Header Left Layout */
+    .modal-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .modal-header h2 {
+      margin: 0;
+      white-space: nowrap; /* Prevent title wrap if possible */
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 250px;
+    }
+
+    .title-edit-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 16px; /* Slightly larger */
+      color: var(--accent); /* Make it accent color */
+      margin-left: 0; /* Handled by gap */
+      opacity: 0.9; /* More visible */
+      transition: 0.2s;
+      flex-shrink: 0; /* Prevent button shrinking */
+    }
+    .title-edit-btn:hover { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 5px var(--accent-glow)); }
+
+    .btn-nav {
+      white-space: nowrap; /* Prevent header buttons wrapping */
+    }
+
     .analysis-text {
       background: rgba(0, 0, 0, 0.3);
       padding: 20px;
@@ -314,16 +346,7 @@
     }
 
     /* Titles edit */
-    .title-edit-btn {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-      margin-left: 8px;
-      opacity: 0.5;
-      transition: 0.2s;
-    }
-    .title-edit-btn:hover { opacity: 1; transform: scale(1.1); }
+
 
     .title-edit-input {
       background: rgba(0,0,0,0.5);

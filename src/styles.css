@@ -471,11 +471,13 @@ input[type="range"].bb-slider::-webkit-slider-thumb {
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
-    justify-content: center; /* Center align cards */
+    justify-content: center;
+    /* Center align cards */
   }
 
   .cardpicker-card {
-    width: calc(100% / 7 - 6px); /* Roughly 7 cards per row */
+    width: calc(100% / 7 - 6px);
+    /* Roughly 7 cards per row */
     aspect-ratio: 3/4;
     font-size: 11px;
   }
@@ -718,6 +720,21 @@ input[type="range"].bb-slider::-webkit-slider-thumb {
   border-radius: 12px;
   overflow-x: auto;
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Main Layout Grid */
+.grid {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  /* Narrower sidebar (was ~320px effectively) */
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* =========================================

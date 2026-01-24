@@ -344,25 +344,22 @@ export default function App() {
     const PAD = isMobile ? 12 : 40;
 
     // ステージ実寸の中心
-    // ステージ実寸の中心
     const cx = width / 2;
-    // Mobile tweak: Shift down to avoid header overlap
-    const cy = height / 2 + (isMobile ? 25 : 0);
+    // Mobile tweak: Shift down more (+35)
+    const cy = height / 2 + (isMobile ? 35 : 0);
 
     // Mobile tweak: "More Round" & "Maximize Width"
-    // Reduce padding on mobile to use full width.
-    const _mobPad = isMobile ? 4 : 40;
+    // Restore some padding (was 4, now 16) to avoid "tight" look
+    const _mobPad = isMobile ? 16 : 40;
     const _mobSeatW = isMobile ? 80 : 130;
 
-    // rx: Use almost full width. (Width - Seat - Pad)/2
-    // If width=360, seat=80 => (280/2) = 140. 
-    // Old val was ~80. This is a HUGE increase.
+    // rx: calculated with more padding
     const safeRx = Math.floor((width - _mobSeatW - 2 * _mobPad) / 2);
-    const rx = isMobile ? Math.max(130, safeRx) : Math.max(120, safeRx - 6);
+    const rx = isMobile ? Math.max(120, safeRx) : Math.max(120, safeRx - 6);
 
-    // ry: Use vertical space. KKPoker is taller.
+    // ry: Use vertical space, but reduce slightly to avoid top cutoff
     const safeRy = Math.floor((height - SEAT_H - 2 * PAD) / 2);
-    const ry = isMobile ? Math.max(140, safeRy - 10) : Math.max(90, safeRy - 6);
+    const ry = isMobile ? Math.max(130, safeRy - 25) : Math.max(90, safeRy - 6);
 
     // ヒーローを常に最下部（BTN位置）に回転オフセットで固定
     const heroIdx = Math.max(0, seatsList.findIndex(s => s === heroSeat));
@@ -828,7 +825,7 @@ export default function App() {
             style={{ height: 32, padding: '0 10px', fontSize: 11 }}
             onClick={() => window.location.href = "history.html"}
           >
-            HISTORY
+            履歴
           </button>
           {/* 設定ボタン */}
           <button className="btn" style={{ height: 32, width: 32, padding: 0 }} onClick={() => setShowSettings(true)}>
