@@ -85,10 +85,20 @@ export default function ActionBar({
             </div>
 
             {/* Raise Presets & Slider Area */}
-            <div>
-                {/* Raise Presets (Chips) */}
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: isMobile ? 8 : 12, minHeight: 0 }}>
+                {/* Raise Presets (Chips) - Scrollable on Mobile */}
                 {raisePresets.length > 0 && (
-                    <div className="chip-group" style={{ marginBottom: 16, justifyContent: "center" }}>
+                    <div
+                        className="chip-group"
+                        style={{
+                            marginBottom: isMobile ? 8 : 16,
+                            justifyContent: isMobile ? "flex-start" : "center",
+                            overflowX: isMobile ? "auto" : "visible",
+                            whiteSpace: isMobile ? "nowrap" : "normal",
+                            paddingBottom: isMobile ? 4 : 0, // Scrollbar space
+                            flexShrink: 0
+                        }}
+                    >
                         {showBetPct && (
                             <button key="pct-33" className="chip" onClick={() => handleBetPct(0.33)}>33%</button>
                         )}
@@ -127,38 +137,60 @@ export default function ActionBar({
                     </div>
                 )}
 
-                {/* Slider & Raise Button */}
-                <div className="raise-wrap">
-                    <button
-                        className="btn btn--primary raise-fixed"
-                        onClick={() => { if (Number.isFinite(value)) onTo(+Number(value).toFixed(2)); }}
-                        disabled={!legal.raise && !legal.bet}
-                        title="決定"
-                    >
-                        {S.currentBet === 0 ? "BET" : "RAISE"} {fmtBB(value)}
-                    </button>
+                {/* Slider & Actions Grid (Mobile Optimized) */}
+                <div style={isMobile ? { display: "grid", gridTemplateColumns: "1fr auto", gap: 8, alignItems: "center" } : {}}>
 
-                    <input
-                        type="range"
-                        className="bb-slider"
-                        style={{ flex: 1, ["--pct"]: pct }}
-                        min={minTo}
-                        max={Math.max(minTo, maxTo)}
-                        step={0.5}
-                        value={value}
-                        onChange={(e) => setRaiseTo(+e.target.value)}
-                    />
-                </div>
-                <div className="bb-ticks"><span /><span /><span /></div>
+                    {/* PC: Slider and Raise Button wrap standard logic */}
+                    {/* Mobile: Slider on top? Or Input Area? */}
 
-                {/* All-In Button */}
-                <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
-                    <button
-                        className="btn glow btn-danger"
-                        onClick={() => onTo((S?.committed?.[S.actor] ?? 0) + (S?.stacks?.[S.actor] ?? 0))}
-                    >
-                        All-in
-                    </button>
+                    {/* Unified Raise Block */}
+                    <div className="raise-wrap" style={isMobile ? { width: "100%", gridColumn: "1 / -1" } : {}}>
+                        <button
+                            className="btn btn--primary raise-fixed"
+                            onClick={() => { if (Number.isFinite(value)) onTo(+Number(value).toFixed(2)); }}
+                            disabled={!legal.raise && !legal.bet}
+                            title="決定"
+                            style={isMobile ? { height: 36, fontSize: 12, padding: "0 10px" } : {}}
+                        >
+                            {S.currentBet === 0 ? "BET" : "RAISE"} {fmtBB(value)}
+                        </button>
+
+                        <input
+                            type="range"
+                            className="bb-slider"
+                            style={{ flex: 1, ["--pct"]: pct }}
+                            min={minTo}
+                            max={Math.max(minTo, maxTo)}
+                            step={0.5}
+                            value={value}
+                            onChange={(e) => setRaiseTo(+e.target.value)}
+                        />
+                    </div>
+                    {!isMobile && <div className="bb-ticks"><span /><span /><span /></div>}
+
+                    {/* All-In Button */}
+                    <div style={isMobile ? { gridColumn: "1 / -1", display: "flex", justifyContent: "flex-end" } : { display: 'flex', justifyContent: 'center', marginTop: 12 }}>
+                        {/* Mobile: Make All-in huge? Or small? User wanted it "inline" or smaller. 
+                             Let's actually put All-in NEXT to the slider/button on mobile if possible.
+                             Or just small button.
+                          */}
+                        {isMobile ? (
+                            <button
+                                className="btn glow btn-danger"
+                                style={{ height: 36, fontSize: 11, padding: "0 12px", width: "100%" }}
+                                onClick={() => onTo((S?.committed?.[S.actor] ?? 0) + (S?.stacks?.[S.actor] ?? 0))}
+                            >
+                                ALL-IN
+                            </button>
+                        ) : (
+                            <button
+                                className="btn glow btn-danger"
+                                onClick={() => onTo((S?.committed?.[S.actor] ?? 0) + (S?.stacks?.[S.actor] ?? 0))}
+                            >
+                                All-in
+                            </button>
+                        )}
+                    </div>
                 </div>
 
             </div>

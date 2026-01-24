@@ -468,24 +468,24 @@ input[type="range"].bb-slider::-webkit-slider-thumb {
   }
 
   .cardpicker-row {
-    /* Mobile: Use fewer columns or scrollable row? 
-       Rank(13) is too wide. Let's make it horizontal scroll or smaller.
-       Actually, shrinking cards is better. */
-    gap: 2px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center; /* Center align cards */
   }
 
   .cardpicker-card {
-    /* Dynamic width based on container, or just fixed small size */
+    width: calc(100% / 7 - 6px); /* Roughly 7 cards per row */
     aspect-ratio: 3/4;
-    font-size: 10px;
-  }
-
-  .cardpicker-rank {
     font-size: 11px;
   }
 
-  .cardpicker-suit {
+  .cardpicker-rank {
     font-size: 12px;
+  }
+
+  .cardpicker-suit {
+    font-size: 14px;
   }
 }
 
@@ -761,8 +761,9 @@ input[type="range"].bb-slider::-webkit-slider-thumb {
   /* アクションパネル: 画面下部に固定 */
   .mobile-action-panel {
     height: auto;
-    min-height: 280px;
-    max-height: 45vh;
+    min-height: auto;
+    max-height: 40vh;
+    /* Allow less max height */
     width: 100%;
     background: rgba(13, 22, 35, 0.95);
     border-top: 1px solid rgba(100, 149, 237, 0.3);
@@ -773,8 +774,10 @@ input[type="range"].bb-slider::-webkit-slider-thumb {
 
     display: flex;
     flex-direction: column;
-    padding: 16px;
-    gap: 12px;
+    padding: 12px 16px;
+    /* Reduced vertical padding */
+    gap: 8px;
+    /* Reduced gap */
     overflow-y: auto;
   }
 
