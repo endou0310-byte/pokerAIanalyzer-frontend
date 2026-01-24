@@ -597,6 +597,7 @@ export default function App() {
       const notFolded = (S.folded || []).reduce((count, folded) => folded ? count : count + 1, 0);
 
       console.log("[App] Hand End. Actor:", S.actor, "NotFolded:", notFolded, "FoldedArr:", S.folded);
+      console.warn("[App] Hand End. Actor:", S.actor, "NotFolded:", notFolded, "FoldedArr:", S.folded);
 
       if (notFolded > 1) {
         // Showdown: Need ALL 5 cards eventually
@@ -610,7 +611,7 @@ export default function App() {
       }
 
       const cur = board.FLOP.length + board.TURN.length + board.RIVER.length;
-      console.log("[App] Board Need:", need, "Cur:", cur, "ShowBoard:", showBoard);
+      console.warn("[App] Board Need:", need, "Cur:", cur, "ShowBoard:", showBoard);
 
       if (need > 0 && cur < need) {
         if (!showBoard) setShowBoard(true);
