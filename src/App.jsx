@@ -532,7 +532,18 @@ export default function App() {
   const onFold = () => { if (!S) return; pushHistory(S); const n = structuredClone(S); E.actFold(n); setS(n); };
   const onCheck = () => { if (!S) return; pushHistory(S); const n = structuredClone(S); E.actCheck(n); setS(n); };
   const onCall = () => { if (!S) return; pushHistory(S); const n = structuredClone(S); E.actCall(n); setS(n); };
-  const onTo = (to) => { if (!S) return; pushHistory(S); const n = structuredClone(S); E.actTo(n, to); setS(n); };
+  const onTo = (to) => {
+    if (!S) return;
+    const num = Number(to);
+    if (!Number.isFinite(num)) {
+      console.warn("Invalid raise amount:", to);
+      return;
+    }
+    pushHistory(S);
+    const n = structuredClone(S);
+    E.actTo(n, num);
+    setS(n);
+  };
 
   /* postflop bet% */
   function onBetPct(pct) {
@@ -542,7 +553,9 @@ export default function App() {
     const want = +(basePot * pct).toFixed(2);
     const already = S.committed[S.actor] ?? 0;
     const to = +(already + want).toFixed(2);
-    onTo(to);
+    if (Number.isFinite(to)) {
+      onTo(to);
+    }
   }
   const raisePresets = S ? E.presets(S) : [];
   const showBetPct = !!S && S.street !== "PRE" && S.currentBet === 0;
