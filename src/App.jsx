@@ -421,16 +421,21 @@ export default function App() {
 
     // ステージ実寸の中心
     const cx = width / 2;
-    // Mobile tweak: Shift down slightly
-    const cy = height / 2 + (isMobile ? 35 : 0);
+    // Mobile tweak: Shift down slightly (less shift needed as we shrink table)
+    const cy = height / 2 + (isMobile ? 20 : 0);
 
     // Mobile: Rounded Rectangle Logic
     if (isMobile) {
-      const _mobPad = 16;
-      // Dimensions of the rectangle
-      const rectW = width - _mobPad * 2;
-      const rectH = height - PAD * 2 - 40; // Subtract extra for header/footer clearance
-      const radius = 60; // Corner radius
+      // Calculate Safe Bounds to contain Seat centers
+      // Total Width required = rectW + SEAT_W.
+      // We want Total Width <= width - small_margin
+      // rectW <= width - SEAT_W - margin
+      const margin = 24;
+      const rectW = width - SEAT_W - margin;
+      // Same for height, but needs more clearance for Header/Footer
+      const rectH = height - SEAT_H - margin - 50;
+
+      const radius = 50; // Slightly tighter radius for smaller table
 
       // Hero index
       const heroIdx = Math.max(0, seatsList.findIndex(s => s === heroSeat));
