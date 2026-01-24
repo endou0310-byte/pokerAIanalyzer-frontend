@@ -47,9 +47,8 @@ export default function CardPickerModal({
         return next;
       }
       // Keep first card when adding second (limit to 2 cards total)
-      const next = cur.slice(0, 1);
-      next.push(code);
-      return next;
+      // Use spread to ensure new array reference for React
+      return [...cur.slice(0, 1), code];
     });
   };
 
