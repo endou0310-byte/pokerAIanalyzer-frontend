@@ -128,14 +128,14 @@ body {
 
 /* Layout */
 .page {
-  max-width: 1240px;
+  max-width: 1540px;
   margin: 32px auto 60px;
   padding: 0 20px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: 350px 1fr;
   gap: 24px;
 }
 
