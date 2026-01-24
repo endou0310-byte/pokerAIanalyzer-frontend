@@ -177,8 +177,11 @@ function rotateOrStreet(S) {
 
   const actives = canActIdx(S);
 
+  console.warn("[Engine] rotateOrStreet - Street:", S.street, "Actives:", actives.length, "NotFolded:", notFolded.length);
+
   // 2. Everyone All-In (or only 1 left and matched bet)
   if (actives.length === 0) {
+    console.warn("[Engine] Everyone All-In detected. Proceeding to showdown.");
     // Proceed to showdown (simulate streets)
     while (S.street !== "RIVER" && S.street !== "SHOWDOWN") { // "SHOWDOWN" isn't a street? logic says RIVER.
       if (S.street === "RIVER") break;
