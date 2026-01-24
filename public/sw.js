@@ -22,6 +22,7 @@ self.addEventListener('fetch', (event) => {
     // Simple Network-falling-back-to-cache strategy
     // For analysis API calls, we always want network.
     if (event.request.method !== 'GET') return;
+    if (!event.request.url.startsWith('http')) return; // Ignore chrome-extension:// etc.
 
     event.respondWith(
         fetch(event.request)
