@@ -1136,24 +1136,14 @@ export default function App() {
     <>
 
       <header className="topbar">
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div className="top-left-group">
           <div className="logo-pill">Poker Analyzer</div>
           <div className="top-title">ハンド記録</div>
         </div>
-        <div
-          className="top-right"
-          style={{ display: "flex", alignItems: "center", gap: 16 }}
-        >
-          {/* プラン情報（1つだけ表示） */}
+        <div className="top-right-group">
+          {/* プラン情報（モバイルでは非表示にしたい） */}
           {plan && (
-            <div
-              style={{
-                fontSize: 13,
-                color: "#d1d5db",
-                textAlign: "right",
-                lineHeight: 1.4,
-              }}
-            >
+            <div className="plan-info">
               <div>{plan.toUpperCase()} プラン</div>
               <div>
                 解析 残り{" "}
@@ -1209,15 +1199,7 @@ export default function App() {
 
       <main className="page">
         <section className="panel" style={{ padding: 16 }}>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "minmax(220px, 12vw) 1fr",
-              gap: 16,
-              alignItems: "start",
-              height: "100%"
-            }}
-          >
+          <div className="grid">
 
             {/* 左：セットアップ＋LOG */}
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
