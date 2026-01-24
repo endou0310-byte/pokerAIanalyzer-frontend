@@ -387,6 +387,7 @@ export default function App() {
   /* cards */
   const [heroCards, setHeroCards] = useState([]);
   const [villainCards, setVillainCards] = useState([]);
+  const [seatHands, setSeatHands] = useState({}); // For multiway: { "UTG": ["Qd", "Qc"], "CO": [...] }
   const [board, setBoard] = useState({ FLOP: [], TURN: [], RIVER: [] });
 
   /* 任意レイズ入力用 */
@@ -677,8 +678,15 @@ export default function App() {
     };
 
     // ショーダウンで相手ハンドが分かる場合だけ付与
+    // Heads-up: simple villainCards
     if (villainCards.length === 2) {
       payload.villain = { cards: villainCards };
+    }
+
+    // Multiway: seat-specific opponent hands
+    const hasSeatHands = Object.keys(seatHands).length > 0;
+    if (hasSeatHands) {
+      payload.opponent_hands = seatHands; // e.g., { "UTG": ["Qd", "Qc"], "CO": [...] }
     }
 
     return payload;
@@ -1647,36 +1655,98 @@ export default function App() {
             </div>
 
             {/* 相手ハンド入力（任意） */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: 24,
-                padding: "8px 12px",
-                background: "rgba(255,255,255,0.03)",
-                borderRadius: 8,
-                border: "1px solid rgba(255,255,255,0.05)"
-              }}
-            >
-              <div style={{ fontSize: 13, color: "#d1d5db" }}>
-                相手ハンド（任意）
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ fontSize: 14, color: villainCards.length === 2 ? "#fff" : "#6b7280", fontWeight: "bold" }}>
-                  {villainCards.length === 2
-                    ? villainCards.join(" ")
-                    : "未入力"}
-                </div>
-                <button
-                  className="btn btn--primary"
-                  style={{ height: 32, padding: "0 12px", fontSize: 12 }}
-                  onClick={() => setShowVillain(true)}
-                >
-                  入力
-                </button>
-              </div>
-            </div>
+            {(() => {
+              // Detect multiway showdown (3+ players not folded)
+              const notFoldedSeats = (S?.folded || []).map((folded, idx) => !folded ? (S?.seats || [])[idx] : null).filter(s => s && s !== heroSeat);
+              const isMultiway = notFoldedSeats.length >= 2;
+
+              if (isMultiway) {
+                // Multiway: Show seat-by-seat input
+                return (
+                  <div
+                    style={{
+                      marginBottom: 24,
+                      padding: "12px",
+                      background: "rgba(255,255,255,0.03)",
+                      borderRadius: 8,
+                      border: "1px solid rgba(255,255,255,0.05)"
+                    }}
+                  >
+                    <div style={{ fontSize: 13, color: "#d1d5db", marginBottom: 12, fontWeight: 600 }}>
+                      相手ハンド（座席ごと・任意）
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      {notFoldedSeats.map((seat) => (
+                        <div
+                          key={seat}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            padding: "6px 8px",
+                            background: "rgba(255,255,255,0.02)",
+                            borderRadius: 6
+                          }}
+                        >
+                          <div style={{ fontSize: 12, color: "#9ca3af", minWidth: 60 }}>{seat}:</div>
+                          <div style={{ flex: 1, fontSize: 13, color: seatHands[seat]?.length === 2 ? "#fff" : "#6b7280", fontWeight: "bold", marginRight: 8 }}>
+                            {seatHands[seat]?.length === 2 ? seatHands[seat].join(" ") : "未入力"}
+                          </div>
+                          <button
+                            className="btn btn--primary"
+                            style={{ height: 28, padding: "0 10px", fontSize: 11 }}
+                            onClick={() => {
+                              // Store current seat being edited
+                              window.__currentEditingSeat = seat;
+                              setShowVillain(true);
+                            }}
+                          >
+                            入力
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              } else {
+                // Heads-up: Show simple single opponent input
+                return (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      marginBottom: 24,
+                      padding: "8px 12px",
+                      background: "rgba(255,255,255,0.03)",
+                      borderRadius: 8,
+                      border: "1px solid rgba(255,255,255,0.05)"
+                    }}
+                  >
+                    <div style={{ fontSize: 13, color: "#d1d5db" }}>
+                      相手ハンド（任意）
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <div style={{ fontSize: 14, color: villainCards.length === 2 ? "#fff" : "#6b7280", fontWeight: "bold" }}>
+                        {villainCards.length === 2
+                          ? villainCards.join(" ")
+                          : "未入力"}
+                      </div>
+                      <button
+                        className="btn btn--primary"
+                        style={{ height: 32, padding: "0 12px", fontSize: 12 }}
+                        onClick={() => {
+                          window.__currentEditingSeat = null; // Clear for heads-up
+                          setShowVillain(true);
+                        }}
+                      >
+                        入力
+                      </button>
+                    </div>
+                  </div>
+                );
+              }
+            })()}
 
             {/* ボタン群 */}
             <div
@@ -1732,7 +1802,7 @@ export default function App() {
         showVillain && (
           <CardPickerModal
             open={showVillain}
-            initialCards={villainCards}
+            initialCards={window.__currentEditingSeat ? (seatHands[window.__currentEditingSeat] || []) : villainCards}
             exclude={[
               ...board.FLOP,
               ...board.TURN,
@@ -1740,7 +1810,17 @@ export default function App() {
               ...heroCards,
             ]}
             onConfirm={(cs) => {
-              setVillainCards(cs.slice(0, 2)); // 2枚まで
+              const pickedCards = cs.slice(0, 2); // 2枚まで
+              const editingSeat = window.__currentEditingSeat;
+
+              if (editingSeat) {
+                // Multiway: Store in seat-specific slot
+                setSeatHands(prev => ({ ...prev, [editingSeat]: pickedCards }));
+              } else {
+                // Heads-up: Store in simple villainCards
+                setVillainCards(pickedCards);
+              }
+
               setShowVillain(false);
             }}
             onCancel={() => setShowVillain(false)}
