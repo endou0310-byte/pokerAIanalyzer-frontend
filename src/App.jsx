@@ -576,13 +576,6 @@ export default function App() {
   useEffect(() => {
     if (!recording || !S) return;
 
-    // 行動者がいない → ハンド終了
-    if (S.actor < 0) {
-      if (recording) setRecording(false);
-      setShowPost(true);
-      return;
-    }
-
     // ストリートごとの必要枚数 (Showdownなら5枚揃っているべき)
     let need = 0;
     if (S.street === "FLOP") need = 3;
