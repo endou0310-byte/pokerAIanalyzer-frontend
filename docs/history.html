@@ -327,18 +327,36 @@
       max-width: 250px;
     }
 
-    .title-edit-btn {
+    .icon-btn {
       background: transparent;
       border: none;
       cursor: pointer;
-      font-size: 16px; /* Slightly larger */
-      color: var(--accent); /* Make it accent color */
-      margin-left: 0; /* Handled by gap */
-      opacity: 0.9; /* More visible */
-      transition: 0.2s;
-      flex-shrink: 0; /* Prevent button shrinking */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      border-radius: 4px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      color: #94a3b8; /* Default muted */
     }
-    .title-edit-btn:hover { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 5px var(--accent-glow)); }
+    .icon-btn:hover { 
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .edit-btn { color: var(--accent); }
+    .edit-btn:hover { 
+      color: #fff; 
+      transform: scale(1.1); 
+      filter: drop-shadow(0 0 8px var(--accent-glow)); 
+    }
+
+    .delete-btn { color: #ef4444; }
+    .delete-btn:hover { 
+      color: #f87171; 
+      transform: scale(1.1); 
+      filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5)); 
+    }
 
     .btn-nav {
       white-space: nowrap; /* Prevent header buttons wrapping */
@@ -430,22 +448,19 @@
 <div class="modal-header">
   <div class="modal-header-left">
     <h2 id="modalTitle">履歴詳細</h2>
-    <button
-      id="titleEditBtn"
-      class="title-edit-btn"
-      type="button"
-      title="ハンド名を編集"
-    >
-      ✏
+    <!-- Edit Button (SVG) -->
+    <button id="titleEditBtn" class="icon-btn edit-btn" type="button" title="名前を変更">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+      </svg>
     </button>
-    <button
-      id="historyDeleteBtn"
-      class="title-edit-btn"
-      type="button"
-      title="履歴を削除"
-      style="margin-left: 8px; color: #ff4b5c;"
-    >
-      🗑️
+    <!-- Delete Button (SVG) -->
+    <button id="historyDeleteBtn" class="icon-btn delete-btn" type="button" title="この履歴を削除">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"></polyline>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+      </svg>
     </button>
   </div>
   <button id="modalClose" class="modal-close" aria-label="閉じる">×</button>
@@ -867,6 +882,35 @@ if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
         throw new Error(`update-title error: ${json.error || "unknown"}`);
       }
       return json;
+    }
+
+    // -------- 履歴削除 --------
+    const historyDeleteBtn = document.getElementById("historyDeleteBtn");
+    if (historyDeleteBtn) {
+      historyDeleteBtn.addEventListener("click", async () => {
+        if (!currentEditingId) {
+          console.error("No currentEditingId");
+          return;
+        }
+        if (!window.confirm("この履歴を削除しますか？\nこの操作は取り消せません。")) return;
+
+        try {
+          const res = await fetch(`${API}/history/delete_item`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: user.user_id, id: currentEditingId })
+          });
+          const json = await res.json();
+          if (json.ok) {
+            modalOuter.style.display = "none";
+            loadHistory(); // Reload list
+          } else {
+            alert("削除に失敗しました: " + (json.error || "Unknown"));
+          }
+        } catch (e) {
+          alert("エラーが発生しました: " + e.message);
+        }
+      });
     }
 
     // -------- HTML エスケープ --------
