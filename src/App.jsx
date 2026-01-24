@@ -370,7 +370,7 @@ export default function App() {
       return { x: cx + rx * Math.cos(t), y: cy + ry * Math.sin(t) };
     });
 
-    return { rx, ry, points, seatW: SEAT_W, seatH: SEAT_H, isMobile };
+    return { rx, ry, points, seatW: SEAT_W, seatH: SEAT_H, isMobile, cx, cy };
   }, [S, players, width, height, heroSeat]);
 
   // ストリート/アクター/ベット変更時にスライダー初期位置を最小レイズへ同期
@@ -844,8 +844,8 @@ export default function App() {
           {/* SVG Table Background */}
           <svg viewBox={`0 0 ${width} ${height}`} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
             {/* テーブル外形 */}
-            <ellipse cx={width / 2} cy={height / 2} rx={seatGeom.rx + 60} ry={seatGeom.ry + 60} fill="rgba(0,0,0,0.3)" />
-            <ellipse cx={width / 2} cy={height / 2} rx={seatGeom.rx + 40} ry={seatGeom.ry + 40} stroke="#1f2f46" strokeWidth="4" fill="none" />
+            <ellipse cx={seatGeom.cx || width / 2} cy={seatGeom.cy || height / 2} rx={seatGeom.rx + 60} ry={seatGeom.ry + 60} fill="rgba(0,0,0,0.3)" />
+            <ellipse cx={seatGeom.cx || width / 2} cy={seatGeom.cy || height / 2} rx={seatGeom.rx + 40} ry={seatGeom.ry + 40} stroke="#1f2f46" strokeWidth="4" fill="none" />
           </svg>
 
           {/* Seats */}
