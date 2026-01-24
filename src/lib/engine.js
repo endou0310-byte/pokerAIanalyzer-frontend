@@ -211,6 +211,26 @@ function rotateOrStreet(S) {
     }
   }
 
+  // 3.5. Multi-stack all-in detection
+  // If all active players have matched the current bet AND no one can raise further,
+  // proceed to showdown (e.g., 75BB, 150BB, 500BB all-in with 500BB caller)
+  if (actives.length > 1) {
+    const allMatched = actives.every(i => S.committed[i] === S.currentBet);
+    const maxPossibleRaise = Math.max(...actives.map(i => S.stacks[i]));
+
+    if (allMatched && maxPossibleRaise <= 0) {
+      // Everyone matched, no one can raise -> Showdown
+      while (S.street !== "RIVER") {
+        const nextStreet = { PRE: "FLOP", FLOP: "TURN", TURN: "RIVER" }[S.street];
+        S.street = nextStreet;
+        settleStreetAndMaybeNext(S);
+      }
+      settleStreetAndMaybeNext(S);
+      S.actor = -1;
+      return;
+    }
+  }
+
   // 4. Normal Rotation
   // Check if anyone on this street still needs to act?
   // "pend" logic:
