@@ -656,17 +656,27 @@ export default function App() {
   const [showPost, setShowPost] = useState(false);
   /* stage */
   const [stageRef, stage] = useSize();
-  // スマホ(350px程度)でも破綻しないよう、最小幅制限を緩和
-  const width = Math.max(stage.w, 340);
-  const height = Math.max(stage.h, 400);
+
+  // 画面全体の幅を監視してレイアウトを決定する
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // スマホ判定: windowWidth を基準にする (初期値0問題を回避)
+  const isMobile = windowWidth < 600;
+
+  // テーブル描画用の幅 (stage.w が取れていない初期は windowWidth などでフォールバック)
+  // ただしDesktop時は min 900 で描画したいので、レイアウトモードに応じて下限を変える
+  const width = Math.max(stage.w, isMobile ? 340 : 900);
+  const height = Math.max(stage.h, isMobile ? 400 : 620);
 
   const seatGeom = useMemo(() => {
     const seatsList = buildSeatsList(S, players);
     const n = seatsList.length;
     if (n <= 0) return { rx: 0, ry: 0, points: [] };
-
-    // 画面幅に応じてサイズを動的に変える
-    const isMobile = width < 600;
 
     // 座席カードの見込みサイズ＋安全余白 (スマホ時は小さく)
     const SEAT_W = isMobile ? 80 : 130;
@@ -1129,8 +1139,7 @@ export default function App() {
     heroCards.length === 2 &&
     hasActions &&
     (remainingMonth === null || remainingMonth > 0);
-  // モバイル判定（幅600px未満）
-  const isMobile = width < 600;
+
 
   // --- Mobile Layout Renderer ---
   const renderMobile = () => (
@@ -1241,9 +1250,27 @@ export default function App() {
 
         {/* コントロール群 (Start/Reset or Actions) */}
         {!recording ? (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <button className="btn" onClick={resetAll}>リセット</button>
-            <button className="btn glow btn-accent" onClick={begin}>記録開始</button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {/* Mobile Setup Controls */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <label className="text-sm text-muted">
+                Players
+                <select value={players} onChange={e => setPlayers(Number(e.target.value))} style={{ marginTop: 4 }}>
+                  {[2, 3, 4, 6, 7, 8, 9].map(n => <option key={n} value={n}>{n}</option>)}
+                </select>
+              </label>
+              <label className="text-sm text-muted">
+                Hero Seat
+                <select value={heroSeat} onChange={e => setHeroSeat(e.target.value)} style={{ marginTop: 4 }}>
+                  {(S?.seats ?? ["UTG", "BTN", "SB", "BB"]).map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </label>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <button className="btn" onClick={resetAll}>リセット</button>
+              <button className="btn glow btn-accent" onClick={begin}>記録開始</button>
+            </div>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

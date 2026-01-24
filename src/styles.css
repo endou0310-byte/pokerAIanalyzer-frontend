@@ -460,6 +460,35 @@ input[type="range"].bb-slider::-webkit-slider-thumb {
   }
 }
 
+@media (max-width: 600px) {
+  .cardpicker-dialog {
+    width: 96vw;
+    padding: 16px;
+    max-height: 80vh;
+  }
+
+  .cardpicker-row {
+    /* Mobile: Use fewer columns or scrollable row? 
+       Rank(13) is too wide. Let's make it horizontal scroll or smaller.
+       Actually, shrinking cards is better. */
+    gap: 2px;
+  }
+
+  .cardpicker-card {
+    /* Dynamic width based on container, or just fixed small size */
+    aspect-ratio: 3/4;
+    font-size: 10px;
+  }
+
+  .cardpicker-rank {
+    font-size: 11px;
+  }
+
+  .cardpicker-suit {
+    font-size: 12px;
+  }
+}
+
 .cardpicker-card {
   /* Reset default button styles */
   appearance: none;
