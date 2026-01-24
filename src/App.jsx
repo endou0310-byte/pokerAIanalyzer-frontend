@@ -1470,7 +1470,7 @@ export default function App() {
                   ref={stageRef}
                   style={{
                     position: "relative",
-                    width: "900px",   // ★ 固定幅
+                    width: "100%",    // ★ レスポンシブ (親幅に合わせる)
                     height: "620px",  // ★ 固定高さ
                     margin: "0 auto", // ★ パネル内で中央寄せ
                     padding: 0,              // 寸法は clientWidth/Height を使う
