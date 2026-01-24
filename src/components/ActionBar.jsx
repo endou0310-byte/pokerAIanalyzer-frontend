@@ -54,6 +54,115 @@ export default function ActionBar({
     const range = Math.max(1e-9, maxTo - minTo);
     const pct = ((value - minTo) / range) * 100;
 
+    // ======================
+    // PC Layout (New)
+    // ======================
+    if (!isMobile) {
+        return (
+            <div style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                width: "100%", maxWidth: 960, margin: "0 auto",
+                background: "rgba(10, 15, 25, 0.75)",
+                backdropFilter: "blur(20px)",
+                border: "1px solid rgba(135, 206, 250, 0.15)",
+                borderRadius: 24, padding: "16px 24px",
+                boxShadow: "0 10px 40px rgba(0,0,0,0.4)"
+            }}>
+                {/* Left: General Actions */}
+                <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+                    {onUndo && (
+                        <button onClick={onUndo} title="Undo" style={{
+                            width: 42, height: 42, borderRadius: "50%",
+                            background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+                            color: "#94a3b8", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center"
+                        }}>↩</button>
+                    )}
+                    <button onClick={onFold} disabled={!legal.fold} style={{
+                        height: 48, minWidth: 100, borderRadius: 12,
+                        background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)",
+                        color: "#fca5a5", fontSize: 15, fontWeight: 700, cursor: !legal.fold ? "not-allowed" : "pointer", opacity: !legal.fold ? 0.4 : 1
+                    }}>FOLD</button>
+
+                    <button onClick={onCheck} disabled={!legal.check} style={{
+                        height: 48, minWidth: 100, borderRadius: 12,
+                        background: legal.check ? "rgba(255,255,255,0.08)" : "transparent",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        color: "#e2e8f0", fontSize: 15, fontWeight: 700, cursor: !legal.check ? "not-allowed" : "pointer", opacity: !legal.check ? 0.3 : 1
+                    }}>CHECK</button>
+
+                    <button onClick={onCall} disabled={!legal.call} style={{
+                        height: 48, minWidth: 100, borderRadius: 12,
+                        background: legal.call ? "rgba(255,255,255,0.08)" : "transparent",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        color: "#e2e8f0", fontSize: 15, fontWeight: 700, cursor: !legal.call ? "not-allowed" : "pointer", opacity: !legal.call ? 0.3 : 1
+                    }}>CALL</button>
+                </div>
+
+                {/* Divider */}
+                <div style={{ width: 1, height: 40, background: "rgba(255,255,255,0.1)", margin: "0 4px" }} />
+
+                {/* Right: Betting */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
+                    {/* Presets Row */}
+                    <div style={{ display: "flex", gap: 6, justifyContent: "center" }}>
+                        {raisePresets.map((p, i) => (
+                            <button key={i} onClick={() => onTo(p.amount)} style={{
+                                fontSize: 11, padding: "4px 10px", borderRadius: 20,
+                                background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+                                color: "#cbd5e1", cursor: "pointer", transition: "0.2s"
+                            }}>
+                                {p.label}
+                            </button>
+                        ))}
+                        {showBetPct && [0.33, 0.5, 0.75, 1.0, 1.5].map(pctVal => (
+                            <button key={pctVal} onClick={() => handleBetPct(pctVal)} style={{
+                                fontSize: 11, padding: "4px 10px", borderRadius: 20,
+                                background: "rgba(0, 212, 255, 0.1)", border: "1px solid rgba(0, 212, 255, 0.2)",
+                                color: "#7dd3fc", cursor: "pointer"
+                            }}>
+                                {pctVal * 100}%
+                            </button>
+                        ))}
+                        <button onClick={() => onTo(maxTo)} style={{
+                            fontSize: 11, padding: "4px 10px", borderRadius: 20,
+                            background: "rgba(255, 75, 92, 0.15)", border: "1px solid rgba(255, 75, 92, 0.3)",
+                            color: "#fda4af", fontWeight: 700, cursor: "pointer"
+                        }}>ALL-IN</button>
+                    </div>
+
+                    {/* Slider & Raise Input */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <div style={{ position: "relative", flex: 1, height: 24, display: "flex", alignItems: "center" }}>
+                            <div style={{ position: "absolute", left: 0, right: 0, height: 4, background: "#334155", borderRadius: 2 }}>
+                                <div style={{ width: `${pct}%`, height: "100%", background: "#00d4ff", borderRadius: 2 }} />
+                            </div>
+                            <input type="range" min={minTo} max={maxTo} step={inc} value={value}
+                                onChange={(e) => setRaiseTo(Math.min(maxTo, Math.max(minTo, Number(e.target.value))))}
+                                style={{ width: "100%", height: 24, opacity: 0, cursor: "pointer", zIndex: 10, position: "absolute", top: 0, left: 0, margin: 0 }}
+                            />
+                        </div>
+
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(0,0,0,0.3)", borderRadius: 12, padding: 4 }}>
+                            <input type="number" value={raiseTo} onChange={(e) => setRaiseTo(e.target.value)}
+                                style={{ width: 70, background: "transparent", border: "none", color: "#fff", textAlign: "right", fontSize: 16, fontWeight: 700, outline: "none" }}
+                            />
+                            <span style={{ fontSize: 11, color: "#94a3b8", paddingRight: 8 }}>BB</span>
+                        </div>
+
+                        <button disabled={!legal.raise} onClick={() => onTo(value)} style={{
+                            height: 42, padding: "0 20px", borderRadius: 12,
+                            background: "linear-gradient(135deg, #00d4ff 0%, #00aaff 100%)",
+                            border: "none", color: "#0f172a", fontSize: 14, fontWeight: 800,
+                            boxShadow: "0 0 15px rgba(0, 212, 255, 0.4)", cursor: !legal.raise ? "not-allowed" : "pointer", opacity: !legal.raise ? 0.5 : 1
+                        }}>
+                            RAISE
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 12, width: "100%" }}>
 
