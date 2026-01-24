@@ -41,18 +41,28 @@ export default function ActionBar({
     }
 
     // Compute Slider ranges
-    const inc = Math.max(1.0, S.lastRaiseSize || 1.0);
-    const base = S.lastBetTo || S.currentBet || 0;
-    const minTo = S.currentBet === 0
+    const safeNum = (n, def = 0) => (Number.isFinite(n) ? n : def);
+
+    const inc = Math.max(1.0, safeNum(S.lastRaiseSize, 1.0));
+    const base = safeNum(S.lastBetTo) || safeNum(S.currentBet) || 0;
+
+    // minTo logic
+    let minTo = safeNum(S.currentBet) === 0
         ? (S.street === "PRE" ? 2 : 1)
         : +(base + inc).toFixed(2);
-    const maxTo = +((S.committed?.[S.actor] || 0) + (S.stacks?.[S.actor] || 0)).toFixed(2);
+    if (!Number.isFinite(minTo)) minTo = 2.0;
+
+    // maxTo logic
+    const stack = safeNum(S.stacks?.[S.actor]);
+    const commit = safeNum(S.committed?.[S.actor]);
+    const maxTo = +(stack + commit).toFixed(2);
 
     // Input value logic
     const value = Number.isFinite(Number(raiseTo)) ? Number(raiseTo) : minTo;
+
     // Handle slider pct for visuals
     const range = Math.max(1e-9, maxTo - minTo);
-    const pct = ((value - minTo) / range) * 100;
+    const pct = Math.min(100, Math.max(0, ((value - minTo) / range) * 100));
 
     // ======================
     // PC Layout (New)
