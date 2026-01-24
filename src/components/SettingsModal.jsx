@@ -154,6 +154,7 @@ export default function SettingsModal({ open, onClose, userInfo, plan, remaining
                 <h3 style={{ marginTop: 0 }}>アカウント</h3>
                 <div style={{ color: "#cbd5e1", lineHeight: 1.9, fontSize: 13 }}>
                   <div>メール：{userInfo?.email || "-"}</div>
+                  <div style={{ fontSize: 10, color: "#64748b" }}>ID: {userInfo?.user_id || "-"}</div>
                   <div>プラン：{plan ? plan.toUpperCase() : "-"}</div>
                   <div>今月の残り解析：{remainingMonth === null ? "∞" : `${remainingMonth} 回`}</div>
                 </div>

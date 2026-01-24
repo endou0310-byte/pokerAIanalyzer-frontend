@@ -225,7 +225,10 @@ export default function App() {
   // auth から userInfo をセット（未ログインは null）
   useEffect(() => {
     if (auth.loggedIn && auth.user?.email) {
-      setUserInfo({ email: auth.user.email });
+      setUserInfo({
+        email: auth.user.email,
+        user_id: auth.user.user_id || auth.user.id
+      });
     } else {
       setUserInfo(null);
     }
@@ -240,7 +243,7 @@ export default function App() {
     (async () => {
       try {
         const res = await fetch(
-          `${API_BASE}/auth/me?user_id=${encodeURIComponent(uid)}`
+          `${API_BASE}/auth/me?user_id=${encodeURIComponent(uid)}&_t=${Date.now()}`
         );
         if (!res.ok) {
           console.warn("Fetch default_stack failed:", res.status);
