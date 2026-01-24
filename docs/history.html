@@ -41,6 +41,7 @@
       background-repeat: repeat, no-repeat, no-repeat;
       background-size: 100px 100px, 100% 100%, 100% 100%;
       min-height: 100vh;
+      overflow-x: hidden; /* Prevent horizontal scroll */
     }
 
     /* Topbar matching App.jsx */
@@ -57,6 +58,15 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    
+    @media (max-width: 600px) {
+      .topbar {
+        height: 56px;
+        padding: 0 12px;
+      }
+      .logo-pill { font-size: 14px !important; margin-right: 6px !important; }
+      .btn-nav { font-size: 11px !important; padding: 6px 10px !important; }
     }
 
     .logo-pill {
