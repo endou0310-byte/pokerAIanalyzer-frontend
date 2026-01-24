@@ -259,8 +259,11 @@ export default function App() {
             }
           } catch { }
 
-          // heroStack が未設定なら初期表示も合わせる
-          setHeroStack((prev) => (prev == null || !Number.isFinite(prev) ? v : prev));
+          // heroStack が未設定、またはNaN、または初期値(100)のままならDB値で上書き
+          setHeroStack((prev) => {
+            if (prev == null || !Number.isFinite(prev) || prev === 100) return v;
+            return prev;
+          });
         }
       } catch {
         // 取得失敗時は何もしない
