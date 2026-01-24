@@ -46,7 +46,8 @@ export default function CardPickerModal({
         next.splice(i, 1);
         return next;
       }
-      const next = cur.slice(-1); // 常に2枚まで
+      // Keep first card when adding second (limit to 2 cards total)
+      const next = cur.slice(0, 1);
       next.push(code);
       return next;
     });
@@ -82,39 +83,39 @@ export default function CardPickerModal({
           </div>
         </div>
 
-{/* 4行×13列のカードグリッド（カードのみ） */}
-<div className="cardpicker-grid">
-  {SUITS.map((suit) => (
-    <div className="cardpicker-row" key={suit}>
-      {RANKS.map((rank) => {
-        const code = rank + suit;
-        const active = picked.includes(code);
-        const locked = disabledSet.has(code);
-        let cls = "cardpicker-card";
-        if (active) cls += " cardpicker-card--active";
-        if (locked) cls += " cardpicker-card--disabled";
-        return (
-          <button
-            key={code}
-            type="button"
-            className={cls}
-            onClick={() => toggle(code)}
-            disabled={locked}
-            title={code}
-          >
-            <span className="cardpicker-rank">{rank}</span>
-            <span
-              className="cardpicker-suit"
-              data-suit={suit}
-            >
-              {suitSym[suit]}
-            </span>
-          </button>
-        );
-      })}
-    </div>
-  ))}
-</div>
+        {/* 4行×13列のカードグリッド（カードのみ） */}
+        <div className="cardpicker-grid">
+          {SUITS.map((suit) => (
+            <div className="cardpicker-row" key={suit}>
+              {RANKS.map((rank) => {
+                const code = rank + suit;
+                const active = picked.includes(code);
+                const locked = disabledSet.has(code);
+                let cls = "cardpicker-card";
+                if (active) cls += " cardpicker-card--active";
+                if (locked) cls += " cardpicker-card--disabled";
+                return (
+                  <button
+                    key={code}
+                    type="button"
+                    className={cls}
+                    onClick={() => toggle(code)}
+                    disabled={locked}
+                    title={code}
+                  >
+                    <span className="cardpicker-rank">{rank}</span>
+                    <span
+                      className="cardpicker-suit"
+                      data-suit={suit}
+                    >
+                      {suitSym[suit]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
 
         {/* フッター */}
         <div className="cardpicker-footer">
