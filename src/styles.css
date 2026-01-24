@@ -211,6 +211,10 @@ body {
 .table-stage {
   position: relative;
   min-height: 640px;
+  max-width: 960px;
+  /* Limit maximum width to prevent excessive stretching */
+  margin: 0 auto;
+  /* Center the table */
   padding: 16px;
   border-radius: var(--radius);
 
