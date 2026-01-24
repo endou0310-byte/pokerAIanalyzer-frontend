@@ -616,11 +616,13 @@ export default function App() {
       if (need > 0 && cur < need) {
         if (!showBoard) setShowBoard(true);
         // Do NOT show Post yet. Wait until user inputs board.
+        // IMPORTANT: Return here to prevent setShowPost below
         return;
       }
 
       // All cards input done (or not needed) -> Show Analysis
-      if (!showBoard) setShowPost(true); // Don't popup if Board Picker is open
+      // Since we returned above if board input was needed, we can safely show Post here
+      setShowPost(true);
       return;
     }
 
