@@ -1309,21 +1309,18 @@ export default function App() {
     </div>
   );
 
-  /* UI */
-  if (isMobile) return renderMobile();
+  /* UI Renderers */
 
-  // --- PC Layout (Existing) ---
-  return (
-
+  // --- PC Layout ---
+  const renderDesktop = () => (
     <>
-
       <header className="topbar">
         <div className="top-left-group">
           <div className="logo-pill">Poker Analyzer</div>
           <div className="top-title">ハンド記録</div>
         </div>
         <div className="top-right-group">
-          {/* プラン情報（モバイルでは非表示にしたい） */}
+          {/* プラン情報 */}
           {plan && (
             <div className="plan-info">
               <div>{plan.toUpperCase()} プラン</div>
@@ -1336,11 +1333,9 @@ export default function App() {
 
           {auth.loggedIn ? (
             <>
-              {/* プラン変更ボタン */}
               <button className="btn" onClick={() => setShowPlanModal(true)}>
                 プラン変更
               </button>
-
               <button
                 className="btn glow"
                 onClick={() => {
@@ -1349,7 +1344,6 @@ export default function App() {
               >
                 履歴
               </button>
-
               <button className="btn glow" onClick={() => setShowSettings(true)}>
                 設定
               </button>
@@ -1378,11 +1372,9 @@ export default function App() {
         </div>
       )}
 
-
       <main className="page">
         <section className="panel" style={{ padding: 16 }}>
           <div className="grid">
-
             {/* 左：セットアップ＋LOG */}
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div className="panel">
@@ -1433,7 +1425,7 @@ export default function App() {
                     ? <button className="btn glow btn-accent" onClick={begin} style={{ flex: 1 }}>記録開始</button>
                     : <button className="btn glow btn-danger" onClick={endRecord} style={{ flex: 1 }}>記録終了</button>}
                 </div>
-                {/* 解析ボタン（ハンド入力完了後のみ有効） */}
+
                 <div style={{ display: "flex", gap: 8, marginTop: 8, flexDirection: "column" }}>
                   <button
                     className="btn glow btn-accent"
@@ -1450,8 +1442,6 @@ export default function App() {
                     </div>
                   )}
                 </div>
-
-
               </div>
 
               <div className="panel">
@@ -1464,29 +1454,26 @@ export default function App() {
 
             {/* 右：テーブル＋アクション */}
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {/* 外側は .panel の余白を保持。座標系は内側の stage で統一 */}
-              <div className="panel" style={{ padding: 16 }}>
+              <div className="panel" style={{ padding: 16, overflowX: 'auto' }}>
                 <div
                   ref={stageRef}
                   style={{
                     position: "relative",
-                    width: "100%",    // ★ レスポンシブ (親幅に合わせる)
-                    height: "620px",  // ★ 固定高さ
-                    margin: "0 auto", // ★ パネル内で中央寄せ
-                    padding: 0,              // 寸法は clientWidth/Height を使う
-                    boxSizing: "border-box", // 枠線分を含めた実寸基準に統一
+                    width: "100%",
+                    minWidth: "900px", // ★ PCでは最低幅を確保し、それ以下の場合はスクロールさせる
+                    height: "620px",
+                    margin: "0 auto",
+                    padding: 0,
+                    boxSizing: "border-box",
                     overflow: "hidden",
                     borderRadius: 12,
                   }}
                 >
-
-                  {/* 楕円（座席中心が縁に一致） */}
                   <svg
                     width="100%" height="100%"
                     viewBox={`0 0 ${Math.round(width)} ${Math.round(height)}`}
                     preserveAspectRatio="xMidYMid meet"
                   >
-
                     <ellipse
                       cx={width / 2}
                       cy={height / 2}
@@ -1498,7 +1485,6 @@ export default function App() {
                     />
                   </svg>
 
-                  {/* 座席 */}
                   {buildSeatsList(S, players).map((s, i) => {
                     const p = seatGeom.points[i];
                     const active = !!(recording && S && i === S.actor);
@@ -1574,7 +1560,6 @@ export default function App() {
                     );
                   })}
 
-                  {/* 中央：POT + ボード */}
                   <div
                     style={{
                       position: "absolute",
@@ -1598,10 +1583,10 @@ export default function App() {
                           title={c}
                           style={{
                             width: 46,
-                            height: 60,
-                            borderRadius: 10,
-                            border: "1px solid #1b2a41",
+                            height: 64,
                             background: "#0f1b2b",
+                            borderRadius: 6,
+                            border: "1px solid #1b2a41",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -1678,106 +1663,100 @@ export default function App() {
               <div className="panel" style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                 {recording && S && S.actor >= 0 ? (
                   <>
-                    <button className="btn glow" onClick={onFold} disabled={!legal.fold}>Fold</button>
+                    <div className="action-bar" style={{ marginTop: 24, justifyContent: "center" }}>
+                      <button className="btn btn-danger" disabled={!legal.fold} onClick={onFold}>
+                        Fold
+                      </button>
+                      <button className="btn" disabled={!legal.check} onClick={onCheck}>
+                        Check
+                      </button>
+                      <button className="btn" disabled={!legal.call} onClick={onCall}>
+                        Call
+                      </button>
+                    </div>
 
-                    {S.currentBet === 0
-                      ? <button className="btn glow" onClick={onCheck} disabled={!legal.check}>Check</button>
-                      : <button className="btn glow" onClick={onCall} disabled={!legal.call}>Call</button>
-                    }
-
-                    {/* === Raise UI（セグメント＋充填スライダー／±ボタン無し） === */}
-                    {S && (
-                      <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: 1, minWidth: 360 }}>
-                        {/* プリセット（チップ風） */}
-                        <div className="chip-group">
+                    <div style={{ marginTop: 16 }}>
+                      {/* ベット額プリセット */}
+                      {raisePresets.length > 0 && (
+                        <div className="chip-group" style={{ marginBottom: 12, justifyContent: "center" }}>
+                          {showBetPct && (
+                            <button key="pct-33" className="chip" onClick={() => onBetPct(0.33)}>33%</button>
+                          )}
                           {(() => {
-                            const inc = Math.max(1.0, S.lastRaiseSize || 1.0);
-                            const base = S.lastBetTo || S.currentBet || 0;
-
-                            if (S.street === "PRE" && S.currentBet === 0) {
-                              // オープン（絶対額）
-                              return [2, 2.5, 3, 4, 5].map((bb) => {
-                                const to = +bb.toFixed(2);
-                                const active = Number(raiseTo) === to;
-                                return (
-                                  <button key={`open-${bb}`} className={`chip ${active ? "active" : ""}`} onClick={() => setRaiseTo(to)}>
-                                    {fmtBB(to)}
-                                  </button>
-                                );
-                              });
+                          });
                             }
 
-                            if (S.street === "PRE") {
+                          if (S.street === "PRE") {
                               // 再レイズ（k倍、最小尊重）
                               const minTo = +(base + inc).toFixed(2);
                               return [2, 2.5, 3, 4, 5].map((k) => {
                                 const cand = +(base * k).toFixed(2);
-                                const to = Math.max(cand, minTo);
-                                const active = Number(raiseTo) === to;
-                                return (
-                                  <button key={`rr-${k}`} className={`chip ${active ? "active" : ""}`} onClick={() => setRaiseTo(to)}>
-                                    {`${k}x(${fmtBB(to)})`}
-                                  </button>
-                                );
+                          const to = Math.max(cand, minTo);
+                          const active = Number(raiseTo) === to;
+                          return (
+                          <button key={`rr-${k}`} className={`chip ${active ? "active" : ""}`} onClick={() => setRaiseTo(to)}>
+                            {`${k}x(${fmtBB(to)})`}
+                          </button>
+                          );
                               });
                             }
 
                             // ポストフロップ（Pot％）
                             const sumBets = (S.bets || []).reduce((a, b) => a + b, 0);
-                            const potBase = (S.pot || 0) + sumBets;
-                            const pctList = [0.25, 0.33, 0.5, 0.66, 0.75, 1.0, 1.25];
+                          const potBase = (S.pot || 0) + sumBets;
+                          const pctList = [0.25, 0.33, 0.5, 0.66, 0.75, 1.0, 1.25];
                             return pctList.map((p) => {
                               const want = +(potBase * p).toFixed(2);
-                              const already = S.committed[S.actor] ?? 0;
-                              const to = +(already + want).toFixed(2);
-                              const active = Number(raiseTo) === to;
-                              return (
-                                <button key={`pct-${p}`} className={`chip ${active ? "active" : ""}`} onClick={() => setRaiseTo(to)}>
-                                  {`${Math.round(p * 100)}% (${fmtBB(to)})`}
-                                </button>
-                              );
+                          const already = S.committed[S.actor] ?? 0;
+                          const to = +(already + want).toFixed(2);
+                          const active = Number(raiseTo) === to;
+                          return (
+                          <button key={`pct-${p}`} className={`chip ${active ? "active" : ""}`} onClick={() => setRaiseTo(to)}>
+                            {`${Math.round(p * 100)}% (${fmtBB(to)})`}
+                          </button>
+                          );
                             });
                           })()}
                         </div>
 
 
                         {/* 下段：固定幅の「Raise To …BB」＋充填スライダー */}
-                        {(() => {
-                          const inc = Math.max(1.0, S.lastRaiseSize || 1.0);
-                          const base = S.lastBetTo || S.currentBet || 0;
-                          const minTo =
-                            S.currentBet === 0 ? (S.street === "PRE" ? 2 : 1) : +(base + inc).toFixed(2);
-                          const maxTo = +((S.committed?.[S.actor] || 0) + (S.stacks?.[S.actor] || 0)).toFixed(2);
-                          const value = Number.isFinite(raiseTo) ? raiseTo : minTo;
-                          const pct = ((value - minTo) / Math.max(1e-9, (maxTo - minTo))) * 100;
+                      {(() => {
+                        const inc = Math.max(1.0, S.lastRaiseSize || 1.0);
+                        const base = S.lastBetTo || S.currentBet || 0;
+                        const minTo =
+                          S.currentBet === 0 ? (S.street === "PRE" ? 2 : 1) : +(base + inc).toFixed(2);
+                        const maxTo = +((S.committed?.[S.actor] || 0) + (S.stacks?.[S.actor] || 0)).toFixed(2);
+                        const value = Number.isFinite(raiseTo) ? raiseTo : minTo;
+                        const pct = ((value - minTo) / Math.max(1e-9, (maxTo - minTo))) * 100;
 
-                          return (
-                            <>
-                              <div className="raise-wrap">
-                                <button
-                                  className="btn btn--primary raise-fixed"
-                                  onClick={() => { if (Number.isFinite(value)) onTo(+Number(value).toFixed(2)); }}
-                                  title="決定"
-                                >
-                                  {`Raise To ${fmtBB(value)}`}
-                                </button>
+                        return (
+                          <>
+                            <div className="raise-wrap">
+                              <button
+                                className="btn btn--primary raise-fixed"
+                                onClick={() => { if (Number.isFinite(value)) onTo(+Number(value).toFixed(2)); }}
+                                title="決定"
+                              >
+                                {`Raise To ${fmtBB(value)}`}
+                              </button>
 
-                                <input
-                                  type="range"
-                                  className="bb-slider"
-                                  style={{ flex: 1, ["--pct"]: pct }}
-                                  min={minTo}
-                                  max={Math.max(minTo, maxTo)}
-                                  step={0.5}
-                                  value={value}
-                                  onChange={(e) => setRaiseTo(+e.target.value)}
-                                />
-                              </div>
-                              <div className="bb-ticks"><span /><span /><span /></div>
-                            </>
-                          );
-                        })()}
-                      </div>
+                              <input
+                                type="range"
+                                className="bb-slider"
+                                style={{ flex: 1, ["--pct"]: pct }}
+                                min={minTo}
+                                max={Math.max(minTo, maxTo)}
+                                step={0.5}
+                                value={value}
+                                onChange={(e) => setRaiseTo(+e.target.value)}
+                              />
+                            </div>
+                            <div className="bb-ticks"><span /><span /><span /></div>
+                          </>
+                        );
+                      })()}
+                    </div>
                     )}
 
                     <button
