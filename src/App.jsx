@@ -199,7 +199,8 @@ export default function App() {
   const [defaultStack, setDefaultStack] = useState(() => {
     try {
       const u = JSON.parse(localStorage.getItem("pa_user") || "null");
-      return u?.default_stack != null ? Number(u.default_stack) : 100;
+      const v = Number(u?.default_stack);
+      return Number.isFinite(v) ? v : 100;
     } catch {
       return 100;
     }
@@ -244,7 +245,8 @@ export default function App() {
         const data = await res.json();
 
         if (data?.ok && data?.user?.default_stack != null) {
-          const v = Number(data.user.default_stack);
+          const raw = Number(data.user.default_stack);
+          const v = Number.isFinite(raw) ? raw : 100;
           setDefaultStack(v);
           lastSavedDefaultStackRef.current = v;
 
@@ -258,7 +260,7 @@ export default function App() {
           } catch { }
 
           // heroStack が未設定なら初期表示も合わせる
-          setHeroStack((prev) => (prev == null ? v : prev));
+          setHeroStack((prev) => (prev == null || !Number.isFinite(prev) ? v : prev));
         }
       } catch {
         // 取得失敗時は何もしない
@@ -986,14 +988,17 @@ export default function App() {
                 onClick={() => {
                   if (active) return;
                   const nextStack = window.prompt(`Stack for ${s}?`, S?.stacks?.[i] ?? defaultStack);
-                  if (nextStack && !isNaN(nextStack)) {
-                    setS((prev) => {
-                      if (!prev) return prev;
-                      const nx = structuredClone(prev);
-                      nx.stacks[i] = Number(nextStack);
-                      return nx;
-                    });
-                    if (s === heroSeat) setHeroStack(Number(nextStack));
+                  if (nextStack && nextStack.trim() !== "") {
+                    const num = Number(nextStack);
+                    if (Number.isFinite(num)) {
+                      setS((prev) => {
+                        if (!prev) return prev;
+                        const nx = structuredClone(prev);
+                        nx.stacks[i] = num;
+                        return nx;
+                      });
+                      if (s === heroSeat) setHeroStack(num);
+                    }
                   }
                 }}
                 style={{
