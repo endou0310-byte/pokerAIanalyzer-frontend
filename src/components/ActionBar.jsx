@@ -134,6 +134,20 @@ export default function ActionBar({
                                 );
                             });
                         })()}
+                        {/* Integrated All-In Chip */}
+                        <button
+                            className="chip"
+                            style={{
+                                background: "#4a151b",
+                                borderColor: "#7f1d1d",
+                                color: "#fca5a5",
+                                fontWeight: "bold"
+                            }}
+                            onClick={() => onTo((S?.committed?.[S.actor] ?? 0) + (S?.stacks?.[S.actor] ?? 0))}
+                            title="All-In"
+                        >
+                            ALL-IN
+                        </button>
                     </div>
                 )}
 
@@ -168,29 +182,7 @@ export default function ActionBar({
                     </div>
                     {!isMobile && <div className="bb-ticks"><span /><span /><span /></div>}
 
-                    {/* All-In Button */}
-                    <div style={isMobile ? { gridColumn: "1 / -1", display: "flex", justifyContent: "flex-end" } : { display: 'flex', justifyContent: 'center', marginTop: 12 }}>
-                        {/* Mobile: Make All-in huge? Or small? User wanted it "inline" or smaller. 
-                             Let's actually put All-in NEXT to the slider/button on mobile if possible.
-                             Or just small button.
-                          */}
-                        {isMobile ? (
-                            <button
-                                className="btn glow btn-danger"
-                                style={{ height: 36, fontSize: 11, padding: "0 12px", width: "100%" }}
-                                onClick={() => onTo((S?.committed?.[S.actor] ?? 0) + (S?.stacks?.[S.actor] ?? 0))}
-                            >
-                                ALL-IN
-                            </button>
-                        ) : (
-                            <button
-                                className="btn glow btn-danger"
-                                onClick={() => onTo((S?.committed?.[S.actor] ?? 0) + (S?.stacks?.[S.actor] ?? 0))}
-                            >
-                                All-in
-                            </button>
-                        )}
-                    </div>
+
                 </div>
 
             </div>

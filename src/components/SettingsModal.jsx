@@ -65,7 +65,10 @@ export default function SettingsModal({ open, onClose, userInfo, plan, remaining
     borderBottom: "1px solid rgba(255,255,255,0.1)",
     padding: "0 4px",
     marginBottom: 12,
-    flexShrink: 0
+    flexShrink: 0,
+    // Scroll hint
+    maskImage: "linear-gradient(to right, black 85%, transparent 100%)",
+    WebkitMaskImage: "linear-gradient(to right, black 85%, transparent 100%)",
   } : {
     width: 180,
     display: "flex",
@@ -95,8 +98,8 @@ export default function SettingsModal({ open, onClose, userInfo, plan, remaining
       <div
         style={{
           width: 800, maxWidth: "94vw",
-          height: isMobile ? "85vh" : "auto",
-          maxHeight: "90vh",
+          height: "auto", // Auto height to fit content
+          maxHeight: "85vh", // Limit max height
           background: "#0f1723",
           border: "1px solid #1e293b",
           borderRadius: 16,

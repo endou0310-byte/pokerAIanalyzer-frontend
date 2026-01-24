@@ -344,8 +344,10 @@ export default function App() {
     const PAD = isMobile ? 12 : 40;
 
     // ステージ実寸の中心
+    // ステージ実寸の中心
     const cx = width / 2;
-    const cy = height / 2;
+    // Mobile tweak: Shift down to avoid header overlap
+    const cy = height / 2 + (isMobile ? 25 : 0);
 
     // Mobile tweak: "More Round" & "Maximize Width"
     // Reduce padding on mobile to use full width.
@@ -820,8 +822,13 @@ export default function App() {
         <div className="logo-pill" style={{ fontSize: 14 }}>Poker Analyzer</div>
         <div style={{ display: 'flex', gap: 8 }}>
           {/* 簡易ログ表示ボタン */}
-          <button className="btn" style={{ height: 32, padding: '0 10px', fontSize: 11 }} onClick={() => alert("LOG: " + (S ? line(S.actions, S.street) : ""))}>
-            LOG
+          {/* History Button (was LOG) */}
+          <button
+            className="btn"
+            style={{ height: 32, padding: '0 10px', fontSize: 11 }}
+            onClick={() => window.location.href = "history.html"}
+          >
+            HISTORY
           </button>
           {/* 設定ボタン */}
           <button className="btn" style={{ height: 32, width: 32, padding: 0 }} onClick={() => setShowSettings(true)}>
