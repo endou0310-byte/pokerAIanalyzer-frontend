@@ -1129,8 +1129,163 @@ export default function App() {
     heroCards.length === 2 &&
     hasActions &&
     (remainingMonth === null || remainingMonth > 0);
-  /* UI */
+  // モバイル判定（幅600px未満）
+  const isMobile = width < 600;
 
+  // --- Mobile Layout Renderer ---
+  const renderMobile = () => (
+    <div className="mobile-app-root">
+      {/* 1. Header Overlay */}
+      <div className="mobile-header-overlay">
+        <div className="logo-pill" style={{ fontSize: 14 }}>Poker Analyzer</div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {/* 簡易ログ表示ボタン */}
+          <button className="btn" style={{ height: 32, padding: '0 10px', fontSize: 11 }} onClick={() => alert("LOG: " + (S ? line(S.actions, S.street) : ""))}>
+            LOG
+          </button>
+          {/* 設定ボタン */}
+          <button className="btn" style={{ height: 32, width: 32, padding: 0 }} onClick={() => setShowSettings(true)}>
+            ⚙
+          </button>
+        </div>
+      </div>
+
+      {/* 2. Table Area (Fixed Top) */}
+      <div className="mobile-table-area">
+        <div
+          ref={stageRef}
+          className="table-stage"
+          style={{ width: "100%", height: "100%", position: "relative" }}
+        >
+          {/* SVG Table Background */}
+          <svg viewBox={`0 0 ${width} ${height}`} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
+            {/* テーブル外形 */}
+            <ellipse cx={width / 2} cy={height / 2} rx={seatGeom.rx + 60} ry={seatGeom.ry + 60} fill="rgba(0,0,0,0.3)" />
+            <ellipse cx={width / 2} cy={height / 2} rx={seatGeom.rx + 40} ry={seatGeom.ry + 40} stroke="#1f2f46" strokeWidth="4" fill="none" />
+          </svg>
+
+          {/* Seats */}
+          {seatGeom.points.map((p, i) => {
+            const s = S?.seats?.[i] ?? "SR";
+            const isHero = s === heroSeat;
+            const active = S?.actor === i;
+            return (
+              <div
+                key={i}
+                onClick={() => {
+                  if (active) return;
+                  const nextStack = window.prompt(`Stack for ${s}?`, S?.stacks?.[i] ?? defaultStack);
+                  if (nextStack && !isNaN(nextStack)) {
+                    setS((prev) => {
+                      if (!prev) return prev;
+                      const nx = structuredClone(prev);
+                      nx.stacks[i] = Number(nextStack);
+                      return nx;
+                    });
+                    if (s === heroSeat) setHeroStack(Number(nextStack));
+                  }
+                }}
+                style={{
+                  position: "absolute",
+                  left: p.x, top: p.y,
+                  transform: "translate(-50%,-50%)",
+                  width: seatGeom.seatW, height: seatGeom.seatH,
+                  borderRadius: 8,
+                  background: active ? "#14263b" : "#0e1d2e",
+                  border: active ? "2px solid #ffe08a" : "1px solid #29425c",
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                  fontSize: 10, color: "#d7e7ff", zIndex: 10
+                }}
+              >
+                <div style={{ fontWeight: 700 }}>{isHero ? "YOU" : s}</div>
+                <div>{(S?.stacks?.[i] ?? 0).toFixed(1)}</div>
+                {!!S?.bets?.[i] && <div style={{ color: "#ffe08a" }}>Bet:{S.bets[i]}</div>}
+                {!!S?.folded?.[i] && <div style={{ color: "#555" }}>FOLD</div>}
+
+                {/* Hero Cards (Mobile: compact display) */}
+                {isHero && heroCards.length === 2 && (
+                  <div style={{ marginTop: 2, display: 'flex', gap: 2 }}>{heroCards.map(c => <span key={c}>{pretty(c, "small")}</span>)}</div>
+                )}
+              </div>
+            );
+          })}
+
+          {/* Community Cards & Pot */}
+          <div style={{
+            position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)",
+            textAlign: "center", pointerEvents: "none"
+          }}>
+            <div style={{ fontSize: 16, fontWeight: 800, color: "#d7e7ff", marginBottom: 4 }}>
+              POT {(S?.pot ?? 0).toFixed(1)}
+            </div>
+            <div style={{ display: "flex", gap: 4 }}>
+              {[...board.FLOP, ...board.TURN, ...board.RIVER].map((c, i) => (
+                <div key={i} style={{
+                  width: 32, height: 42, background: "#0f1b2b", borderRadius: 4, border: "1px solid #20354d",
+                  display: "flex", alignItems: "center", justifyContent: "center"
+                }}>
+                  <PrettyBoardCard card={c} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Action Panel (Fixed Bottom) */}
+      <div className="mobile-action-panel">
+        {/* 直近ログ表示 */}
+        <div className="mobile-log-preview">
+          {S ? line(S.actions, S.street) || "No actions yet" : "Ready to start"}
+        </div>
+
+        {/* コントロール群 (Start/Reset or Actions) */}
+        {!recording ? (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <button className="btn" onClick={resetAll}>リセット</button>
+            <button className="btn glow btn-accent" onClick={begin}>記録開始</button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {/* 上段: Fold/Check/Call */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+              <button className="btn btn-danger" disabled={!legal.fold} onClick={onFold}>Fold</button>
+              <button className="btn" disabled={!legal.check} onClick={onCheck}>Check</button>
+              <button className="btn" disabled={!legal.call} onClick={onCall}>Call</button>
+            </div>
+
+            {/* 下段: Raise/Bet */}
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <div style={{ flex: 1 }}>
+                {/* 簡易スライダー */}
+                <input type="range" className="bb-slider"
+                  min={S?.street === "PRE" ? 2 : 1} max={100} step={0.5}
+                  value={raiseTo} onChange={e => setRaiseTo(Number(e.target.value))}
+                />
+                <div style={{ textAlign: 'center', fontSize: 12, marginTop: 4 }}>
+                  {raiseTo} BB
+                </div>
+              </div>
+              <button className="btn btn--primary" disabled={!legal.raise && !legal.bet} onClick={() => onTo(Number(raiseTo))}>
+                {S?.currentBet === 0 ? "BET" : "RAISE"}
+              </button>
+            </div>
+
+            {canAnalyze && (
+              <button className="btn glow btn-accent" onClick={doAnalyze} style={{ marginTop: 8 }}>
+                解析する
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  /* UI */
+  if (isMobile) return renderMobile();
+
+  // --- PC Layout (Existing) ---
   return (
 
     <>
