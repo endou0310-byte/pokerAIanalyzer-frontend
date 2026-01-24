@@ -1683,38 +1683,43 @@ export default function App() {
                             <button key="pct-33" className="chip" onClick={() => onBetPct(0.33)}>33%</button>
                           )}
                           {(() => {
-                          });
-                            }
+                            const currentToCall = (S.lastBetTo || 0) - (S.committed[S.actor] || 0);
+                            const remainingStack = S.stacks[S.actor] || 0;
+                            const canRaise = remainingStack > currentToCall + 0.01;
+                            if (!canRaise) return null;
+                            const inc = Math.max(1.0, S.lastRaiseSize || 1.0);
+                            const base = S.lastBetTo || S.currentBet || 0;
 
-                          if (S.street === "PRE") {
+                            // プリフロップ (2x, 2.5x, 3x, etc.)
+                            if (S.street === "PRE") {
                               // 再レイズ（k倍、最小尊重）
                               const minTo = +(base + inc).toFixed(2);
                               return [2, 2.5, 3, 4, 5].map((k) => {
                                 const cand = +(base * k).toFixed(2);
-                          const to = Math.max(cand, minTo);
-                          const active = Number(raiseTo) === to;
-                          return (
-                          <button key={`rr-${k}`} className={`chip ${active ? "active" : ""}`} onClick={() => setRaiseTo(to)}>
-                            {`${k}x(${fmtBB(to)})`}
-                          </button>
-                          );
+                                const to = Math.max(cand, minTo);
+                                const active = Number(raiseTo) === to;
+                                return (
+                                  <button key={`rr-${k}`} className={`chip ${active ? "active" : ""}`} onClick={() => setRaiseTo(to)}>
+                                    {`${k}x(${fmtBB(to)})`}
+                                  </button>
+                                );
                               });
                             }
 
                             // ポストフロップ（Pot％）
                             const sumBets = (S.bets || []).reduce((a, b) => a + b, 0);
-                          const potBase = (S.pot || 0) + sumBets;
-                          const pctList = [0.25, 0.33, 0.5, 0.66, 0.75, 1.0, 1.25];
+                            const potBase = (S.pot || 0) + sumBets;
+                            const pctList = [0.25, 0.33, 0.5, 0.66, 0.75, 1.0, 1.25];
                             return pctList.map((p) => {
                               const want = +(potBase * p).toFixed(2);
-                          const already = S.committed[S.actor] ?? 0;
-                          const to = +(already + want).toFixed(2);
-                          const active = Number(raiseTo) === to;
-                          return (
-                          <button key={`pct-${p}`} className={`chip ${active ? "active" : ""}`} onClick={() => setRaiseTo(to)}>
-                            {`${Math.round(p * 100)}% (${fmtBB(to)})`}
-                          </button>
-                          );
+                              const already = S.committed[S.actor] ?? 0;
+                              const to = +(already + want).toFixed(2);
+                              const active = Number(raiseTo) === to;
+                              return (
+                                <button key={`pct-${p}`} className={`chip ${active ? "active" : ""}`} onClick={() => setRaiseTo(to)}>
+                                  {`${Math.round(p * 100)}% (${fmtBB(to)})`}
+                                </button>
+                              );
                             });
                           })()}
                         </div>
