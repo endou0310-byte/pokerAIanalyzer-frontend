@@ -2134,30 +2134,40 @@ export default function App() {
             style={{
               position: "fixed",
               inset: 0,
-              background: "rgba(0,0,0,0.65)",
+              background: "rgba(0,0,0,0.75)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               zIndex: 1500,
+              backdropFilter: "blur(4px)",
             }}
           >
             <div
               style={{
-                minWidth: 260,
-                maxWidth: 320,
-                padding: "16px 20px",
-                borderRadius: 12,
-                background:
-                  "radial-gradient(circle at top, rgba(59,130,246,0.35), #020617 55%)",
-                boxShadow: "0 18px 45px rgba(0,0,0,0.7)",
-                border: "1px solid rgba(148,163,184,0.4)",
+                minWidth: 300,
+                maxWidth: 360,
+                padding: "32px 24px",
+                borderRadius: 20,
+                background: "rgba(13, 22, 35, 0.9)",
+                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.8)",
+                border: "1px solid rgba(100, 149, 237, 0.3)",
                 textAlign: "center",
+                backdropFilter: "blur(12px)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 16,
               }}
             >
-              <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
+              <div style={{
+                fontSize: 18,
+                fontWeight: 700,
+                color: "#eef4ff",
+                textShadow: "0 0 20px rgba(0, 212, 255, 0.5)"
+              }}>
                 解析中...
               </div>
-              <div style={{ fontSize: 12, color: "#cbd5f5", lineHeight: 1.6 }}>
+              <div style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.6 }}>
                 数秒〜十数秒ほどかかる場合があります。
                 <br />
                 そのままお待ちください。

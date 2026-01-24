@@ -198,7 +198,7 @@ export default function ResultModal({
           evaluation,
           conversation: nextConv,
           markdown: `${initialMd}\n\n**Q:** ${text}\n\n**A:** ${answer}`,
-        }).catch(() => {});
+        }).catch(() => { });
       }
 
     } catch (e) {
@@ -235,23 +235,25 @@ export default function ResultModal({
         style={{
           width: "min(960px, 92vw)",
           maxHeight: "84vh",
-          background: "#0e1b2b",
-          border: "1px solid #1f2f46",
-          borderRadius: 12,
-          padding: 16,
-          boxShadow: "0 12px 40px rgba(0,0,0,.45)",
+          background: "rgba(13, 22, 35, 0.95)", // Glass base dark
+          border: "1px solid rgba(100, 149, 237, 0.2)",
+          borderRadius: 20,
+          padding: 24,
+          boxShadow: "0 25px 80px rgba(0,0,0,0.6)",
+          backdropFilter: "blur(12px)",
           display: "flex",
           flexDirection: "column",
-          gap: 12,
+          gap: 16,
         }}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* 本文 */}
         <div
+          className="markdown-result"
           style={{
             overflow: "auto",
-            paddingRight: 6,
-            fontSize: 13,
-            lineHeight: 1.8,
+            paddingRight: 8,
+            flex: 1, // Fill available space
           }}
         >
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
