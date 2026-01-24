@@ -584,8 +584,6 @@ export default function App() {
 
     // Actor < 0 (End of Hand / Showdown)
     if (S.actor < 0) {
-      if (recording) setRecording(false);
-
       // Showdown check: >1 active players? (Not Folded)
       const notFolded = (S.folded || []).reduce((count, folded) => folded ? count : count + 1, 0);
 
@@ -607,13 +605,15 @@ export default function App() {
       console.warn("[App] Board Need:", need, "Cur:", cur, "ShowBoard:", showBoard);
 
       if (need > 0 && cur < need) {
+        // Still need more board cards - keep recording active and show board picker
         if (!showBoard) setShowBoard(true);
         // Do NOT show Post yet. Wait until user inputs board.
         // IMPORTANT: Return here to prevent setShowPost below
         return;
       }
 
-      // All cards input done (or not needed) -> Show Analysis
+      // All cards input done (or not needed) -> Stop recording and show Analysis
+      if (recording) setRecording(false);
       // Since we returned above if board input was needed, we can safely show Post here
       setShowPost(true);
       return;
