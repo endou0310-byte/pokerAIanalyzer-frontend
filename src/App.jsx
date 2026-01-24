@@ -588,9 +588,6 @@ export default function App() {
       // Showdown check: >1 active players? (Not Folded)
       const notFolded = (S.folded || []).reduce((count, folded) => folded ? count : count + 1, 0);
 
-      console.log("[App] Hand End. Actor:", S.actor, "NotFolded:", notFolded, "FoldedArr:", S.folded);
-      console.warn("[App] Hand End. Actor:", S.actor, "NotFolded:", notFolded, "FoldedArr:", S.folded);
-
       if (notFolded > 1) {
         // Showdown: Need ALL 5 cards eventually
         // But for now, just ensure we have enough for the *current* street?
@@ -603,7 +600,6 @@ export default function App() {
       }
 
       const cur = board.FLOP.length + board.TURN.length + board.RIVER.length;
-      console.warn("[App] Board Need:", need, "Cur:", cur, "ShowBoard:", showBoard);
 
       if (need > 0 && cur < need) {
         // Still need more board cards - keep recording active and show board picker
