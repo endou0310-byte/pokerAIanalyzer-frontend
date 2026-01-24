@@ -347,14 +347,23 @@ export default function App() {
     const cx = width / 2;
     const cy = height / 2;
 
-    // はみ出しを確実に避ける半径（座席サイズと余白を控除）
-    // Mobile tweak: Slightly squarer aspect ratio (increase ry) to avoid "weapon" look
-    const rx = Math.max(isMobile ? 80 : 120, Math.floor((width - SEAT_W - 2 * PAD) / 2) - 6);
-    const ry = Math.max(isMobile ? 90 : 90, Math.floor((height - SEAT_H - 2 * PAD) / 2) - 6);
+    // Mobile tweak: "More Round" & "Maximize Width"
+    // Reduce padding on mobile to use full width.
+    const _mobPad = isMobile ? 4 : 40;
+    const _mobSeatW = isMobile ? 80 : 130;
+
+    // rx: Use almost full width. (Width - Seat - Pad)/2
+    // If width=360, seat=80 => (280/2) = 140. 
+    // Old val was ~80. This is a HUGE increase.
+    const safeRx = Math.floor((width - _mobSeatW - 2 * _mobPad) / 2);
+    const rx = isMobile ? Math.max(130, safeRx) : Math.max(120, safeRx - 6);
+
+    // ry: Use vertical space. KKPoker is taller.
+    const safeRy = Math.floor((height - SEAT_H - 2 * PAD) / 2);
+    const ry = isMobile ? Math.max(140, safeRy - 10) : Math.max(90, safeRy - 6);
 
     // ヒーローを常に最下部（BTN位置）に回転オフセットで固定
     const heroIdx = Math.max(0, seatsList.findIndex(s => s === heroSeat));
-    // Mobile tweak: Shift rotation slightly if needed, but usually just geometric balance
     const offset = Math.PI / 2 - (2 * Math.PI * heroIdx) / n;
 
     const points = Array.from({ length: n }, (_, i) => {
