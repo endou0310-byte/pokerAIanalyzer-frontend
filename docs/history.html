@@ -529,17 +529,22 @@
       const rank = card.slice(0, card.length - 1);
       const suit = card.slice(-1).toLowerCase();
       
-      let color = "#e2e8f0"; // Default (Spades)
+      let color = "#9ecbff"; // Default (Spades/Clubs) - Light Blue to match BoardPicker
       let suitChar = suit;
       
-      if (suit === 'h') { suitChar = "♥"; color = "#ff5f5f"; } // Red
-      else if (suit === 'd') { suitChar = "♦"; color = "#3b82f6"; } // Blue (often used for Diamond in 4-color deck) or Red
-      else if (suit === 'c') { suitChar = "♣"; color = "#10b981"; } // Green
-      else if (suit === 's') { suitChar = "♠"; color = "#94a3b8"; } // Slate (Spades)
-
-      // Let's stick to 2-color common or 4-color if preferred. 
-      // User asked for "Pictures", so 4-color is clearer.
-      // H=Red, D=Blue, C=Green, S=Black(DarkGray)
+      if (suit === 'h') { 
+        suitChar = "♥"; 
+        color = "#ff6b81"; // Red (Hearts)
+      } else if (suit === 'd') { 
+        suitChar = "♦"; 
+        color = "#ff6b81"; // Red (Diamonds) - Matches BoardPicker
+      } else if (suit === 'c') { 
+        suitChar = "♣"; 
+        color = "#9ecbff"; // Blue (Clubs)
+      } else if (suit === 's') { 
+        suitChar = "♠"; 
+        color = "#9ecbff"; // Blue (Spades)
+      }
       
       return `<span style="color:${color}; font-weight:bold;">${rank}${suitChar}</span>`;
     }
