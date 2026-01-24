@@ -648,9 +648,16 @@ export default function App() {
   const onPickBoard = (cs) => {
     setBoard(prev => {
       const next = { ...prev };
-      if (S.street === "FLOP") next.FLOP = cs.slice(0, 3);
-      else if (S.street === "TURN") next.TURN = [cs[0]];
-      else if (S.street === "RIVER") next.RIVER = [cs[0]];
+      // Determine which street to fill
+      // Should match the logic passed to BoardPicker
+      let target = S.street;
+      if (prev.FLOP.length < 3) target = "FLOP";
+      else if (prev.TURN.length < 1) target = "TURN";
+      else if (prev.RIVER.length < 1) target = "RIVER";
+
+      if (target === "FLOP") next.FLOP = cs.slice(0, 3);
+      else if (target === "TURN") next.TURN = [cs[0]];
+      else if (target === "RIVER") next.RIVER = [cs[0]];
       return next;
     });
     setShowBoard(false);
@@ -1540,20 +1547,19 @@ export default function App() {
       {showBoard && S && (
         <BoardPickerModal
           open={showBoard}
-          street={S.street}
+          street={(() => {
+            if (board.FLOP.length < 3) return "FLOP";
+            if (board.TURN.length < 1) return "TURN";
+            return "RIVER";
+          })()}
           used={[...heroCards, ...board.FLOP, ...board.TURN, ...board.RIVER]}
-          initial={S.street === "FLOP" ? board.FLOP : S.street === "TURN" ? board.TURN : board.RIVER}
+          initial={(() => {
+            if (board.FLOP.length < 3) return board.FLOP;
+            if (board.TURN.length < 1) return board.TURN;
+            return board.RIVER;
+          })()}
           onClose={() => setShowBoard(false)}
-          onPick={(cards) => {
-            setBoard((prev) => {
-              const next = { ...prev };
-              if (S.street === "FLOP") next.FLOP = cards.slice(0, 3);
-              else if (S.street === "TURN") next.TURN = cards.slice(0, 1);
-              else if (S.street === "RIVER") next.RIVER = cards.slice(0, 1);
-              return next;
-            });
-            setShowBoard(false);
-          }}
+          onPick={onPickBoard}
         />
       )}
 
