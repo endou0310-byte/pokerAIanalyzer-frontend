@@ -1344,7 +1344,6 @@ export default function App() {
                     padding: 0,
                     boxSizing: "border-box",
                     overflow: "hidden",
-                    borderRadius: 12,
                   }}
                 >
                   <svg
