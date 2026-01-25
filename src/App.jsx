@@ -1247,7 +1247,7 @@ export default function App() {
           <div className="grid">
             {/* 左：セットアップ＋LOG */}
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <div style={{ padding: 12, background: 'rgba(0,0,0,0.2)', borderRadius: 8 }}>
+              <div style={{ padding: 12, background: 'var(--glass-base)', border: '1px solid var(--glass-border)', borderRadius: 12, boxShadow: 'inset 0 1px 0 0 var(--glass-highlight), 0 4px 12px rgba(0, 0, 0, 0.4)' }}>
                 <label>Players
                   <select
                     value={players}
@@ -1327,7 +1327,7 @@ export default function App() {
 
             {/* 右：テーブル＋アクション */}
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <div style={{ overflowX: 'auto' }}>
+              <div style={{ overflowX: 'auto', background: 'var(--glass-base)', border: '1px solid var(--glass-border)', borderRadius: 12, boxShadow: 'inset 0 1px 0 0 var(--glass-highlight), 0 4px 12px rgba(0, 0, 0, 0.4)' }}>
                 <div
                   ref={stageRef}
                   style={{
