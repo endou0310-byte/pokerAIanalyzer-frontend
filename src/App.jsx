@@ -1248,6 +1248,7 @@ export default function App() {
             {/* 左：セットアップ＋LOG */}
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div style={{ padding: 12, background: 'var(--glass-base)', border: '1px solid var(--glass-border)', borderRadius: 12, boxShadow: 'inset 0 1px 0 0 var(--glass-highlight), 0 4px 12px rgba(0, 0, 0, 0.4)' }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)', marginBottom: 12, paddingBottom: 8, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>セットアップ</div>
                 <label>Players
                   <select
                     value={players}
@@ -1316,8 +1317,8 @@ export default function App() {
 
               {/* Mobile: Hide separate LOG panel (redundant) */}
               {!isMobile && (
-                <div className="panel">
-                  <div style={{ fontWeight: 700, marginBottom: 8 }}>LOG</div>
+                <div style={{ padding: 12, background: 'var(--glass-base)', border: '1px solid var(--glass-border)', borderRadius: 12, boxShadow: 'inset 0 1px 0 0 var(--glass-highlight), 0 4px 12px rgba(0, 0, 0, 0.4)' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)', marginBottom: 8, paddingBottom: 8, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>アクションログ</div>
                   <pre className="kbd" style={{ margin: 0, whiteSpace: "pre-wrap" }}>
                     {["PRE", "FLOP", "TURN", "RIVER"].map(st => `${st}: ${S ? line(S.actions, st) : ""}`).join("\n")}
                   </pre>
