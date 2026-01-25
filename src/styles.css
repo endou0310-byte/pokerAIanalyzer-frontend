@@ -1,227 +1,263 @@
 /* ======================
-   Glassmorphism Poker Theme
+   Neo-dark Poker Theme
+   （Stripe 決済画面寄せ）
    ====================== */
 :root {
-  /* ベース背景：より深いブルーブラック */
-  --bg: #020408;
-
-  /* グラスモーフィズム用：半透明なレイヤー色 */
-  --glass-base: rgba(13, 22, 35, 0.72);
-  --glass-border: rgba(100, 149, 237, 0.15);
-  --glass-highlight: rgba(255, 255, 255, 0.08);
-
-  --text: #eef4ff;
-  --muted: #94a3b8;
-
-  /* アクセントカラー：ネオンシアン */
-  --accent: #00d4ff;
-  --accent-glow: rgba(0, 212, 255, 0.4);
-
-  --danger: #ff4b5c;
-  --radius: 20px;
-
-  /* フォント微調整 */
-  --font-family: "Inter", system-ui, -apple-system, sans-serif;
+  --bg: #050910;
+  --surface: rgba(5, 9, 16, 0.98);
+  --elev: rgba(10, 14, 25, 0.97);
+  --line: rgba(120, 180, 255, 0.24);
+  --text: #e7edf8;
+  --muted: #9fb0c1;
+  --accent: #35b5ff;
+  /* 明るめのシアンブルー */
+  --danger: #f97373;
+  --radius: 18px;
 }
 
-/* Base Setup */
+/* Base */
 * {
-  box-sizing: border-box;
+  box-sizing: border-box
 }
 
 html,
 body,
 #root {
-  height: 100%;
+  height: 100%
 }
 
 body {
   margin: 0;
   color: var(--text);
-  font-family: var(--font-family);
-  letter-spacing: 0.03em;
-  background-color: var(--bg);
-
-  /* ノイズテクスチャ + 放射状グラデーション */
-  background-image:
-    url('/noise.svg'),
-    radial-gradient(circle at 50% 0%, #112240 0%, transparent 80%),
-    radial-gradient(circle at 100% 0%, #0a1525 0%, transparent 50%);
-  background-repeat: repeat, no-repeat, no-repeat;
-  background-size: 100px 100px, 100% 100%, 100% 100%;
+  background:
+    radial-gradient(circle at 0% 0%, #123259 0, transparent 55%),
+    radial-gradient(circle at 100% 0%, #132949 0, transparent 55%),
+    #050910;
+  font: 14px/1.5 "Inter", system-ui, -apple-system, Segoe UI, Roboto,
+    "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  letter-spacing: .2px;
 }
 
-/* Topbar: グラスモーフィズム */
+/* Topbar（ネイビーカード風） */
 .topbar {
   position: sticky;
   top: 0;
   z-index: 50;
-  height: 64px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
-
-  background: rgba(5, 9, 16, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0 20px;
+  background: linear-gradient(to bottom, rgba(10, 16, 30, 0.96), rgba(5, 9, 16, 0.98));
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.85);
 }
 
 .logo-pill {
   padding: 0;
-  background: none;
+  height: auto;
+  border-radius: 0;
   border: none;
-  font-family: var(--font-family);
-  font-weight: 800;
-  font-size: 18px;
+  background: none;
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 6px;
   color: var(--text);
-  letter-spacing: 0.15em;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: .12em;
+  /* 文字間を少しあけてロゴっぽく */
   text-transform: uppercase;
-  text-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  /* POKER ANALYZER 風 */
 }
 
-.top-left-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.top-right-group {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.plan-info {
-  font-size: 13px;
-  color: #d1d5db;
-  text-align: right;
-  line-height: 1.4;
-}
-
-@media (max-width: 600px) {
-  .topbar {
-    padding: 0 12px;
-    /* Reduce side padding */
-  }
-
-  .top-title {
-    display: none;
-    /* Hide subtitle on phone */
-  }
-
-  .plan-info {
-    display: none;
-    /* Hide plan info text on phone to prevent overlap */
-  }
-
-  .top-right-group {
-    gap: 8px;
-    /* Tighter gap for buttons */
-  }
+.top-title {
+  font-size: 14px;
+  color: var(--muted);
 }
 
 /* Layout */
 .page {
-  max-width: 1540px;
-  margin: 32px auto 60px;
-  padding: 0 20px;
+  max-width: 1200px;
+  margin: 24px auto 40px;
+  padding: 0 18px;
+}
+
+.panel {
+  background: var(--elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.85),
+    0 0 0 1px rgba(10, 20, 40, 0.6);
 }
 
 .grid {
   display: grid;
-  grid-template-columns: 350px 1fr;
-  gap: 24px;
+  grid-template-columns: 1fr 340px;
+  gap: 16px
 }
 
-@media (max-width: 1100px) {
+@media (max-width:1100px) {
   .grid {
-    display: flex;
-    flex-direction: column-reverse;
-    /* Table on top, Controls below */
-    gap: 16px;
-  }
-
-  /* Table stage minimum height adjustment for mobile */
-  .table-stage {
-    min-height: 480px;
+    grid-template-columns: 1fr
   }
 }
 
-@media (max-width: 600px) {
-  .table-stage {
-    min-height: 360px;
-    /* Even smaller for phones */
-    padding: 8px;
-    /* Less padding */
-    border-width: 2px;
-  }
-
-  .seat {
-    min-width: 70px;
-    /* Allow shrinking */
-    padding: 6px 4px;
-    font-size: 11px;
-    border-radius: 8px;
-  }
-
-  .cardpicker-card {
-    border-radius: 4px;
-  }
-}
-
-/* Panels: すりガラスパネル共通 */
-.panel,
-.side-card,
-.log-card {
-  background: var(--glass-base);
-  border-radius: var(--radius);
-
-  /* 光の反射ボーダー（上だけ明るく） */
-  box-shadow:
-    inset 0 1px 0 0 var(--glass-highlight),
-    0 12px 40px rgba(0, 0, 0, 0.6);
-  border: 1px solid var(--glass-border);
-  border-top-color: rgba(100, 149, 237, 0.3);
-
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-/* Specific Panel Styles */
+/* Cards / Sidebar */
 .side-card {
-  padding: 16px;
+  background: var(--elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
 }
 
 .log-card {
-  padding: 14px;
-  height: 300px;
+  background: var(--elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px;
+  height: 280px;
   overflow: auto;
-  font-size: 13px;
-  line-height: 1.6;
-  color: #cbd5e1;
+  color: var(--muted);
 }
 
-/* Table Stage: ポーカーテーブルエリア */
+/* Inputs */
+label {
+  display: block;
+  margin: 10px 0 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+input,
+select {
+  width: 100%;
+  height: 38px;
+  padding: 0 10px;
+  color: var(--text);
+  background: #070b12;
+  border: 1px solid rgba(80, 105, 145, 0.8);
+  border-radius: 10px;
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(53, 181, 255, 0.4), 0 0 0 6px rgba(53, 181, 255, 0.12);
+}
+
+/* ================================
+   Buttons ② Nordic Blue Glow
+   ================================ */
+.btn_glow,
+.btn {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .2px;
+  transition:
+    background .16s ease,
+    box-shadow .16s ease,
+    transform .08s ease,
+    border-color .16s ease,
+    filter .10s ease;
+}
+
+/* 通常ボタン：深く落ち着いたブルー光 */
+.btn {
+  color: #e3eaf5;
+  background: linear-gradient(180deg,
+      #1b2738 0%,
+      #151f2f 55%,
+      #0f1623 100%);
+  border: 1px solid rgba(74, 111, 165, 0.65);
+  /* 北欧ブルー */
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 10px 24px rgba(74, 111, 165, 0.28);
+}
+
+.btn:hover {
+  background: linear-gradient(180deg,
+      #202e42 0%,
+      #182435 55%,
+      #111a28 100%);
+  border-color: rgba(98, 143, 206, 0.85);
+}
+
+.btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.85);
+}
+
+/* メインアクション：静かな深青の光 */
+.btn--primary,
+.btn.glow,
+.btn-accent {
+  color: #f4f7ff;
+  background: linear-gradient(180deg,
+      #2b405e 0%,
+      #23354f 55%,
+      #1b2a40 100%);
+  border: 1px solid rgba(94, 126, 180, 0.85);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.07) inset,
+    0 12px 26px rgba(59, 91, 135, 0.45);
+}
+
+.btn--primary:hover,
+.btn.glow:hover,
+.btn-accent:hover {
+  background: linear-gradient(180deg,
+      #314766 0%,
+      #293d58 55%,
+      #203145 100%);
+}
+
+
+
+/* 危険系ボタン（削除など） */
+.btn-danger {
+  background: linear-gradient(135deg, #fb7185, #f97316);
+  border-color: rgba(248, 113, 113, 0.85);
+  color: #020308;
+  box-shadow: 0 18px 40px rgba(248, 113, 113, 0.55);
+}
+
+.btn-danger:hover {
+  filter: brightness(1.06);
+}
+
+.btn--pill {
+  border-radius: 999px;
+  height: 30px;
+  padding: 0 10px
+}
+
+/* Table stage（カードテーブル面） */
 .table-stage {
   position: relative;
-  min-height: 640px;
+  min-height: 620px;
   max-width: 600px;
-  /* Reduced from 750px (-20%) to fix horizontal stretching */
+  /* Reduced from default to fix stretching */
   margin: 0 auto;
-  /* Center the table */
-  padding: 16px;
+  /* Center align */
+  padding: 12px;
+  background: radial-gradient(circle at 50% 0, #1d3657 0, #050910 55%);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
-
-  /* 深いフェルト色 */
-  background: radial-gradient(circle at 50% 40%, #1e3a5f 0%, #060b14 65%);
-  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.8);
-  border: 4px solid #0f1b2d;
 }
 
 .table-stage svg {
@@ -230,557 +266,412 @@ body {
   display: block;
 }
 
-/* ... (skip buttons) ... */
+/* Action row */
+.action-bar {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 
-/* New Card Picker Styles */
+.action-bar .btn,
+.action-bar .btn--primary {
+  height: 34px;
+  border-radius: 999px;
+}
+
+/* Badges / small */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #070b12;
+  border: 1px solid rgba(80, 105, 145, 0.85);
+  color: var(--muted);
+}
+
+.muted {
+  color: var(--muted)
+}
+
+.small {
+  font-size: 12px
+}
+
+/* Table seats（読みやすくシンプル） */
+.seat {
+  background: #070c14;
+  border: 1px solid rgba(60, 90, 135, 0.9);
+  border-radius: 12px;
+  padding: 6px 8px;
+  min-width: 120px;
+  text-align: center;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.8);
+}
+
+.seat .is-hero {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Cards text (A♥ 等) */
+.cardtext {
+  font-weight: 600;
+  letter-spacing: .4px;
+}
+
+/* Raise 行の補助 */
+.raise-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.raise-label {
+  min-width: 140px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Raise行 共通 --- */
+.raise-fixed {
+  width: 170px;
+  /* ← 横幅を固定（可変にしない） */
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+  /* 桁ズレ防止 */
+}
+
+/* 充填型スライダー（値に応じて左から塗る） */
+input[type="range"].bb-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(to right,
+      var(--accent, #3b82f6) calc(var(--pct, 0)*1%),
+      #223043 calc(var(--pct, 0)*1%));
+  outline: none;
+  box-shadow: inset 0 0 0 1px #1c2a3b;
+}
+
+input[type="range"].bb-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #111b29;
+  border: 3px solid #ff5a5a;
+  /* 赤リング */
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, .35);
+  margin-top: -5px;
+}
+
+input[type="range"].bb-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #111b29;
+  border: 3px solid #ff5a5a;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, .35);
+}
+
+.bb-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+
+.bb-ticks>span {
+  width: 2px;
+  height: 5px;
+  background: #34465e;
+  border-radius: 1px;
+  opacity: .8;
+}
+
+/* --- セグメント（倍率プリセット）を引き締める --- */
+.segment {
+  display: inline-flex;
+  gap: 0;
+  border: 1px solid #2c3e50;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #0e1d2e;
+}
+
+.segment .seg {
+  border: 0;
+  background: #0f1b2b;
+  color: #cfe4ff;
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+.segment .seg+.seg {
+  border-left: 1px solid #2c3e50;
+}
+
+.segment .seg:hover {
+  background: #14263b;
+  color: #fff;
+}
+
+.segment .seg.active {
+  background: var(--accent, #3b82f6);
+  color: #0b0f14;
+}
+
+/* ===== プリセット：チップ風 ===== */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.chip {
+  border: 1px solid #2c3e50;
+  background: #0f1b2b;
+  color: #cfe4ff;
+  padding: 6px 12px;
+  line-height: 20px;
+  font-size: 12px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+
+.chip:hover {
+  background: #14263b;
+  color: #fff;
+}
+
+.chip.active {
+  background: var(--accent, #3b82f6);
+  color: #0b0f14;
+  border-color: var(--accent, #3b82f6);
+}
+
+
+/* ================================
+   Card / Board Picker Modal 共通
+   ================================ */
+
+.cardpicker-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(3, 7, 18, 0.68);
+  z-index: 1000;
+}
+
+.cardpicker-dialog {
+  width: min(1120px, 96vw);
+  max-height: 80vh;
+  padding: 20px 18px 18px;
+  border-radius: 16px;
+  background: #0b1621;
+  border: 1px solid #1f2937;
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.65);
+  overflow: auto;
+}
+
 .cardpicker-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding-bottom: 16px;
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
 .cardpicker-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
-  color: #fff;
-  text-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+  color: #d7e7ff;
+}
+
+.cardpicker-current {
+  font-size: 13px;
+  color: #8aa3b8;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.cardpicker-current-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.6);
+}
+
+/* 4 行（スート） × 13 列（ランク） */
+.cardpicker-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .cardpicker-row {
   display: grid;
   grid-template-columns: repeat(13, 1fr);
+  /* 1fr for cleaner grid */
   gap: 8px;
-  /* Slightly increased gap */
-  margin-bottom: 8px;
+  /* Added gap */
 }
 
-@media (max-width: 900px) {
+@media (max-width:960px) {
   .cardpicker-row {
-    gap: 3px;
+    grid-template-columns: repeat(13, minmax(32px, 1fr));
   }
 }
 
-@media (max-width: 600px) {
-  .cardpicker-dialog {
-    width: 96vw;
-    padding: 16px;
-    max-height: 80vh;
-  }
-
-  .cardpicker-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    justify-content: center;
-    /* Center align cards */
-  }
-
-  .cardpicker-card {
-    width: calc(100% / 7 - 6px);
-    /* Roughly 7 cards per row */
-    aspect-ratio: 3/4;
-    font-size: 11px;
-  }
-
-  .cardpicker-rank {
-    font-size: 12px;
-  }
-
-  .cardpicker-suit {
-    font-size: 14px;
-  }
+.cardpicker-suit-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.cardpicker-suit-icon {
+  font-size: 20px;
+}
+
+.cardpicker-suit-icon[data-suit="h"],
+.cardpicker-suit-icon[data-suit="d"] {
+  color: #fb7185;
+}
+
+.cardpicker-suit-icon[data-suit="s"],
+.cardpicker-suit-icon[data-suit="c"] {
+  color: #93c5fd;
+}
+
+/* カードタイル */
 .cardpicker-card {
-  /* Reset default button styles */
-  appearance: none;
-  -webkit-appearance: none;
-  border: none;
-  outline: none;
-  padding: 0;
-  margin: 0;
-  font-family: inherit;
-
+  position: relative;
+  /* height: 38px; Removed fixed height */
   aspect-ratio: 3/4;
-  /* Made taller/larger (was 4/5) */
-  border-radius: 6px;
-  background: linear-gradient(180deg, #1c2635 0%, #0f1621 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #cbd5e1;
+  /* Made taller/larger */
+  border-radius: 9px;
+  background: linear-gradient(180deg, #101827 0%, #070f1a 100%);
+  border: 1px solid #1f2937;
+  color: #e5edf7;
   display: flex;
   flex-direction: column;
+  /* Column layout for Rank/Suit stack */
   align-items: center;
   justify-content: center;
   gap: 2px;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-  transition: transform 0.1s, background 0.1s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.12s ease,
+    border-color 0.12s ease,
+    background 0.12s ease,
+    filter 0.12s ease;
 }
 
 .cardpicker-card:hover {
-  transform: translateY(-2px);
-  background: #232d3f;
-  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.7);
+  border-color: #3b82f6;
 }
 
 .cardpicker-card--active {
-  background: linear-gradient(135deg, #1e3c72, #2a5298);
-  border-color: #5ea3ff;
-  color: #fff;
-  box-shadow: 0 0 12px rgba(42, 82, 152, 0.6);
+  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+  border-color: #60a5fa;
+  box-shadow:
+    0 0 0 1px rgba(96, 165, 250, 0.75),
+    0 10px 26px rgba(37, 99, 235, 0.6);
 }
 
 .cardpicker-card--disabled {
-  opacity: 0.15;
-  pointer-events: none;
-  filter: grayscale(1);
+  opacity: 0.35;
+  cursor: default;
+  box-shadow: none;
+}
+
+.cardpicker-card--disabled:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: #1f2937;
 }
 
 .cardpicker-rank {
+  font-weight: 700;
   font-size: 16px;
-  /* Larger rank (was 14px) */
-  font-weight: 800;
+  /* Increased from default */
 }
 
 .cardpicker-suit {
   font-size: 20px;
-  /* Larger suit (was 16px) */
+  /* Increased from 13px */
 }
 
-/* Colors */
 .cardpicker-suit[data-suit="h"],
 .cardpicker-suit[data-suit="d"] {
-  color: #ff6b6b;
+  color: #fb7185;
 }
 
 .cardpicker-suit[data-suit="s"],
 .cardpicker-suit[data-suit="c"] {
-  color: #4facfe;
+  color: #93c5fd;
 }
 
+/* フッター */
 .cardpicker-footer {
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-}
-
-/* ログインバナー（B案） */
-.login-banner {
-  margin: 16px 0;
-  padding: 20px;
-  border-radius: var(--radius);
-  background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 0, 0, 0.4));
-  border: 1px solid rgba(0, 212, 255, 0.2);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-/* Typography Utilities */
-.text-accent {
-  color: var(--accent);
-  text-shadow: 0 0 8px var(--accent-glow);
-}
-
-.text-muted {
-  color: var(--muted);
-}
-
-.text-sm {
-  font-size: 12px;
-}
-
-.font-bold {
-  font-weight: 700;
-}
-
-/* その他細部調整 */
-.action-bar {
+  gap: 8px;
   margin-top: 16px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.seat {
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 8px 10px;
-  min-width: 110px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-}
-
-.seat .is-hero {
-  color: #ffda79;
-  text-shadow: 0 0 5px rgba(255, 218, 121, 0.5);
-}
-
-/* Markdown Result Premium Styles */
-.markdown-result {
-  color: #e2e8f0;
-  font-family: var(--font-family);
-  line-height: 1.8;
-  font-size: 14px;
-}
-
-.markdown-result h1,
-.markdown-result h2,
-.markdown-result h3 {
-  color: #fff;
-  margin-top: 24px;
-  margin-bottom: 12px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-
-.markdown-result h1 {
-  font-size: 20px;
-  background: linear-gradient(90deg, #fff, #93c5fd);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-  padding-bottom: 8px;
-}
-
-.markdown-result h2 {
-  font-size: 16px;
-  color: var(--accent);
-  display: flex;
-  align-items: center;
-}
-
-.markdown-result h2::before {
-  content: '';
-  display: inline-block;
-  width: 4px;
-  height: 16px;
-  background: var(--accent);
-  margin-right: 10px;
-  border-radius: 4px;
-  box-shadow: 0 0 10px var(--accent-glow);
-}
-
-.markdown-result h3 {
-  font-size: 15px;
-  color: #cbd5e1;
-}
-
-.markdown-result p {
-  margin-bottom: 16px;
-  color: #cbd5e1;
-}
-
-.markdown-result strong {
-  color: #fff;
-  font-weight: 700;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 0 4px;
-  border-radius: 4px;
-}
-
-.markdown-result ul,
-.markdown-result ol {
-  margin-bottom: 16px;
-  padding-left: 24px;
-}
-
-.markdown-result li {
-  margin-bottom: 6px;
-  color: #cbd5e1;
-}
-
-.markdown-result li::marker {
-  color: var(--accent);
-}
-
-.markdown-result blockquote {
-  border-left: 3px solid var(--accent);
-  background: rgba(0, 212, 255, 0.05);
-  margin: 16px 0;
-  padding: 12px 16px;
-  border-radius: 0 8px 8px 0;
-  font-style: italic;
-  color: #94a3b8;
-}
-
-.markdown-result code {
-  font-family: monospace;
-  background: #0f172a;
-  padding: 2px 6px;
-  border-radius: 4px;
-  color: #fca5a5;
-  font-size: 0.9em;
-}
-
-.markdown-result pre {
-  background: #020617;
-  padding: 16px;
-  border-radius: 12px;
-  overflow-x: auto;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Main Layout Grid */
-.grid {
-  display: grid;
-  grid-template-columns: 250px 1fr;
-  /* Narrower sidebar (was ~320px effectively) */
-  gap: 16px;
-  align-items: start;
-}
-
-@media (max-width: 900px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* =========================================
-   Mobile App-Like Layout (Fixed Viewport)
-   ========================================= */
-@media (max-width: 600px) {
-
-  /* 固定ビューポートルート: スクロールさせない */
-  .mobile-app-root {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100dvh;
-    /* dynamic viewport height for mobile browsers */
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    background: var(--bg);
-  }
-
-  /* テーブルエリア: 上部に配置、残りの高さを占有 */
-  .mobile-table-area {
-    flex: 1;
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    /* 背景は親(body)のものを透過させるか、独自に設定 */
-    z-index: 1;
-  }
-
-  /* テーブルステージ自体の調整 */
-  .mobile-table-area .table-stage {
-    height: 100%;
-    min-height: auto;
-    /* 重書き */
-    border: none;
-    background: radial-gradient(circle at 50% 40%, rgba(30, 58, 95, 0.4) 0%, rgba(6, 11, 20, 0.8) 70%);
-    box-shadow: none;
-  }
-
-  /* アクションパネル: 画面下部に固定 */
-  .mobile-action-panel {
-    height: auto;
-    min-height: auto;
-    max-height: 40vh;
-    /* Allow less max height */
-    width: 100%;
-    background: rgba(13, 22, 35, 0.95);
-    border-top: 1px solid rgba(100, 149, 237, 0.3);
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    z-index: 10;
-
-    display: flex;
-    flex-direction: column;
-    padding: 12px 16px;
-    /* Reduced vertical padding */
-    gap: 8px;
-    /* Reduced gap */
-    overflow-y: auto;
-  }
-
-  /* モバイル専用ヘッダー (Overlay) */
-  .mobile-header-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 50px;
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 16px;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent);
-    pointer-events: none;
-    /* 下のテーブル操作を邪魔しない */
-  }
-
-  .mobile-header-overlay>* {
-    pointer-events: auto;
-    /* ボタンなどは押せるように */
-  }
-
-  /* ログ用ドロワー/モーダル */
-  .mobile-log-drawer {
-    position: absolute;
-    inset: 0;
-    z-index: 50;
-    background: rgba(2, 4, 8, 0.95);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .mobile-log-close {
-    align-self: flex-end;
-    margin-bottom: 10px;
-  }
-
-  /* Log preview in action panel */
-  .mobile-log-preview {
-    font-size: 11px;
-    color: #94a3b8;
-    background: rgba(0, 0, 0, 0.3);
-    padding: 6px 10px;
-    border-radius: 6px;
-    margin-bottom: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    border-left: 2px solid var(--accent);
-  }
-}
-
-   
-
-/* ===== CardPickerModal Styles ===== */
-.cardpicker-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.cardpicker-dialog {
-  background: #0b1621;
-  border: 1px solid #203040;
-  border-radius: 12px;
-  padding: 16px;
-  width: 95%;
-  max-width: 500px;
-  max-height: 92vh;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-}
-
-.cardpicker-header {
-  margin-bottom: 12px;
-  flex-shrink: 0;
-}
-
-.cardpicker-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #e5e7eb;
-  margin-bottom: 6px;
-}
-
-.cardpicker-current {
-  font-size: 13px;
-  color: #94a3b8;
-}
-
-.cardpicker-current-chip {
-  display: inline-block;
-  margin-right: 8px;
-  padding: 4px 8px;
-  background: rgba(99, 102, 241, 0.2);
-  border-radius: 4px;
-}
-
-.cardpicker-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin-bottom: 12px;
-  flex-shrink: 0;
-}
-
-.cardpicker-row {
-  display: flex;
-  gap: 4px;
-  justify-content: center;
-}
-
-.cardpicker-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
-  background: #1a2332;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-}
-
-.cardpicker-card:hover:not(.cardpicker-card--disabled) {
-  background: #243447;
-  border-color: rgba(99, 102, 241, 0.5);
-}
-
-.cardpicker-card--active {
-  background: #6366f1 !important;
-  border-color: #818cf8 !important;
-  box-shadow: 0 0 8px rgba(99, 102, 241, 0.6);
-  transform: scale(1.02);
-}
-
-.cardpicker-card--disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-  background: #0f1b2d !important;
-}
-
-.cardpicker-rank {
-  font-size: 12px;
-  font-weight: 700;
-  color: #fff;
-  line-height: 1;
-}
-
-.cardpicker-suit {
-  font-size: 10px;
-  line-height: 1;
-}
-
-.cardpicker-suit[data-suit="h"],
-.cardpicker-suit[data-suit="d"] {
-  color: #ff6b81;
-}
-
-.cardpicker-suit[data-suit="s"],
-.cardpicker-suit[data-suit="c"] {
-  color: #9ecbff;
 }
 
 .cardpicker-footer {
   display: flex;
-  gap: 12px;
   justify-content: flex-end;
-  flex-shrink: 0;
-  margin-top: auto;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+/* ===== 未ログイン誘導バナー（B案） ===== */
+.login-banner {
+  margin: 14px 0 18px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(120, 180, 255, 0.26);
+  background: radial-gradient(circle at top left, rgba(53, 181, 255, 0.18), rgba(10, 14, 25, 0.92));
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+}
+
+.login-banner__title {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  margin-bottom: 6px;
+}
+
+.login-banner__text {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+.login-banner__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
