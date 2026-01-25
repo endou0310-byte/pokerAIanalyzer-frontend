@@ -690,3 +690,52 @@ input[type="range"].bb-slider::-moz-range-thumb {
   gap: 10px;
   flex-wrap: wrap;
 }
+
+/* ===== Mobile Header (Unified with History Page) ===== */
+.mobile-header-overlay {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  background: rgba(5, 9, 16, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mobile-table-area {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.mobile-action-panel {
+  position: sticky;
+  bottom: 0;
+  background: rgba(5, 9, 16, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 12px;
+}
+
+.mobile-log-preview {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 12px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mobile-app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
