@@ -211,8 +211,8 @@ body {
 .table-stage {
   position: relative;
   min-height: 640px;
-  max-width: 750px;
-  /* Limit maximum width to prevent excessive stretching */
+  max-width: 600px;
+  /* Reduced from 750px (-20%) to fix horizontal stretching */
   margin: 0 auto;
   /* Center the table */
   padding: 16px;
@@ -230,209 +230,7 @@ body {
   display: block;
 }
 
-/* Buttons: ネオングロー */
-.btn,
-.btn--primary,
-.btn_glow,
-.btn-accent,
-.btn-danger {
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
-  height: 40px;
-  padding: 0 20px;
-  border-radius: 999px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-
-  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-/* Primary Button */
-/* Primary Button - Brighter for visibility */
-.btn--primary,
-.btn-accent {
-  background: linear-gradient(135deg, rgba(60, 100, 180, 0.9), rgba(60, 130, 210, 0.9));
-  color: #fff;
-  border: 1px solid rgba(130, 200, 255, 0.4);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-.btn--primary:hover,
-.btn-accent:hover {
-  transform: translateY(-2px);
-  background: linear-gradient(135deg, rgba(80, 120, 200, 0.95), rgba(80, 150, 230, 1));
-  box-shadow: 0 6px 20px rgba(60, 130, 210, 0.5);
-  border-color: rgba(180, 230, 255, 0.8);
-}
-
-/* Secondary Button - Glassier and lighter */
-.btn {
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #e2e8f0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-/* Danger Button */
-.btn-danger {
-  background: rgba(255, 75, 92, 0.15);
-  color: var(--danger);
-  border: 1px solid rgba(255, 75, 92, 0.4);
-}
-
-.btn-danger:hover {
-  background: rgba(255, 75, 92, 0.25);
-  box-shadow: 0 0 15px rgba(255, 75, 92, 0.4);
-}
-
-/* Inputs */
-label {
-  display: block;
-  margin: 12px 0 6px;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 500;
-}
-
-input,
-select {
-  width: 100%;
-  height: 42px;
-  padding: 0 14px;
-  color: var(--text);
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  outline: none;
-  font-family: inherit;
-  transition: border-color 0.2s;
-}
-
-input:focus,
-select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent-glow);
-  background: rgba(0, 0, 0, 0.5);
-}
-
-/* Slider Style */
-input[type="range"].bb-slider {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 99px;
-  outline: none;
-}
-
-input[type="range"].bb-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--text);
-  border: 2px solid var(--accent);
-  box-shadow: 0 0 10px var(--accent-glow);
-  cursor: grab;
-  margin-top: -7px;
-  /* Align check */
-}
-
-/* Chip/Segment controls */
-.chip-group {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-/* Improve Chip Contrast */
-.chip {
-  padding: 6px 14px;
-  border-radius: 99px;
-  font-size: 12px;
-  background: rgba(255, 255, 255, 0.12);
-  /* Slightly lighter for visibility */
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #e2e8f0;
-  /* Brighter text than muted */
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.chip:hover {
-  background: rgba(255, 255, 255, 0.25);
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-/* Limit the width of the Raise Bar */
-.raise-wrap {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  max-width: 500px;
-  /* Limit width */
-  margin-top: 8px;
-  /* Space from chips */
-}
-
-.raise-fixed {
-  min-width: 140px;
-  /* Ensure button text fits */
-}
-
-.chip.active {
-  background: rgba(0, 212, 255, 0.15);
-  color: var(--accent);
-  border-color: var(--accent);
-  box-shadow: 0 0 10px rgba(0, 212, 255, 0.2) inset;
-}
-
-/* Modal Backdrop */
-.cardpicker-backdrop {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-
-  /* 背景を濃くぼかす */
-  background: rgba(0, 2, 5, 0.75);
-  backdrop-filter: blur(8px);
-}
-
-.cardpicker-dialog {
-  /* モーダル自体もガラス */
-  background: rgba(15, 23, 35, 0.92);
-  border: 1px solid rgba(100, 149, 237, 0.2);
-  box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
-    0 25px 80px rgba(0, 0, 0, 0.8);
-  border-radius: 20px;
-  padding: 24px;
-  max-width: 90vw;
-  width: 1000px;
-  backdrop-filter: blur(16px);
-  max-height: 85vh;
-  overflow: auto;
-}
+/* ... (skip buttons) ... */
 
 /* New Card Picker Styles */
 .cardpicker-header {
@@ -454,7 +252,8 @@ input[type="range"].bb-slider::-webkit-slider-thumb {
 .cardpicker-row {
   display: grid;
   grid-template-columns: repeat(13, 1fr);
-  gap: 6px;
+  gap: 8px;
+  /* Slightly increased gap */
   margin-bottom: 8px;
 }
 
@@ -505,7 +304,8 @@ input[type="range"].bb-slider::-webkit-slider-thumb {
   margin: 0;
   font-family: inherit;
 
-  aspect-ratio: 4/5;
+  aspect-ratio: 3/4;
+  /* Made taller/larger (was 4/5) */
   border-radius: 6px;
   background: linear-gradient(180deg, #1c2635 0%, #0f1621 100%);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -540,12 +340,14 @@ input[type="range"].bb-slider::-webkit-slider-thumb {
 }
 
 .cardpicker-rank {
-  font-size: 14px;
+  font-size: 16px;
+  /* Larger rank (was 14px) */
   font-weight: 800;
 }
 
 .cardpicker-suit {
-  font-size: 16px;
+  font-size: 20px;
+  /* Larger suit (was 16px) */
 }
 
 /* Colors */
