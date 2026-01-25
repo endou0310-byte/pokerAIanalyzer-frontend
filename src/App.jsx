@@ -1190,7 +1190,7 @@ export default function App() {
   const renderDesktop = () => (
     <>
       <header className="topbar">
-        <div className="top-left-group">
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <div className="logo-pill">Poker Analyzer</div>
           <div className="top-title">ハンド記録</div>
         </div>

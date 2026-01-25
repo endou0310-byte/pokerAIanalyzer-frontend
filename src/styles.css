@@ -89,26 +89,24 @@ body {
 }
 
 .logo-pill {
-  padding: 0;
-  height: auto;
-  border-radius: 0;
-  border: none;
-  background: none;
-  display: inline-flex;
-  align-items: flex-end;
-  gap: 6px;
-  color: var(--text);
-  font-weight: 700;
-  font-size: 16px;
-  letter-spacing: .12em;
-  /* 文字間を少しあけてロゴっぽく */
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  /* POKER ANALYZER 風 */
+  text-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+  margin-right: 12px;
 }
 
 .top-title {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--muted);
+  opacity: 0.8;
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  padding-left: 12px;
+  height: 20px;
+  display: flex;
+  align-items: center;
 }
 
 /* Layout */
