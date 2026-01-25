@@ -1319,12 +1319,15 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="panel">
-                <div style={{ fontWeight: 700, marginBottom: 8 }}>LOG</div>
-                <pre className="kbd" style={{ margin: 0, whiteSpace: "pre-wrap" }}>
-                  {["PRE", "FLOP", "TURN", "RIVER"].map(st => `${st}: ${S ? line(S.actions, st) : ""}`).join("\n")}
-                </pre>
-              </div>
+              {/* Mobile: Hide separate LOG panel (redundant) */}
+              {!isMobile && (
+                <div className="panel">
+                  <div style={{ fontWeight: 700, marginBottom: 8 }}>LOG</div>
+                  <pre className="kbd" style={{ margin: 0, whiteSpace: "pre-wrap" }}>
+                    {["PRE", "FLOP", "TURN", "RIVER"].map(st => `${st}: ${S ? line(S.actions, st) : ""}`).join("\n")}
+                  </pre>
+                </div>
+              )}
             </div>
 
             {/* 右：テーブル＋アクション */}
