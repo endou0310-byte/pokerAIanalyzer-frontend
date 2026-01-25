@@ -1133,11 +1133,6 @@ export default function App() {
 
       {/* 3. Action Panel (Fixed Bottom) */}
       <div className="mobile-action-panel">
-        {/* 直近ログ表示 */}
-        <div className="mobile-log-preview">
-          {S ? line(S.actions, S.street) || "No actions yet" : "Ready to start"}
-        </div>
-
         {/* コントロール群 (Start/Reset or Actions) */}
         {!recording ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
