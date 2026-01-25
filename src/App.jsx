@@ -1248,7 +1248,7 @@ export default function App() {
       )}
 
       <main className="page">
-        <section className="panel" style={{ padding: 16 }}>
+        <section style={{ padding: 16 }}>
           <div className="grid">
             {/* 左：セットアップ＋LOG */}
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
