@@ -1,18 +1,24 @@
 /* ======================
    Neo-dark Poker Theme
-   （Stripe 決済画面寄せ）
+   (Unified with History Page)
    ====================== */
 :root {
-  --bg: #050910;
-  --surface: rgba(5, 9, 16, 0.98);
+  --bg: #020408;
+  --glass-base: rgba(13, 22, 35, 0.72);
+  --glass-border: rgba(100, 149, 237, 0.15);
+  --glass-highlight: rgba(255, 255, 255, 0.08);
+
+  --text: #eef4ff;
+  --muted: #94a3b8;
   --elev: rgba(10, 14, 25, 0.97);
+  /* Keep for some deeply elevated elements if needed, but prefer glass-base */
   --line: rgba(120, 180, 255, 0.24);
-  --text: #e7edf8;
-  --muted: #9fb0c1;
-  --accent: #35b5ff;
-  /* 明るめのシアンブルー */
+  --accent: #00d4ff;
+  --accent-glow: rgba(0, 212, 255, 0.4);
   --danger: #f97373;
-  --radius: 18px;
+  --radius: 20px;
+
+  --font-family: "Inter", system-ui, -apple-system, sans-serif;
 }
 
 /* Base */
@@ -29,28 +35,57 @@ body,
 body {
   margin: 0;
   color: var(--text);
-  background:
-    radial-gradient(circle at 0% 0%, #123259 0, transparent 55%),
-    radial-gradient(circle at 100% 0%, #132949 0, transparent 55%),
-    #050910;
-  font: 14px/1.5 "Inter", system-ui, -apple-system, Segoe UI, Roboto,
-    "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  font-family: var(--font-family);
+  background-color: var(--bg);
+  background-image:
+    url('./noise.svg'),
+    radial-gradient(circle at 50% 0%, #112240 0%, transparent 80%),
+    radial-gradient(circle at 100% 0%, #0a1525 0%, transparent 50%);
+  background-repeat: repeat, no-repeat, no-repeat;
+  background-size: 100px 100px, 100% 100%, 100% 100%;
+  min-height: 100vh;
   letter-spacing: .2px;
 }
 
-/* Topbar（ネイビーカード風） */
+/* Topbar (Unified) */
 .topbar {
   position: sticky;
   top: 0;
   z-index: 50;
-  height: 60px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
-  background: linear-gradient(to bottom, rgba(10, 16, 30, 0.96), rgba(5, 9, 16, 0.98));
-  border-bottom: 1px solid var(--line);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.85);
+  padding: 0 24px;
+  background: rgba(5, 9, 16, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: none;
+  /* Removed heavy shadow */
+}
+
+/* Fix overlap in top-right group */
+.top-right-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+  /* Keep them in line */
+}
+
+/* Plan info styling to fit nicely */
+.plan-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.3;
+  margin-right: 8px;
+  text-align: right;
+  white-space: nowrap;
+  /* Prevent wrap */
 }
 
 .logo-pill {
@@ -84,15 +119,14 @@ body {
 }
 
 /* Panel - Clean History Style */
+/* Panel - Clean History Style */
 .panel {
-  background: var(--elev);
-  /* Dark Navy */
-  border: 1px solid rgba(120, 180, 255, 0.2);
-  /* Crisp blue-ish border */
+  background: var(--glass-base);
+  border: 1px solid var(--glass-border);
   border-radius: 12px;
-  /* Slightly tighter radius */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  /* Reduced shadow for cleaner look */
+  box-shadow:
+    inset 0 1px 0 0 var(--glass-highlight),
+    0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 /* Main Layout Grid - Corrected Order */
@@ -156,7 +190,7 @@ select:focus {
 }
 
 /* ================================
-   Buttons ② Nordic Blue Glow (REPAIRED)
+   Buttons (Unified with History Page)
    ================================ */
 .btn_glow,
 .btn {
@@ -164,71 +198,55 @@ select:focus {
   box-sizing: border-box;
   cursor: pointer;
   height: 36px;
-  padding: 0 14px;
+  padding: 0 16px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: .2px;
-  transition:
-    background .16s ease,
-    box-shadow .16s ease,
-    transform .08s ease,
-    border-color .16s ease,
-    filter .10s ease;
+  transition: all 0.2s ease;
+
+  /* History Page Style (Glass) */
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+  box-shadow: none;
 }
 
-/* 通常ボタン：深く落ち着いたブルー光 */
-.btn {
-  color: #e3eaf5;
-  background: linear-gradient(180deg,
-      #1b2738 0%,
-      #151f2f 55%,
-      #0f1623 100%);
-  border: 1px solid rgba(74, 111, 165, 0.65);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.04) inset,
-    0 10px 24px rgba(74, 111, 165, 0.28);
+.btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
-.btn:hover {
-  background: linear-gradient(180deg,
-      #202e42 0%,
-      #182435 55%,
-      #111a28 100%);
-  border-color: rgba(98, 143, 206, 0.85);
-}
-
-.btn:active {
+.btn:active:not(:disabled) {
   transform: translateY(1px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.85);
 }
 
-/* メインアクション：静かな深青の光 */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Primary / Details (Keeping slightly brighter but matching glass theme) */
 .btn--primary,
 .btn.glow,
 .btn-accent {
-  color: #f4f7ff;
-  background: linear-gradient(180deg,
-      #2b405e 0%,
-      #23354f 55%,
-      #1b2a40 100%);
-  border: 1px solid rgba(94, 126, 180, 0.85);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.07) inset,
-    0 12px 26px rgba(59, 91, 135, 0.45);
+  background: rgba(0, 212, 255, 0.15);
+  /* Tinted glass */
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  color: #cffafe;
 }
 
 .btn--primary:hover,
 .btn.glow:hover,
 .btn-accent:hover {
-  background: linear-gradient(180deg,
-      #314766 0%,
-      #293d58 55%,
-      #203145 100%);
+  background: rgba(0, 212, 255, 0.25);
+  border-color: rgba(0, 212, 255, 0.5);
+  color: #fff;
 }
 
 
