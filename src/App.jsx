@@ -1243,11 +1243,11 @@ export default function App() {
       )}
 
       <main className="page">
-        <section style={{ padding: 16 }}>
+        <section className="panel" style={{ padding: 16 }}>
           <div className="grid">
             {/* 左：セットアップ＋LOG */}
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <div className="panel">
+              <div style={{ padding: 12, background: 'rgba(0,0,0,0.2)', borderRadius: 8 }}>
                 <label>Players
                   <select
                     value={players}
@@ -1327,7 +1327,7 @@ export default function App() {
 
             {/* 右：テーブル＋アクション */}
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <div className="panel" style={{ overflowX: 'auto' }}>
+              <div style={{ overflowX: 'auto' }}>
                 <div
                   ref={stageRef}
                   style={{
