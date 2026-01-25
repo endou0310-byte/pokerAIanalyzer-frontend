@@ -1332,7 +1332,7 @@ export default function App() {
 
             {/* 右：テーブル＋アクション */}
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <div className="panel" style={{ padding: 16, overflowX: 'auto' }}>
+              <div className="panel" style={{ overflowX: 'auto' }}>
                 <div
                   ref={stageRef}
                   style={{
