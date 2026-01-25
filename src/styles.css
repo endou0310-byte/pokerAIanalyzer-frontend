@@ -92,9 +92,11 @@ body {
     0 0 0 1px rgba(10, 20, 40, 0.6);
 }
 
+/* Main Layout Grid - Corrected Order */
 .grid {
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: 350px 1fr;
+  /* INFO (Left) = Fixed, TABLE (Right) = Flexible */
   gap: 16px
 }
 
@@ -150,7 +152,7 @@ select:focus {
 }
 
 /* ================================
-   Buttons ② Nordic Blue Glow
+   Buttons ② Nordic Blue Glow (REPAIRED)
    ================================ */
 .btn_glow,
 .btn {
@@ -183,7 +185,6 @@ select:focus {
       #151f2f 55%,
       #0f1623 100%);
   border: 1px solid rgba(74, 111, 165, 0.65);
-  /* 北欧ブルー */
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.04) inset,
     0 10px 24px rgba(74, 111, 165, 0.28);
