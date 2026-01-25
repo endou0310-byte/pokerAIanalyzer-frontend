@@ -426,8 +426,8 @@ export default function App() {
   const isMobile = windowWidth < 600;
 
   // テーブル描画用の幅 (stage.w が取れていない初期は windowWidth などでフォールバック)
-  // ただしDesktop時は min 900 で描画したいので、レイアウトモードに応じて下限を変える
-  const width = Math.max(stage.w, isMobile ? 340 : 900);
+  // ただしDesktop時は min 650 で描画したいので、レイアウトモードに応じて下限を変える
+  const width = Math.max(stage.w, isMobile ? 340 : 650);
   const height = Math.max(stage.h, isMobile ? 400 : 620);
 
   const seatGeom = useMemo(() => {

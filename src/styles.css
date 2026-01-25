@@ -250,10 +250,6 @@ select:focus {
 .table-stage {
   position: relative;
   min-height: 620px;
-  max-width: 600px;
-  /* Reduced from default to fix stretching */
-  margin: 0 auto;
-  /* Center align */
   padding: 12px;
   background: radial-gradient(circle at 50% 0, #1d3657 0, #050910 55%);
   border: 1px solid var(--line);
@@ -526,10 +522,8 @@ input[type="range"].bb-slider::-moz-range-thumb {
 
 .cardpicker-row {
   display: grid;
-  grid-template-columns: repeat(13, 1fr);
-  /* 1fr for cleaner grid */
-  gap: 8px;
-  /* Added gap */
+  grid-template-columns: repeat(13, minmax(40px, 1fr));
+  gap: 6px;
 }
 
 @media (max-width:960px) {
@@ -561,16 +555,16 @@ input[type="range"].bb-slider::-moz-range-thumb {
 /* カードタイル */
 .cardpicker-card {
   position: relative;
-  /* height: 38px; Removed fixed height */
+  /* Fixed height removed in favor of Aspect Ratio */
+  /* height: 38px; */
   aspect-ratio: 3/4;
-  /* Made taller/larger */
   border-radius: 9px;
   background: linear-gradient(180deg, #101827 0%, #070f1a 100%);
   border: 1px solid #1f2937;
   color: #e5edf7;
   display: flex;
   flex-direction: column;
-  /* Column layout for Rank/Suit stack */
+  /* Stack Rank/Suit vertically */
   align-items: center;
   justify-content: center;
   gap: 2px;
