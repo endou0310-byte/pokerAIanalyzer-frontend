@@ -3,7 +3,7 @@ node_modules/
 
 # production
 dist/
-docs/
+# docs/  ← GitHub Pages用にコミット必要
 
 # local env files
 .env
