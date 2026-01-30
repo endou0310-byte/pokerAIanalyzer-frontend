@@ -959,3 +959,26 @@ input[type="range"].bb-slider::-moz-range-thumb {
     font-size: 9px;
   }
 }
+
+/* ==================
+   Loading Spinner
+   ================== */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spinner {
+  width: 56px;
+  height: 56px;
+  border: 4px solid rgba(148, 163, 184, 0.15);
+  border-top: 4px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 1.1s cubic-bezier(0.6, 0.05, 0.2, 0.95) infinite;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+}

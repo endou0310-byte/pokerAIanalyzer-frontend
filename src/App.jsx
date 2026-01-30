@@ -176,6 +176,7 @@ export default function App() {
   const handleLogout = () => {
     try {
       localStorage.removeItem("pa_user");
+      localStorage.removeItem("pa_last_access");
     } finally {
       window.location.href = "login.html";
     }
@@ -212,7 +213,24 @@ export default function App() {
   useEffect(() => {
     try {
       const u = JSON.parse(localStorage.getItem("pa_user") || "null");
+
+      // ★ Session Timeout Check (12 hours)
+      const last = localStorage.getItem("pa_last_access");
+      const now = Date.now();
+      const TIMEOUT_MS = 12 * 60 * 60 * 1000;
+
       if (u && u.user_id) {
+        // If expired
+        if (last && (now - Number(last) > TIMEOUT_MS)) {
+          console.log("Session expired (>12h)");
+          localStorage.removeItem("pa_user");
+          localStorage.removeItem("pa_last_access");
+          setAuth({ loggedIn: false, user: null });
+          return;
+        }
+
+        // Valid: Refresh timestamp
+        localStorage.setItem("pa_last_access", String(now));
         setAuth({ loggedIn: true, user: u });
       } else {
         setAuth({ loggedIn: false, user: null });
@@ -743,6 +761,9 @@ export default function App() {
 
       // 解析リクエスト送信
       const res = await analyzeHand(payload);
+
+      // ★ Update session timestamp on successful action
+      localStorage.setItem("pa_last_access", String(Date.now()));
 
       // usage 情報があれば月間残り回数を更新
       if (res && res.usage) {
@@ -2159,33 +2180,38 @@ export default function App() {
           >
             <div
               style={{
-                minWidth: 300,
+                minWidth: 280,
                 maxWidth: 360,
-                padding: "32px 24px",
-                borderRadius: 20,
-                background: "rgba(13, 22, 35, 0.9)",
-                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.8)",
-                border: "1px solid rgba(100, 149, 237, 0.3)",
+                padding: "40px 32px",
+                borderRadius: 24,
+                background: "rgba(10, 18, 30, 0.85)",
+                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255,255,255,0.1)",
+                border: "1px solid rgba(100, 149, 237, 0.2)",
                 textAlign: "center",
-                backdropFilter: "blur(12px)",
+                backdropFilter: "blur(16px)",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                gap: 16,
+                justifyContent: "center",
+                gap: 24,
               }}
             >
-              <div style={{
-                fontSize: 18,
-                fontWeight: 700,
-                color: "#eef4ff",
-                textShadow: "0 0 20px rgba(0, 212, 255, 0.5)"
-              }}>
-                解析中...
-              </div>
-              <div style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.6 }}>
-                数秒〜十数秒ほどかかる場合があります。
-                <br />
-                そのままお待ちください。
+              {/* Spinner Animation */}
+              <div className="loading-spinner" />
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{
+                  fontSize: 20,
+                  fontWeight: 800,
+                  color: "#eef4ff",
+                  letterSpacing: "0.08em",
+                  textShadow: "0 0 30px rgba(0, 212, 255, 0.4)"
+                }}>
+                  ANALYZING
+                </div>
+                <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 500 }}>
+                  AIが最適解を計算しています...
+                </div>
               </div>
             </div>
           </div>
