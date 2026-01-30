@@ -273,7 +273,7 @@ export default function SettingsModal({ open, onClose, userInfo, plan, remaining
 
         {/* Version Indicator */}
         <div style={{ marginTop: 16, textAlign: "right", fontSize: 11, color: "#4b5563", paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-          Version: 2.5 (All-In Fix + DebugLogs)
+          Version: 1.00
         </div>
       </div>
     </div>
