@@ -60,13 +60,36 @@ export default function CardPickerModal({
       role="dialog"
       aria-modal="true"
       onClick={() => onCancel?.()}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(0, 0, 0, 0.8)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 100,
+        padding: '16px'
+      }}
     >
       <div
         className="cardpicker-dialog"
         onClick={(e) => e.stopPropagation()}
+        style={{
+          background: 'rgba(13, 22, 35, 0.95)',
+          borderRadius: '16px',
+          border: '1px solid rgba(100, 149, 237, 0.2)',
+          maxWidth: '95vw',
+          width: '100%',
+          maxHeight: '90vh',
+          display: 'flex',
+          flexDirection: 'column'
+        }}
       >
         {/* ヘッダー */}
-        <div className="cardpicker-header">
+        <div className="cardpicker-header" style={{
+          padding: '16px',
+          borderBottom: '1px solid rgba(100, 149, 237, 0.15)'
+        }}>
           <div className="cardpicker-title">{title}</div>
           <div className="cardpicker-current">
             現在の選択：
@@ -83,30 +106,51 @@ export default function CardPickerModal({
         </div>
 
         {/* 4行×13列のカードグリッド（カードのみ） */}
-        <div className="cardpicker-grid">
+        <div className="cardpicker-grid" style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          maxHeight: '60vh',
+          overflowY: 'auto',
+          padding: '8px'
+        }}>
           {SUITS.map((suit) => (
-            <div className="cardpicker-row" key={suit}>
+            <div className="cardpicker-row" key={suit} style={{
+              display: 'flex',
+              gap: '6px',
+              flexWrap: 'wrap',
+              justifyContent: 'center'
+            }}>
               {RANKS.map((rank) => {
                 const code = rank + suit;
                 const active = picked.includes(code);
                 const locked = disabledSet.has(code);
-                let cls = "cardpicker-card";
-                if (active) cls += " cardpicker-card--active";
-                if (locked) cls += " cardpicker-card--disabled";
+                const suitColor = (suit === 'h' || suit === 'd') ? '#ff6b81' : '#9ecbff';
+
                 return (
                   <button
                     key={code}
                     type="button"
-                    className={cls}
                     onClick={() => toggle(code)}
                     disabled={locked}
                     title={code}
+                    style={{
+                      width: '50px',
+                      height: '70px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: active ? 'rgba(0, 212, 255, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                      border: active ? '2px solid #00d4ff' : '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '8px',
+                      cursor: locked ? 'not-allowed' : 'pointer',
+                      opacity: locked ? 0.3 : 1,
+                      transition: 'all 0.2s'
+                    }}
                   >
-                    <span className="cardpicker-rank">{rank}</span>
-                    <span
-                      className="cardpicker-suit"
-                      data-suit={suit}
-                    >
+                    <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#fff' }}>{rank}</span>
+                    <span style={{ fontSize: '24px', color: suitColor }}>
                       {suitSym[suit]}
                     </span>
                   </button>
@@ -117,7 +161,13 @@ export default function CardPickerModal({
         </div>
 
         {/* フッター */}
-        <div className="cardpicker-footer">
+        <div className="cardpicker-footer" style={{
+          padding: '16px',
+          borderTop: '1px solid rgba(100, 149, 237, 0.15)',
+          display: 'flex',
+          gap: '12px',
+          justifyContent: 'flex-end'
+        }}>
           <button
             className="btn"
             onClick={() => onConfirm?.(picked)}

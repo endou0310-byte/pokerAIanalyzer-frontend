@@ -274,12 +274,21 @@ select:focus {
 .table-stage {
   position: relative;
   min-height: 500px;
-  /* モバイル版の高さを500pxに復元 */
+  /* モバイル版の高さを5 00pxに復元 */
   padding: 8px;
   /* 12px → 8px に縮小 */
   background: radial-gradient(circle at 50% 0, #1d3657 0, #050910 55%);
   border: 1px solid var(--line);
   border-radius: var(--radius);
+}
+
+/* モバイル版：枠を削除 */
+@media (max-width: 1099px) {
+  .table-stage {
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
 }
 
 /* WEB版テーブル調整：横長にして下側にアクションスペースを確保 */
@@ -736,7 +745,8 @@ input[type="range"].bb-slider::-moz-range-thumb {
   background: rgba(5, 9, 16, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 2px solid rgba(135, 206, 250, 0.15);
+  /* 境界線を強調 */
   padding: 12px;
 }
 

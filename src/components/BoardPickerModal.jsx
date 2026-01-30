@@ -66,13 +66,36 @@ export default function BoardPickerModal({
       role="dialog"
       aria-modal="true"
       onClick={onClose}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(0, 0, 0, 0.8)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 100,
+        padding: '16px'
+      }}
     >
       <div
         className="cardpicker-dialog"
         onClick={(e) => e.stopPropagation()}
+        style={{
+          background: 'rgba(13, 22, 35, 0.95)',
+          borderRadius: '16px',
+          border: '1px solid rgba(100, 149, 237, 0.2)',
+          maxWidth: '95vw',
+          width: '100%',
+          maxHeight: '90vh',
+          display: 'flex',
+          flexDirection: 'column'
+        }}
       >
         {/* ヘッダー */}
-        <div className="cardpicker-header">
+        <div className="cardpicker-header" style={{
+          padding: '16px',
+          borderBottom: '1px solid rgba(100, 149, 237, 0.15)'
+        }}>
           <div className="cardpicker-title">
             ボード選択 {street} / {maxPick}枚
           </div>
@@ -82,44 +105,71 @@ export default function BoardPickerModal({
           </div>
         </div>
 
-{/* カードグリッド：4行×13列（カードのみ） */}
-<div className="cardpicker-grid">
-  {SUITS.map((suit) => (
-    <div className="cardpicker-row" key={suit}>
-      {RANKS.map((rank) => {
-        const code = rank + suit;
-        const disabled =
-          usedSet.has(code) || (!sel.includes(code) && sel.length >= maxPick);
-        const active = sel.includes(code);
-        let cls = "cardpicker-card";
-        if (active) cls += " cardpicker-card--active";
-        if (disabled && !active) cls += " cardpicker-card--disabled";
-        return (
-          <button
-            key={code}
-            type="button"
-            className={cls}
-            onClick={() => toggle(code)}
-            disabled={disabled}
-            title={code}
-          >
-            <span className="cardpicker-rank">{rank}</span>
-            <span
-              className="cardpicker-suit"
-              data-suit={suit}
-            >
-              {suitSym[suit]}
-            </span>
-          </button>
-        );
-      })}
-    </div>
-  ))}
-</div>
+        {/* カードグリッド：4行×13列（カードのみ） */}
+        <div className="cardpicker-grid" style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          maxHeight: '60vh',
+          overflowY: 'auto',
+          padding: '8px'
+        }}>
+          {SUITS.map((suit) => (
+            <div className="cardpicker-row" key={suit} style={{
+              display: 'flex',
+              gap: '6px',
+              flexWrap: 'wrap',
+              justifyContent: 'center'
+            }}>
+              {RANKS.map((rank) => {
+                const code = rank + suit;
+                const disabled =
+                  usedSet.has(code) || (!sel.includes(code) && sel.length >= maxPick);
+                const active = sel.includes(code);
+                const suitColor = (suit === 'h' || suit === 'd') ? '#ff6b81' : '#9ecbff';
+
+                return (
+                  <button
+                    key={code}
+                    type="button"
+                    onClick={() => toggle(code)}
+                    disabled={disabled}
+                    title={code}
+                    style={{
+                      width: '50px',
+                      height: '70px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: active ? 'rgba(0, 212, 255, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                      border: active ? '2px solid #00d4ff' : '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '8px',
+                      cursor: disabled ? 'not-allowed' : 'pointer',
+                      opacity: disabled ? 0.3 : 1,
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#fff' }}>{rank}</span>
+                    <span style={{ fontSize: '24px', color: suitColor }}>
+                      {suitSym[suit]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
 
 
         {/* フッター */}
-        <div className="cardpicker-footer">
+        <div className="cardpicker-footer" style={{
+          padding: '16px',
+          borderTop: '1px solid rgba(100, 149, 237, 0.15)',
+          display: 'flex',
+          gap: '12px',
+          justifyContent: 'flex-end'
+        }}>
           <button
             className="btn"
             onClick={() => canDecide && onPick(sel)}
