@@ -829,21 +829,33 @@ input[type="range"].bb-slider::-moz-range-thumb {
   }
 
   .cardpicker-row {
-    gap: 4px;
+    gap: 2px;
+    /* 隙間をさらに詰める */
     margin-bottom: 4px;
+    grid-template-columns: repeat(13, 1fr);
+    /* 強制的に1行に収める */
   }
 
   .cardpicker-card {
-    border-radius: 4px;
-    font-size: 12px;
+    border-radius: 3px;
+    font-size: 10px;
+    padding: 0;
+    min-width: 0;
+    /* flex/grid内での縮小を許可 */
+    height: 38px;
+    /* 高さも少し抑える */
+    border-width: 1px;
   }
 
   .cardpicker-rank {
-    font-size: 11px;
+    font-size: 10px;
+    line-height: 1;
   }
 
   .cardpicker-suit {
-    font-size: 9px;
+    font-size: 12px;
+    line-height: 1;
+    margin-top: -2px;
   }
 
   /* Don't wrap selected cards header on mobile */
