@@ -38,7 +38,7 @@ body {
   font-family: var(--font-family);
   background-color: var(--bg);
   background-image:
-    url('./noise.svg'),
+    url('/noise.svg'),
     radial-gradient(circle at 50% 0%, #112240 0%, transparent 80%),
     radial-gradient(circle at 100% 0%, #0a1525 0%, transparent 50%);
   background-repeat: repeat, no-repeat, no-repeat;
@@ -275,6 +275,16 @@ select:focus {
   background: radial-gradient(circle at 50% 0, #1d3657 0, #050910 55%);
   border: 1px solid var(--line);
   border-radius: var(--radius);
+}
+
+/* WEB版テーブル調整：横長にして下側にアクションスペースを確保 */
+@media (min-width: 1100px) {
+  .table-stage {
+    min-height: 550px;
+    /* 高さを少し抑える */
+    aspect-ratio: 16 / 9;
+    /* 横長の比率 */
+  }
 }
 
 .table-stage svg {
@@ -879,6 +889,32 @@ input[type="range"].bb-slider::-moz-range-thumb {
   gap: 8px;
   padding: 16px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* WEB版専用調整 - テーブルサイズとハンドピッカーを拡大 */
+@media (min-width: 1100px) {
+
+  /* テーブルを大きく表示して入力パネルが見切れないように */
+  .table-stage {
+    min-height: 720px;
+  }
+
+  /* ハンドピッカーを大きく表示（スクロール不要に） */
+  .cardpicker-dialog {
+    max-width: 800px;
+  }
+
+  .cardpicker-card {
+    aspect-ratio: 3/4;
+  }
+
+  .cardpicker-rank {
+    font-size: 18px;
+  }
+
+  .cardpicker-suit {
+    font-size: 16px;
+  }
 }
 
 /* Mobile adjustments */
