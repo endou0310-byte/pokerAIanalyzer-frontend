@@ -397,8 +397,10 @@ export default function App() {
   const [raiseTo, setRaiseTo] = useState("");  // 例: "12.5"
 
   /* Undo History */
+  /* Undo History */
   const [historyStack, setHistoryStack] = useState([]);
   const pushHistory = (st) => setHistoryStack(p => [...p, structuredClone(st)]);
+
   const onUndo = () => {
     if (historyStack.length === 0) return;
     const prev = historyStack[historyStack.length - 1];
