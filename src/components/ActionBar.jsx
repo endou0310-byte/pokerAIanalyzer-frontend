@@ -21,7 +21,6 @@ export default function ActionBar({
     onUndo,        // New: Undo handler
     isMobile,      // New: For conditional layout or reset button
     onReset,       // New: Reset handler (for mobile mainly)
-    onReset,       // New: Reset handler (for mobile mainly)
     analyzing,
     heroCards = [], // New: Validation
     board          // New: future use if needed
