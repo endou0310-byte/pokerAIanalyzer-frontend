@@ -109,16 +109,14 @@ export default function BoardPickerModal({
         <div className="cardpicker-grid" style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: '8px',
-          maxHeight: '60vh',
-          overflowY: 'auto',
+          gap: '4px',
           padding: '8px'
         }}>
           {SUITS.map((suit) => (
             <div className="cardpicker-row" key={suit} style={{
               display: 'flex',
-              gap: '6px',
-              flexWrap: 'wrap',
+              gap: '4px',
+              flexWrap: 'nowrap',
               justifyContent: 'center'
             }}>
               {RANKS.map((rank) => {
@@ -136,22 +134,23 @@ export default function BoardPickerModal({
                     disabled={disabled}
                     title={code}
                     style={{
-                      width: '50px',
-                      height: '70px',
+                      width: '23px',
+                      height: '32px',
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
                       background: active ? 'rgba(0, 212, 255, 0.2)' : 'rgba(255, 255, 255, 0.05)',
                       border: active ? '2px solid #00d4ff' : '1px solid rgba(255, 255, 255, 0.1)',
-                      borderRadius: '8px',
+                      borderRadius: '4px',
                       cursor: disabled ? 'not-allowed' : 'pointer',
                       opacity: disabled ? 0.3 : 1,
-                      transition: 'all 0.2s'
+                      transition: 'all 0.2s',
+                      padding: '2px'
                     }}
                   >
-                    <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#fff' }}>{rank}</span>
-                    <span style={{ fontSize: '24px', color: suitColor }}>
+                    <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#fff' }}>{rank}</span>
+                    <span style={{ fontSize: '14px', color: suitColor }}>
                       {suitSym[suit]}
                     </span>
                   </button>

@@ -442,8 +442,8 @@ export default function App() {
 
     // ステージ実寸の中心
     const cx = width / 2;
-    // テーブルを上寄せに配置（モバイルでは-50で上に移動）
-    const cy = height / 2 + (isMobile ? -50 : 0);
+    // テーブルを少し上寄せに配置（モバイルでは-10で少し上に移動）
+    const cy = height / 2 + (isMobile ? -10 : 0);
 
     // Mobile: Rounded Rectangle Logic
     if (isMobile) {
