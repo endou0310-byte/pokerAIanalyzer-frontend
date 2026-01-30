@@ -60,36 +60,13 @@ export default function CardPickerModal({
       role="dialog"
       aria-modal="true"
       onClick={() => onCancel?.()}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(0, 0, 0, 0.8)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 100,
-        padding: '16px'
-      }}
     >
       <div
         className="cardpicker-dialog"
         onClick={(e) => e.stopPropagation()}
-        style={{
-          background: 'rgba(13, 22, 35, 0.95)',
-          borderRadius: '16px',
-          border: '1px solid rgba(100, 149, 237, 0.2)',
-          maxWidth: '95vw',
-          width: '100%',
-          maxHeight: '90vh',
-          display: 'flex',
-          flexDirection: 'column'
-        }}
       >
         {/* ヘッダー */}
-        <div className="cardpicker-header" style={{
-          padding: '16px',
-          borderBottom: '1px solid rgba(100, 149, 237, 0.15)'
-        }}>
+        <div className="cardpicker-header">
           <div className="cardpicker-title">{title}</div>
           <div className="cardpicker-current">
             現在の選択：
@@ -106,19 +83,9 @@ export default function CardPickerModal({
         </div>
 
         {/* 4行×13列のカードグリッド（カードのみ） */}
-        <div className="cardpicker-grid" style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '4px',
-          padding: '8px'
-        }}>
+        <div className="cardpicker-grid">
           {SUITS.map((suit) => (
-            <div className="cardpicker-row" key={suit} style={{
-              display: 'flex',
-              gap: '4px',
-              flexWrap: 'nowrap',
-              justifyContent: 'center'
-            }}>
+            <div className="cardpicker-row" key={suit}>
               {RANKS.map((rank) => {
                 const code = rank + suit;
                 const active = picked.includes(code);
@@ -145,13 +112,7 @@ export default function CardPickerModal({
         </div>
 
         {/* フッター */}
-        <div className="cardpicker-footer" style={{
-          padding: '16px',
-          borderTop: '1px solid rgba(100, 149, 237, 0.15)',
-          display: 'flex',
-          gap: '12px',
-          justifyContent: 'flex-end'
-        }}>
+        <div className="cardpicker-footer">
           <button
             className="btn"
             onClick={() => onConfirm?.(picked)}
