@@ -422,8 +422,8 @@ export default function App() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // スマホ判定: windowWidth を基準にする (初期値0問題を回避)
-  const isMobile = windowWidth < 600;
+  // スマホ判定: 初回のみ判定し、画面の向きが変わってもレイアウトを維持
+  const [isMobile] = useState(() => window.innerWidth < 600);
 
   // テーブル描画用の幅 (stage.w が取れていない初期は windowWidth などでフォールバック)
   // ただしDesktop時は min 650 で描画したいので、レイアウトモードに応じて下限を変える
