@@ -273,8 +273,8 @@ select:focus {
 /* Table stage（カードテーブル面） */
 .table-stage {
   position: relative;
-  min-height: 250px;
-  /* ★ 変化を明確にするため250pxに設定 */
+  min-height: 500px;
+  /* モバイル版の高さを500pxに復元 */
   padding: 8px;
   /* 12px → 8px に縮小 */
   background: radial-gradient(circle at 50% 0, #1d3657 0, #050910 55%);

@@ -71,7 +71,7 @@ export default function ActionBar({
         return (
             <div style={{
                 display: "flex", alignItems: "center", justifyContent: "space-between",
-                width: "100%", maxWidth: 960, margin: "0 auto",
+                width: "100%", maxWidth: 1020, margin: "0 auto", /* 1200px → 1020px に縮小（15%減） */
                 background: "rgba(10, 15, 25, 0.75)",
                 backdropFilter: "blur(20px)",
                 border: "1px solid rgba(135, 206, 250, 0.15)",
@@ -112,10 +112,10 @@ export default function ActionBar({
                 <div style={{ width: 1, height: 40, background: "rgba(255,255,255,0.1)", margin: "0 4px" }} />
 
                 {/* Right: Betting */}
-                <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1, marginLeft: 16 }}> {/* 左マージン追加 */}
                     {/* Presets Row */}
                     {/* Presets Row */}
-                    <div style={{ display: "flex", gap: 6, justifyContent: "center" }}>
+                    <div style={{ display: "flex", gap: 6, justifyContent: "flex-start" }}> {/* center → flex-start に変更 */}
                         {(() => {
                             if (S.street === "PRE") {
                                 const minToVal = +(base + inc).toFixed(2);
@@ -147,7 +147,7 @@ export default function ActionBar({
                                             background: "rgba(0, 212, 255, 0.1)", border: "1px solid rgba(0, 212, 255, 0.2)",
                                             color: "#7dd3fc", cursor: "pointer"
                                         }}>
-                                            {p >= 1 ? "POT" : `${Math.round(p * 100)}%`} ({fmtBB(to)})
+                                            {p === 1.0 ? "POT" : `${Math.round(p * 100)}%`} ({fmtBB(to)})
                                         </button>
                                     );
                                 });
@@ -166,6 +166,8 @@ export default function ActionBar({
                             <div style={{ position: "absolute", left: 0, right: 0, height: 4, background: "#334155", borderRadius: 2 }}>
                                 <div style={{ width: `${pct}%`, height: "100%", background: "#00d4ff", borderRadius: 2 }} />
                             </div>
+                            {/* スライダーのツマミ（●） */}
+                            <div style={{ position: "absolute", left: `calc(${pct}% - 10px)`, top: "50%", transform: "translateY(-50%)", width: 20, height: 20, background: "#00d4ff", borderRadius: "50%", boxShadow: "0 2px 8px rgba(0, 212, 255, 0.6)", zIndex: 11, pointerEvents: "none" }} />
                             <input type="range" min={minTo} max={maxTo} step={inc} value={value}
                                 onChange={(e) => setRaiseTo(Math.min(maxTo, Math.max(minTo, Number(e.target.value))))}
                                 style={{ width: "100%", height: 24, opacity: 0, cursor: "pointer", zIndex: 10, position: "absolute", top: 0, left: 0, margin: 0 }}
@@ -179,13 +181,13 @@ export default function ActionBar({
                             <span style={{ fontSize: 11, color: "#94a3b8", paddingRight: 8 }}>BB</span>
                         </div>
 
-                        <button disabled={!legal.raise} onClick={() => onTo(value)} style={{
+                        <button disabled={!legal.raise && !legal.bet} onClick={() => onTo(value)} style={{
                             height: 42, padding: "0 20px", borderRadius: 12,
                             background: "linear-gradient(135deg, #00d4ff 0%, #00aaff 100%)",
                             border: "none", color: "#0f172a", fontSize: 14, fontWeight: 800,
-                            boxShadow: "0 0 15px rgba(0, 212, 255, 0.4)", cursor: !legal.raise ? "not-allowed" : "pointer", opacity: !legal.raise ? 0.5 : 1
+                            boxShadow: "0 0 15px rgba(0, 212, 255, 0.4)", cursor: (!legal.raise && !legal.bet) ? "not-allowed" : "pointer", opacity: (!legal.raise && !legal.bet) ? 0.5 : 1
                         }}>
-                            RAISE
+                            {S.currentBet === 0 ? "BET" : "RAISE"}
                         </button>
                     </div>
                 </div>
@@ -251,7 +253,7 @@ export default function ActionBar({
                                     const to = Math.max(cand, minToVal);
                                     const active = Number(raiseTo) === to;
                                     return (
-                                        <button key={`rr-${k}`} className={`chip ${active ? "active" : ""}`} onClick={() => setRaiseTo(to)}>
+                                        <button key={`rr-${k}`} className="chip" onClick={() => onTo(to)}>
                                             {`${k}x(${fmtBB(to)})`}
                                         </button>
                                     );
@@ -267,7 +269,7 @@ export default function ActionBar({
                                 const to = +(already + want).toFixed(2);
                                 const active = Number(raiseTo) === to;
                                 return (
-                                    <button key={`pct-${p}`} className={`chip ${active ? "active" : ""}`} onClick={() => setRaiseTo(to)}>
+                                    <button key={`pct-${p}`} className="chip" onClick={() => onTo(to)}>
                                         {`${Math.round(p * 100)}% (${fmtBB(to)})`}
                                     </button>
                                 );

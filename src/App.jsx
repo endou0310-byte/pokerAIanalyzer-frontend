@@ -1513,7 +1513,7 @@ export default function App() {
 
 
               {/* アクションバー */}
-              <div className="panel" style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}> {/* 外側の枠を削除 */}
                 {recording && S && S.actor >= 0 ? (
                   <ActionBar
                     S={S}
