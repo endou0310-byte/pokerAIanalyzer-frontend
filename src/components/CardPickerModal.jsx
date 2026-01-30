@@ -123,7 +123,6 @@ export default function CardPickerModal({
                 const code = rank + suit;
                 const active = picked.includes(code);
                 const locked = disabledSet.has(code);
-                const suitColor = (suit === 'h' || suit === 'd') ? '#ff6b81' : '#9ecbff';
 
                 return (
                   <button
@@ -132,24 +131,10 @@ export default function CardPickerModal({
                     onClick={() => toggle(code)}
                     disabled={locked}
                     title={code}
-                    style={{
-                      width: '23px',
-                      height: '32px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      background: active ? 'rgba(0, 212, 255, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-                      border: active ? '2px solid #00d4ff' : '1px solid rgba(255, 255, 255, 0.1)',
-                      borderRadius: '4px',
-                      cursor: locked ? 'not-allowed' : 'pointer',
-                      opacity: locked ? 0.3 : 1,
-                      transition: 'all 0.2s',
-                      padding: '2px'
-                    }}
+                    className={`cardpicker-card ${active ? "cardpicker-card--active" : ""} ${locked ? "cardpicker-card--disabled" : ""}`}
                   >
-                    <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#fff' }}>{rank}</span>
-                    <span style={{ fontSize: '14px', color: suitColor }}>
+                    <span className="cardpicker-rank" style={{ color: '#fff' }}>{rank}</span>
+                    <span className="cardpicker-suit" data-suit={suit}>
                       {suitSym[suit]}
                     </span>
                   </button>
