@@ -845,6 +845,20 @@ input[type="range"].bb-slider::-moz-range-thumb {
   .cardpicker-suit {
     font-size: 9px;
   }
+
+  /* Don't wrap selected cards header on mobile */
+  .cardpicker-current {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-end;
+    max-width: 60%;
+    scrollbar-width: none;
+    /* Hide scrollbar for cleaner look */
+  }
+
+  .cardpicker-current::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* ==================

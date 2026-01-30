@@ -21,8 +21,16 @@ export default function ActionBar({
     onUndo,        // New: Undo handler
     isMobile,      // New: For conditional layout or reset button
     onReset,       // New: Reset handler (for mobile mainly)
-    analyzing
+    onReset,       // New: Reset handler (for mobile mainly)
+    analyzing,
+    heroCards = [], // New: Validation
+    board          // New: future use if needed
 }) {
+    // Basic Validation: Must have 2 cards selected for Hero
+    const isValid = heroCards.length === 2;
+    // (Optional) Board validation could be added here if needed, but Engine handles street progression.
+    // However, user specifically asked to prevent action if cards aren't picked.
+
     if (!S || S.actor < 0) return null;
 
     // Compute derived values
@@ -87,24 +95,28 @@ export default function ActionBar({
                             color: "#94a3b8", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center"
                         }}>↩</button>
                     )}
-                    <button onClick={onFold} disabled={!legal.fold} style={{
+                    <button onClick={onFold} disabled={!isValid || !legal.fold} style={{
                         height: 48, minWidth: 100, borderRadius: 12,
                         background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)",
-                        color: "#fca5a5", fontSize: 15, fontWeight: 700, cursor: !legal.fold ? "not-allowed" : "pointer", opacity: !legal.fold ? 0.4 : 1
-                    }}>FOLD</button>
+                        color: "#fca5a5", fontSize: 15, fontWeight: 700, cursor: (!isValid || !legal.fold) ? "not-allowed" : "pointer", opacity: (!isValid || !legal.fold) ? 0.4 : 1,
+                        position: "relative"
+                    }}>
+                        FOLD
+                        {!isValid && <div style={{ fontSize: 9, position: "absolute", bottom: 2, left: 0, right: 0 }}>Cards Required</div>}
+                    </button>
 
-                    <button onClick={onCheck} disabled={!legal.check} style={{
+                    <button onClick={onCheck} disabled={!isValid || !legal.check} style={{
                         height: 48, minWidth: 100, borderRadius: 12,
                         background: legal.check ? "rgba(255,255,255,0.08)" : "transparent",
                         border: "1px solid rgba(255,255,255,0.1)",
-                        color: "#e2e8f0", fontSize: 15, fontWeight: 700, cursor: !legal.check ? "not-allowed" : "pointer", opacity: !legal.check ? 0.3 : 1
+                        color: "#e2e8f0", fontSize: 15, fontWeight: 700, cursor: (!isValid || !legal.check) ? "not-allowed" : "pointer", opacity: (!isValid || !legal.check) ? 0.3 : 1
                     }}>CHECK</button>
 
-                    <button onClick={onCall} disabled={!legal.call} style={{
+                    <button onClick={onCall} disabled={!isValid || !legal.call} style={{
                         height: 48, minWidth: 100, borderRadius: 12,
                         background: legal.call ? "rgba(255,255,255,0.08)" : "transparent",
                         border: "1px solid rgba(255,255,255,0.1)",
-                        color: "#e2e8f0", fontSize: 15, fontWeight: 700, cursor: !legal.call ? "not-allowed" : "pointer", opacity: !legal.call ? 0.3 : 1
+                        color: "#e2e8f0", fontSize: 15, fontWeight: 700, cursor: (!isValid || !legal.call) ? "not-allowed" : "pointer", opacity: (!isValid || !legal.call) ? 0.3 : 1
                     }}>CALL</button>
                 </div>
 
@@ -181,11 +193,11 @@ export default function ActionBar({
                             <span style={{ fontSize: 11, color: "#94a3b8", paddingRight: 8 }}>BB</span>
                         </div>
 
-                        <button disabled={!legal.raise && !legal.bet} onClick={() => onTo(value)} style={{
+                        <button disabled={!isValid || (!legal.raise && !legal.bet)} onClick={() => onTo(value)} style={{
                             height: 42, padding: "0 20px", borderRadius: 12,
                             background: "linear-gradient(135deg, #00d4ff 0%, #00aaff 100%)",
                             border: "none", color: "#0f172a", fontSize: 14, fontWeight: 800,
-                            boxShadow: "0 0 15px rgba(0, 212, 255, 0.4)", cursor: (!legal.raise && !legal.bet) ? "not-allowed" : "pointer", opacity: (!legal.raise && !legal.bet) ? 0.5 : 1
+                            boxShadow: "0 0 15px rgba(0, 212, 255, 0.4)", cursor: (!isValid || (!legal.raise && !legal.bet)) ? "not-allowed" : "pointer", opacity: (!isValid || (!legal.raise && !legal.bet)) ? 0.5 : 1
                         }}>
                             {S.currentBet === 0 ? "BET" : "RAISE"}
                         </button>
@@ -200,13 +212,13 @@ export default function ActionBar({
 
             {/* Action Buttons Row */}
             <div className="action-bar" style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
-                <button className="btn btn-danger" disabled={!legal.fold} onClick={onFold}>
+                <button className="btn btn-danger" disabled={!isValid || !legal.fold} onClick={onFold}>
                     Fold
                 </button>
-                <button className="btn" disabled={!legal.check} onClick={onCheck}>
+                <button className="btn" disabled={!isValid || !legal.check} onClick={onCheck}>
                     Check
                 </button>
-                <button className="btn" disabled={!legal.call} onClick={onCall}>
+                <button className="btn" disabled={!isValid || !legal.call} onClick={onCall}>
                     Call
                 </button>
 
@@ -303,7 +315,7 @@ export default function ActionBar({
                         <button
                             className="btn btn--primary raise-fixed"
                             onClick={() => { if (Number.isFinite(value)) onTo(+Number(value).toFixed(2)); }}
-                            disabled={!legal.raise && !legal.bet}
+                            disabled={!isValid || (!legal.raise && !legal.bet)}
                             title="決定"
                             style={isMobile ? { height: 36, fontSize: 12, padding: "0 10px" } : {}}
                         >

@@ -1196,6 +1196,8 @@ export default function App() {
             isMobile={true}
             onReset={resetAll}
             analyzing={analyzing}
+            heroCards={heroCards}
+            board={board}
           />
         )}
       </div>
@@ -1554,6 +1556,8 @@ export default function App() {
                     // Desktop has explicit Reset button on left, but can add here if needed. 
                     // Not adding onReset here to keep Desktop clean as per design unless user asked.
                     analyzing={analyzing}
+                    heroCards={heroCards}
+                    board={board}
                   />
                 ) : (
 
