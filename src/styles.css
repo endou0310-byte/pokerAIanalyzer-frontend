@@ -794,6 +794,59 @@ input[type="range"].bb-slider::-moz-range-thumb {
   }
 }
 
+/* WEB版専用調整 - テーブルサイズとハンドピッカーを拡大 */
+@media (min-width: 1100px) {
+
+  /* テーブルを大きく表示して入力パネルが見切れないように */
+  .table-stage {
+    min-height: 250px;
+    /* ★ 変化を明確にするため250pxに設定（この値が最優先） */
+  }
+
+  /* ハンドピッカーを大きく表示（スクロール不要に） */
+  .cardpicker-dialog {
+    max-width: 800px;
+  }
+
+  .cardpicker-card {
+    aspect-ratio: 3/4;
+  }
+
+  .cardpicker-rank {
+    font-size: 18px;
+  }
+
+  .cardpicker-suit {
+    font-size: 16px;
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .cardpicker-dialog {
+    max-width: 100%;
+    border-radius: 12px;
+  }
+
+  .cardpicker-row {
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+
+  .cardpicker-card {
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  .cardpicker-rank {
+    font-size: 11px;
+  }
+
+  .cardpicker-suit {
+    font-size: 9px;
+  }
+}
+
 /* ==================
    Loading Spinner
    ================== */
