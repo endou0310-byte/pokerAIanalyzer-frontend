@@ -111,8 +111,10 @@ body {
 
 /* Layout */
 .page {
-  max-width: 1200px;
-  margin: 24px auto 40px;
+  max-width: 1400px;
+  /* 1200px → 1400px に拡大 */
+  margin: 12px auto 16px;
+  /* 上下の余白を縮小: 24px/40px → 12px/16px */
   padding: 0 18px;
 }
 
@@ -131,7 +133,8 @@ body {
 /* Main Layout Grid - Refined Width */
 .grid {
   display: grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: 240px 1fr;
+  /* 260px → 240px に縮小 */
   /* INFO (Left) = Compact, TABLE (Right) = Flexible */
   gap: 16px
 }
@@ -270,8 +273,10 @@ select:focus {
 /* Table stage（カードテーブル面） */
 .table-stage {
   position: relative;
-  min-height: 620px;
-  padding: 12px;
+  min-height: 250px;
+  /* ★ 変化を明確にするため250pxに設定 */
+  padding: 8px;
+  /* 12px → 8px に縮小 */
   background: radial-gradient(circle at 50% 0, #1d3657 0, #050910 55%);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -280,10 +285,10 @@ select:focus {
 /* WEB版テーブル調整：横長にして下側にアクションスペースを確保 */
 @media (min-width: 1100px) {
   .table-stage {
-    min-height: 550px;
-    /* 高さを少し抑える */
-    aspect-ratio: 16 / 9;
-    /* 横長の比率 */
+    min-height: 250px;
+    /* ★ 変化を明確にするため250pxに設定 */
+    max-height: 280px;
+    /* 最大高さも設定 */
   }
 }
 
@@ -718,7 +723,8 @@ input[type="range"].bb-slider::-moz-range-thumb {
 }
 
 .mobile-table-area {
-  flex: 1;
+  flex: 0 0 auto;
+  /* flex: 1 を削除して高さを子要素に委ねる */
   overflow: auto;
   position: relative;
   padding: 8px 8px 0 8px;
@@ -896,7 +902,8 @@ input[type="range"].bb-slider::-moz-range-thumb {
 
   /* テーブルを大きく表示して入力パネルが見切れないように */
   .table-stage {
-    min-height: 720px;
+    min-height: 250px;
+    /* ★ 変化を明確にするため250pxに設定（この値が最優先） */
   }
 
   /* ハンドピッカーを大きく表示（スクロール不要に） */

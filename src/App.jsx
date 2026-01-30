@@ -428,7 +428,7 @@ export default function App() {
   // テーブル描画用の幅 (stage.w が取れていない初期は windowWidth などでフォールバック)
   // ただしDesktop時は min 650 で描画したいので、レイアウトモードに応じて下限を変える
   const width = Math.max(stage.w, isMobile ? 340 : 650);
-  const height = Math.max(stage.h, isMobile ? 400 : 620);
+  const height = Math.max(stage.h, isMobile ? 400 : 680); // デスクトップは680pxに設定
 
   const seatGeom = useMemo(() => {
     const seatsList = buildSeatsList(S, players);
@@ -442,7 +442,7 @@ export default function App() {
 
     // ステージ実寸の中心
     const cx = width / 2;
-    // Mobile tweak: Shift down slightly (less shift needed as we shrink table)
+    // テーブルを中央に配置（height値が正しく設定されているため）
     const cy = height / 2 + (isMobile ? 20 : 0);
 
     // Mobile: Rounded Rectangle Logic
@@ -479,10 +479,10 @@ export default function App() {
 
     // --- Desktop: Ellipse Logic (unchanged) ---
     const safeRx = Math.floor((width - SEAT_W - 2 * PAD) / 2);
-    const rx = Math.max(120, safeRx - 6);
+    const rx = Math.max(180, safeRx - 6); // 120 → 180 に拡大
 
     const safeRy = Math.floor((height - SEAT_H - 2 * PAD) / 2);
-    const ry = Math.max(90, safeRy - 6);
+    const ry = Math.max(100, Math.min(safeRy - 10, safeRy * 0.85)); // 68% → 85% に拡大して枠いっぱいに使う
 
     const heroIdx = Math.max(0, seatsList.findIndex(s => s === heroSeat));
     const offset = Math.PI / 2 - (2 * Math.PI * heroIdx) / n;
@@ -1025,7 +1025,7 @@ export default function App() {
         <div
           ref={stageRef}
           className="table-stage"
-          style={{ width: "100%", height: "100%", position: "relative" }}
+          style={{ width: "100%", position: "relative" }}
         >
           {/* SVG Table Background */}
           <svg viewBox={`0 0 ${width} ${height}`} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
@@ -1335,7 +1335,7 @@ export default function App() {
                     position: "relative",
                     width: "100%",
                     minWidth: "900px", // ★ PCでは最低幅を確保し、それ以下の場合はスクロールさせる
-                    height: "750px",
+                    height: "680px",
                     margin: "0 auto",
                     padding: 0,
                     boxSizing: "border-box",
