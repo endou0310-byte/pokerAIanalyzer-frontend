@@ -202,24 +202,39 @@
   <div class="shell">
     
     <div class="main-grid">
-      <!-- Left: Story -->
-      <section class="card hero-card">
-        <div class="logo-area">Poker Analyzer</div>
-        
-        <div class="hero">
-          <h1>思考を言語化し、<br>勝利の再現性を高める</h1>
-          <p>
-            あなたのポーカーハンドをAIが数学的根拠(Equity)と理論(GTO)に基づいて分析。<br>
-            感覚に頼らない「正しい思考プロセス」をインストールしましょう。
-          </p>
+      <!-- Left Column -->
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+        <section class="card hero-card">
+          <div class="logo-area">Poker Analyzer</div>
           
-          <div class="feature-list">
-            <span class="tag">AIコーチング</span>
-            <span class="tag">勝率計算</span>
-            <span class="tag">思考ログ保存</span>
+          <div class="hero">
+            <h1>思考を言語化し、<br>勝利の再現性を高める</h1>
+            <p>
+              あなたのポーカーハンドをAIが数学的根拠(Equity)と理論(GTO)に基づいて分析。<br>
+              感覚に頼らない「正しい思考プロセス」をインストールしましょう。
+            </p>
+            
+            <div class="feature-list">
+              <span class="tag">AIコーチング</span>
+              <span class="tag">勝率計算</span>
+              <span class="tag">思考ログ保存</span>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        <!-- Information / News -->
+        <section class="card" style="padding: 24px;">
+          <h3 style="margin: 0 0 16px 0; font-size: 15px; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
+            Information
+          </h3>
+          <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
+            <div style="display: flex; gap: 12px;">
+              <span style="color: var(--accent-cyan); font-family: monospace;">2026.01.30</span>
+              <span>Poker Analyzer v1.0 リリース！AI解析機能を公開しました。</span>
+            </div>
+          </div>
+        </section>
+      </div>
 
       <!-- Right: Login -->
       <aside class="card login-box">
@@ -229,7 +244,7 @@
         </div>
         
         <div id="google-login-button" style="display:flex; justify-content:center;"></div>
-        <div id="login-error" style="color:#ff7b7b; font-size:12px; display:none;"></div>
+        <div id="login-error" style="color:#ff7b7b; font-size:12px; display:none; background:rgba(255,0,0,0.1); padding:8px; border-radius:8px;"></div>
 
         <div class="fineprint">
           まずは無料プランからお試しいただけます。<br>
@@ -315,6 +330,12 @@
         document.getElementById("google-login-button"),
         { theme: "outline", size: "large", width: "250", shape: "pill" }
       );
+
+      // Check for session expiry
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("expired")) {
+        showError("セッションの有効期限が切れました。再度ログインしてください。");
+      }
     };
   </script>
 </body>
