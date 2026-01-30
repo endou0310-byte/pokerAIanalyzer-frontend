@@ -1,0 +1,14 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "jp.pokeranalyzer.twa",
+            "sha256_cert_fingerprints": [
+                "A6:76:01:9B:20:D7:3F:B9:92:F5:FF:96:A8:E5:02:14:6E:51:63:88:C2:02:06:A7:8F:64:AB:D5:08:B9:02:18"
+            ]
+        }
+    }
+]
