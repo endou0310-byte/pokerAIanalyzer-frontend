@@ -134,10 +134,11 @@ export default function ActionBar({
                                     const cand = +(base * k).toFixed(2);
                                     const to = Math.max(cand, minToVal);
                                     return (
-                                        <button key={`pc-pre-${k}`} onClick={() => onTo(to)} style={{
+                                        <button key={`pc-pre-${k}`} onClick={() => onTo(to)} disabled={!isValid} style={{
                                             fontSize: 11, padding: "4px 10px", borderRadius: 20,
                                             background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
-                                            color: "#cbd5e1", cursor: "pointer", transition: "0.2s"
+                                            color: "#cbd5e1", cursor: !isValid ? "not-allowed" : "pointer", transition: "0.2s",
+                                            opacity: !isValid ? 0.4 : 1
                                         }}>
                                             {`${k}x (${fmtBB(to)})`}
                                         </button>
@@ -153,10 +154,11 @@ export default function ActionBar({
                                     const already = S.committed[S.actor] ?? 0;
                                     const to = +(already + want).toFixed(2);
                                     return (
-                                        <button key={`pc-post-${p}`} onClick={() => onTo(to)} style={{
+                                        <button key={`pc-post-${p}`} onClick={() => onTo(to)} disabled={!isValid} style={{
                                             fontSize: 11, padding: "4px 10px", borderRadius: 20,
                                             background: "rgba(0, 212, 255, 0.1)", border: "1px solid rgba(0, 212, 255, 0.2)",
-                                            color: "#7dd3fc", cursor: "pointer"
+                                            color: "#7dd3fc", cursor: !isValid ? "not-allowed" : "pointer",
+                                            opacity: !isValid ? 0.4 : 1
                                         }}>
                                             {p === 1.0 ? "POT" : `${Math.round(p * 100)}%`} ({fmtBB(to)})
                                         </button>
@@ -164,10 +166,11 @@ export default function ActionBar({
                                 });
                             }
                         })()}
-                        <button onClick={() => onTo(maxTo)} style={{
+                        <button onClick={() => onTo(maxTo)} disabled={!isValid} style={{
                             fontSize: 11, padding: "4px 10px", borderRadius: 20,
                             background: "rgba(255, 75, 92, 0.15)", border: "1px solid rgba(255, 75, 92, 0.3)",
-                            color: "#fda4af", fontWeight: 700, cursor: "pointer"
+                            color: "#fda4af", fontWeight: 700, cursor: !isValid ? "not-allowed" : "pointer",
+                            opacity: !isValid ? 0.4 : 1
                         }}>ALL-IN</button>
                     </div>
 
@@ -181,7 +184,8 @@ export default function ActionBar({
                             <div style={{ position: "absolute", left: `calc(${pct}% - 10px)`, top: "50%", transform: "translateY(-50%)", width: 20, height: 20, background: "#00d4ff", borderRadius: "50%", boxShadow: "0 2px 8px rgba(0, 212, 255, 0.6)", zIndex: 11, pointerEvents: "none" }} />
                             <input type="range" min={minTo} max={maxTo} step={inc} value={value}
                                 onChange={(e) => setRaiseTo(Math.min(maxTo, Math.max(minTo, Number(e.target.value))))}
-                                style={{ width: "100%", height: 24, opacity: 0, cursor: "pointer", zIndex: 10, position: "absolute", top: 0, left: 0, margin: 0 }}
+                                disabled={!isValid}
+                                style={{ width: "100%", height: 24, opacity: 0, cursor: !isValid ? "not-allowed" : "pointer", zIndex: 10, position: "absolute", top: 0, left: 0, margin: 0 }}
                             />
                         </div>
 
@@ -252,7 +256,7 @@ export default function ActionBar({
                         }}
                     >
                         {showBetPct && (
-                            <button key="pct-33" className="chip" onClick={() => handleBetPct(0.33)}>33%</button>
+                            <button key="pct-33" className="chip" onClick={() => handleBetPct(0.33)} disabled={!isValid}>33%</button>
                         )}
                         {/* Logic for Raise Presets derived from App.jsx IIFE */}
                         {(() => {
@@ -264,7 +268,7 @@ export default function ActionBar({
                                     const to = Math.max(cand, minToVal);
                                     const active = Number(raiseTo) === to;
                                     return (
-                                        <button key={`rr-${k}`} className="chip" onClick={() => onTo(to)}>
+                                        <button key={`rr-${k}`} className="chip" onClick={() => onTo(to)} disabled={!isValid}>
                                             {`${k}x(${fmtBB(to)})`}
                                         </button>
                                     );
@@ -280,7 +284,7 @@ export default function ActionBar({
                                 const to = +(already + want).toFixed(2);
                                 const active = Number(raiseTo) === to;
                                 return (
-                                    <button key={`pct-${p}`} className="chip" onClick={() => onTo(to)}>
+                                    <button key={`pct-${p}`} className="chip" onClick={() => onTo(to)} disabled={!isValid}>
                                         {`${Math.round(p * 100)}% (${fmtBB(to)})`}
                                     </button>
                                 );
@@ -297,6 +301,7 @@ export default function ActionBar({
                             }}
                             onClick={() => onTo((S?.committed?.[S.actor] ?? 0) + (S?.stacks?.[S.actor] ?? 0))}
                             title="All-In"
+                            disabled={!isValid}
                         >
                             ALL-IN
                         </button>
@@ -330,6 +335,7 @@ export default function ActionBar({
                             step={0.5}
                             value={value}
                             onChange={(e) => setRaiseTo(+e.target.value)}
+                            disabled={!isValid}
                         />
                     </div>
                     {!isMobile && <div className="bb-ticks"><span /><span /><span /></div>}
