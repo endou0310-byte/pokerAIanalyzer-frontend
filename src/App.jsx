@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { analyzeHand, followupQuestion, saveHistory, fetchPlan, createCheckoutSession, createPortalSession, updateHistoryConversation, changePlan, } from "./api.js";
 import { sendEvent } from "./lib/firebase.js";
+import { isDigitalGoodsSupported, purchaseSku } from "./lib/billing.js";
 import CardPickerModal from "./components/CardPickerModal.jsx";
 import BoardPickerModal from "./components/BoardPickerModal.jsx";
 import ResultModal from "./components/ResultModal.jsx";
@@ -14,7 +15,6 @@ const API_BASE = import.meta.env.VITE_API_BASE || "";
 function useSize() {
   const ref = useRef(null);
   const [s, setS] = useState({ w: 0, h: 0 });
-
   useEffect(() => {
     if (!ref.current) return;
     const el = ref.current;
@@ -172,6 +172,12 @@ function getPointOnRect(cx, cy, w, h, r, t) {
 }
 
 export default function App() {
+
+  // Native Billing Availability
+  const [isNativeBillingAvailable, setIsNativeBillingAvailable] = useState(false);
+  useEffect(() => {
+    isDigitalGoodsSupported().then(setIsNativeBillingAvailable);
+  }, []);
 
   // ログアウト（localStorage をクリアしてログインへ）
   const handleLogout = () => {
@@ -2140,6 +2146,58 @@ export default function App() {
                         }
 
                         window.location.reload();
+                        return;
+                      }
+
+                      // 無料 → Native Billing (Android TWA)
+                      if (isNativeBillingAvailable && currentPlan === "free") {
+                        const skuMap = {
+                          basic: "poker_analyzer_basic",
+                          pro: "poker_analyzer_pro",
+                          premium: "poker_analyzer_premium"
+                        };
+                        const sku = skuMap[nextPlan];
+
+                        if (!sku) {
+                          alert("このプランはアプリ内決済に対応していません（ID未設定）。");
+                          return;
+                        }
+
+                        try {
+                          const purchase = await purchaseSku(sku);
+
+                          // Backend Verification
+                          const verifyRes = await fetch(`${base.config.apiBaseUrl}/api/verify-android`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              purchaseToken: purchase.token,
+                              productId: sku,
+                              user_id: u.user_id
+                            })
+                          });
+
+                          const verifyData = await verifyRes.json();
+
+                          if (verifyData.ok) {
+                            alert("購入が完了しました！プランが更新されました。");
+                            // UI閉じる
+                            if (purchase.paymentResponse && purchase.paymentResponse.complete) {
+                              await purchase.paymentResponse.complete('success');
+                            }
+                            window.location.reload();
+                          } else {
+                            // 失敗
+                            console.error("Verification failed:", verifyData);
+                            alert(`購入処理に失敗しました (Verify Error): ${verifyData.error}`);
+                            if (purchase.paymentResponse && purchase.paymentResponse.complete) {
+                              await purchase.paymentResponse.complete('fail');
+                            }
+                          }
+
+                        } catch (err) {
+                          console.error("Purchase cancelled or failed:", err);
+                        }
                         return;
                       }
 
