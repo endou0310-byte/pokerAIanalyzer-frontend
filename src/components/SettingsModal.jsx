@@ -5,24 +5,7 @@ const API_BASE = import.meta.env.VITE_API_BASE || "";
 
 export default function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultStack, setDefaultStack, onLogout, isMobile, isNativeBillingAvailable }) {
   // ...
-  {
-    activeTab === "plan" && (
-      <>
-        <h3 style={{ marginTop: 0 }}>プラン</h3>
-        <div style={{ color: "#cbd5e1", lineHeight: 1.9, fontSize: 13, marginBottom: 12 }}>
-          <div>現在：{plan ? plan.toUpperCase() : "-"}</div>
-        </div>
-        {isNativeBillingAvailable ? (
-          <div style={{ fontSize: 12, color: "#9ca3af" }}>
-            定期購入の管理（解約・お支払い方法の変更など）は、<br />
-            Google Play ストアの「定期購入」から行ってください。
-          </div>
-        ) : (
-          <a href="#" onClick={(e) => { e.preventDefault(); handleOpenPortal(); }} style={{ color: "#6366f1" }}>プラン管理画面へ</a>
-        )}
-      </>
-    )
-  }
+
   // リンク先
   const PRIVACY_URL = "privacy.html";
   const TERMS_URL = "terms.html";
