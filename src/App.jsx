@@ -2220,7 +2220,7 @@ export default function App() {
                           } else {
                             // 失敗
                             console.error("Verification failed:", verifyData);
-                            alert(`購入処理に失敗しました (Verify Error): ${verifyData.error}`);
+                            alert(`購入処理に失敗しました (Verify Error):\n${verifyData.error}\nDetails: ${verifyData.details}`);
                             if (purchase.paymentResponse && purchase.paymentResponse.complete) {
                               await purchase.paymentResponse.complete('fail');
                             }
