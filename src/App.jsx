@@ -530,6 +530,13 @@ export default function App() {
 
   /* begin/end/reset */
   function begin() {
+    // B案：ハンド入力開始時もログイン必須にする（データ消失防止）
+    if (!auth.loggedIn) {
+      alert("記録を開始するにはログインが必要です。ログイン画面へ移動します。");
+      window.location.href = "login.html";
+      return;
+    }
+
     // 残留状態を確実にクリア
     setRecording(false);
     setBoard({ FLOP: [], TURN: [], RIVER: [] });
