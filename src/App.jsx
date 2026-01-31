@@ -174,6 +174,27 @@ function getPointOnRect(cx, cy, w, h, r, t) {
 
 export default function App() {
 
+  // Default Stack & Players
+  const [defaultStack, setDefaultStack] = useState(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem("pa_user") || "null");
+      const v = Number(u?.default_stack);
+      return Number.isFinite(v) ? v : 100;
+    } catch { return 100; }
+  });
+  const [defaultPlayers, setDefaultPlayers] = useState(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem("pa_user") || "null");
+      const v = Number(u?.default_players);
+      return (Number.isFinite(v) && v >= 2 && v <= 10) ? v : 6;
+    } catch { return 6; }
+  });
+
+  /* 左ペイン States */
+  const [players, setPlayers] = useState(defaultPlayers);
+  const [heroSeat, setHeroSeat] = useState("UTG");
+  const [heroStack, setHeroStack] = useState(defaultStack);
+
   // Native Billing Availability
   const [isNativeBillingAvailable, setIsNativeBillingAvailable] = useState(false);
   useEffect(() => {
@@ -234,9 +255,7 @@ export default function App() {
     setPlayers(defaultPlayers);
   }, [defaultPlayers]);
 
-  /* 左ペイン */
-  const [players, setPlayers] = useState(defaultPlayers); // Initialize with state
-  const [heroSeat, setHeroSeat] = useState("UTG");
+
 
   // 認証状態（B案：未ログインでも画面に入れる）アウト（localStorage をクリアしてログインへ）
   const handleLogout = () => {
@@ -419,12 +438,6 @@ export default function App() {
       }
     })();
   }, []);
-
-  /* 左ペイン */
-  const [players, setPlayers] = useState(defaultPlayers);
-  const [heroSeat, setHeroSeat] = useState("UTG");
-  // 新規ハンドの初期値は defaultStack を使い、即座に反映させる
-  const [heroStack, setHeroStack] = useState(defaultStack);
 
   /* engine */
   const [recording, setRecording] = useState(false);
