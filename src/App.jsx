@@ -1045,7 +1045,12 @@ export default function App() {
     <div className="mobile-app-root">
       {/* 1. Header Overlay */}
       <div className="mobile-header-overlay">
-        <div className="logo-pill" style={{ fontSize: 14 }}>Poker Analyzer</div>
+        <div className="logo-pill" style={{ fontSize: 14 }}>
+          Poker Analyzer
+          <span style={{ fontSize: 9, color: '#f00', marginLeft: 4 }}>
+            D:{("getDigitalGoodsService" in window) ? "OK" : "NG"}
+          </span>
+        </div>
         <div style={{ display: 'flex', gap: 8 }}>
           {/* 簡易ログ表示ボタン */}
           {/* History Button (was LOG) */}
