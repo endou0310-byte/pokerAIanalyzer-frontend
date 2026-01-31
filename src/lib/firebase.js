@@ -12,11 +12,19 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+let app;
+let analytics;
+
+try {
+    app = initializeApp(firebaseConfig);
+    analytics = getAnalytics(app);
+} catch (e) {
+    console.error("Firebase Initialization Failed:", e);
+}
 
 // イベント送信用のヘルパー関数
 export const sendEvent = (eventName, params) => {
+    if (!analytics) return;
     try {
         logEvent(analytics, eventName, params);
     } catch (e) {
