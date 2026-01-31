@@ -1056,6 +1056,26 @@ export default function App() {
           >
             履歴
           </button>
+
+          {/* Plan Change Button (Native Billing Only) */}
+          {isNativeBillingAvailable && (
+            <button
+              className="btn"
+              style={{
+                height: 32,
+                padding: '0 8px',
+                fontSize: 11,
+                background: 'linear-gradient(135deg, #6366f1, #d946ef)',
+                border: 'none',
+                color: '#fff',
+                fontWeight: 'bold'
+              }}
+              onClick={() => setShowPlanModal(true)}
+            >
+              UPGRADE
+            </button>
+          )}
+
           {/* 設定ボタン */}
           <button className="btn" style={{ height: 32, width: 32, padding: 0 }} onClick={() => setShowSettings(true)}>
             ⚙
