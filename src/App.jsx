@@ -2205,10 +2205,7 @@ export default function App() {
                           return;
                         }
 
-                        // 確認ダイアログ
-                        if (!window.confirm(`Google Play決済で ${nextPlan.toUpperCase()} プランを購入しますか？`)) {
-                          return;
-                        }
+                        // 確認ダイアログは削除 (Google Playのnative UIに任せる)
 
                         try {
                           const purchase = await purchaseSku(sku);
