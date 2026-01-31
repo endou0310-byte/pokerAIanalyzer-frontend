@@ -179,24 +179,7 @@ export default function App() {
     isDigitalGoodsSupported().then(setIsNativeBillingAvailable);
   }, []);
 
-  // Debug: Digital Goods Async Check
-  const [dgStatus, setDgStatus] = useState("Init");
-  useEffect(() => {
-    let count = 0;
-    const timer = setInterval(() => {
-      count++;
-      if ("getDigitalGoodsService" in window) {
-        setDgStatus("OK");
-        clearInterval(timer);
-      } else {
-        setDgStatus(`NG(${count})`);
-        if (count > 20) clearInterval(timer); // Stop after 10 sec
-      }
-    }, 500);
-    return () => clearInterval(timer);
-  }, []);
-
-  // ログアウト（localStorage をクリアしてログインへ）
+  // 認証状態（B案：未ログインでも画面に入れる）アウト（localStorage をクリアしてログインへ）
   const handleLogout = () => {
     try {
       localStorage.removeItem("pa_user");
@@ -1061,36 +1044,33 @@ export default function App() {
   const renderMobile = () => (
     <div className="mobile-app-root">
       {/* 1. Header Overlay */}
-      <div className="mobile-header-overlay">
-        <div className="logo-pill" style={{ fontSize: 14 }}>
-          Poker Analyzer
-          <span style={{ fontSize: 9, color: '#f00', marginLeft: 4 }}>
-            D:{dgStatus}
-          </span>
+      <div className="mobile-header-overlay" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 12px', height: 48 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div className="logo-pill" style={{ fontSize: 14, margin: 0, padding: 0, background: 'none', border: 'none' }}>Poker Analyzer</div>
+          {/* Plan Info for Mobile */}
+          {userInfo && (
+            <div style={{ fontSize: 10, color: '#9ca3af', marginTop: -2 }}>
+              {auth.user?.plan === 'premium' ? 'Premium' : auth.user?.plan === 'pro' ? 'Pro' : auth.user?.plan === 'basic' ? 'Basic' : 'Free'}
+              <span style={{ margin: '0 4px', opacity: 0.5 }}>|</span>
+              Rem: {auth.user?.remaining_hands ?? '-'}
+            </div>
+          )}
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          {/* 簡易ログ表示ボタン */}
-          {/* History Button (was LOG) */}
-          <button
-            className="btn"
-            style={{ height: 32, padding: '0 10px', fontSize: 11 }}
-            onClick={() => window.location.href = "history.html"}
-          >
-            履歴
-          </button>
 
-          {/* Plan Change Button (Native Billing Only) */}
-          {isNativeBillingAvailable && (
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          {/* Upgrade Button (Native Billing Only) */}
+          {isNativeBillingAvailable && (auth.user?.plan !== 'premium') && (
             <button
               className="btn"
               style={{
-                height: 32,
-                padding: '0 8px',
+                height: 30,
+                padding: '0 10px',
                 fontSize: 11,
-                background: 'linear-gradient(135deg, #6366f1, #d946ef)',
-                border: 'none',
-                color: '#fff',
-                fontWeight: 'bold'
+                background: 'rgba(99, 102, 241, 0.2)',
+                border: '1px solid #6366f1',
+                color: '#a5b4fc',
+                borderRadius: 20,
+                whiteSpace: 'nowrap'
               }}
               onClick={() => setShowPlanModal(true)}
             >
@@ -1098,7 +1078,16 @@ export default function App() {
             </button>
           )}
 
-          {/* 設定ボタン */}
+          {/* History Button */}
+          <button
+            className="btn"
+            style={{ height: 32, padding: '0 10px', fontSize: 11, whiteSpace: 'nowrap' }}
+            onClick={() => window.location.href = "history.html"}
+          >
+            履歴
+          </button>
+
+          {/* Settings Button */}
           <button className="btn" style={{ height: 32, width: 32, padding: 0 }} onClick={() => setShowSettings(true)}>
             ⚙
           </button>
