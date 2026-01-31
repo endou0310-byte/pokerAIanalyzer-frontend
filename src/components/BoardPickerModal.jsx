@@ -102,7 +102,7 @@ export default function BoardPickerModal({
                     type="button"
                     onClick={() => toggle(code)}
                     disabled={disabled}
-                    className={`cardpicker-card ${active ? "cardpicker-card--active" : ""} ${isRed ? "s-red" : "s-black"}`}
+                    className={`cardpicker-card ${active ? "cardpicker-card--active" : ""} ${disabled ? "cardpicker-card--disabled" : ""} ${isRed ? "s-red" : "s-black"}`}
                     title={code}
                   >
                     <span className="cardpicker-rank">{rank}</span>
