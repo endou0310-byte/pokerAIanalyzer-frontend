@@ -226,6 +226,18 @@ export default function App() {
     });
   }, []);
 
+  // Sync players with defaultPlayers
+  useEffect(() => {
+    // Only update if current players is default (6) or roughly sync behavior?
+    // Actually, changing Settings should update the board immediately if it's empty/reset.
+    // For now, let's just sync it.
+    setPlayers(defaultPlayers);
+  }, [defaultPlayers]);
+
+  /* 左ペイン */
+  const [players, setPlayers] = useState(defaultPlayers); // Initialize with state
+  const [heroSeat, setHeroSeat] = useState("UTG");
+
   // 認証状態（B案：未ログインでも画面に入れる）アウト（localStorage をクリアしてログインへ）
   const handleLogout = () => {
     try {
@@ -249,18 +261,6 @@ export default function App() {
 
   // 設定モーダル
   const [showSettings, setShowSettings] = useState(false);
-
-  // default_stack（DB同期）
-  // 初期値は localStorage から取得（F5対策）
-  const [defaultStack, setDefaultStack] = useState(() => {
-    try {
-      const u = JSON.parse(localStorage.getItem("pa_user") || "null");
-      const v = Number(u?.default_stack);
-      return Number.isFinite(v) ? v : 100;
-    } catch {
-      return 100;
-    }
-  });
 
   // ★ 最後にDBへ保存できた default_stack を保持（無駄な再保存防止）
   const lastSavedDefaultStackRef = useRef(null);
@@ -327,31 +327,53 @@ export default function App() {
         const data = await res.json();
         console.log("Fetched auth/me:", data);
 
-        if (data?.ok && data?.user?.default_stack != null) {
-          const raw = Number(data.user.default_stack);
-          const v = Number.isFinite(raw) ? raw : 100;
+        if (data?.ok) {
+          // default_stack
+          if (data.user?.default_stack != null) {
+            const raw = Number(data.user.default_stack);
+            const v = Number.isFinite(raw) ? raw : 100;
 
-          setDefaultStack(prev => {
-            if (prev !== v) {
-              try {
-                const u = JSON.parse(localStorage.getItem("pa_user") || "null");
-                if (u) {
-                  u.default_stack = v;
-                  localStorage.setItem("pa_user", JSON.stringify(u));
-                }
-              } catch { }
-              return v;
-            }
-            return prev;
-          });
+            setDefaultStack(prev => {
+              if (prev !== v) {
+                try {
+                  const u = JSON.parse(localStorage.getItem("pa_user") || "null");
+                  if (u) {
+                    u.default_stack = v;
+                    localStorage.setItem("pa_user", JSON.stringify(u));
+                  }
+                } catch { }
+                return v;
+              }
+              return prev;
+            });
 
-          lastSavedDefaultStackRef.current = v;
+            lastSavedDefaultStackRef.current = v;
 
-          setHeroStack((prev) => {
-            // 100 or default or NaN should be overwritten
-            if (prev == null || !Number.isFinite(prev) || prev === 100) return v;
-            return prev;
-          });
+            setHeroStack((prev) => {
+              // 100 or default or NaN should be overwritten
+              if (prev == null || !Number.isFinite(prev) || prev === 100) return v;
+              return prev;
+            });
+          }
+
+          // default_players
+          if (data.user?.default_players != null) {
+            const raw = Number(data.user.default_players);
+            const p = (Number.isFinite(raw) && raw >= 2 && raw >= 2 && raw <= 10) ? raw : 6;
+            setDefaultPlayers(prev => {
+              if (prev !== p) {
+                try {
+                  const u = JSON.parse(localStorage.getItem("pa_user") || "null");
+                  if (u) {
+                    u.default_players = p;
+                    localStorage.setItem("pa_user", JSON.stringify(u));
+                  }
+                } catch { }
+                return p;
+              }
+              return prev;
+            });
+          }
         }
       } catch (e) {
         console.error("Error fetching default_stack:", e);
@@ -399,7 +421,7 @@ export default function App() {
   }, []);
 
   /* 左ペイン */
-  const [players, setPlayers] = useState(6);
+  const [players, setPlayers] = useState(defaultPlayers);
   const [heroSeat, setHeroSeat] = useState("UTG");
   // 新規ハンドの初期値は defaultStack を使い、即座に反映させる
   const [heroStack, setHeroStack] = useState(defaultStack);

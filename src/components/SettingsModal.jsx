@@ -169,28 +169,56 @@ export default function SettingsModal({ open, onClose, userInfo, plan, remaining
             {activeTab === "input" && (
               <>
                 <h3 style={{ marginTop: 0 }}>入力設定</h3>
+
+                {/* Default Stack */}
                 <label style={{ fontSize: 12, color: "#9ca3af", display: "block", marginBottom: 6 }}>初期スタック (BB)</label>
                 <input
                   type="number" value={localStack} onChange={(e) => setLocalStack(e.target.value)}
-                  style={{ width: "100%", padding: 10, borderRadius: 8, background: "#1e293b", border: "1px solid #334155", color: "#fff" }}
+                  style={{ width: "100%", padding: 10, borderRadius: 8, background: "#1e293b", border: "1px solid #334155", color: "#fff", marginBottom: 16 }}
                 />
-                <div style={{ fontSize: 11, color: "#9ca3af", margin: "8px 0 16px" }}>
-                  新規ハンド作成時のデフォルト値です。
+
+                {/* Default Players */}
+                <label style={{ fontSize: 12, color: "#9ca3af", display: "block", marginBottom: 6 }}>初期プレイヤー人数 (2-10人)</label>
+                <select
+                  value={localPlayers}
+                  onChange={(e) => setLocalPlayers(Number(e.target.value))}
+                  style={{ width: "100%", padding: 10, borderRadius: 8, background: "#1e293b", border: "1px solid #334155", color: "#fff" }}
+                >
+                  {[2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+                    <option key={n} value={n}>{n}人</option>
+                  ))}
+                </select>
+
+                <div style={{ fontSize: 11, color: "#9ca3af", margin: "16px 0 16px" }}>
+                  新規ハンド作成時やリセット時のデフォルト値です。
                 </div>
+
                 <button
                   className="btn btn--primary"
-                  disabled={Number(localStack) === Number(defaultStack)}
+                  disabled={Number(localStack) === Number(defaultStack) && Number(localPlayers) === Number(defaultPlayers)}
                   onClick={async () => {
                     const uid = resolveUserId();
                     if (!uid) return alert("ユーザーIDが見つかりません");
                     try {
                       await fetch(`${API_BASE}/auth/settings`, {
                         method: "POST", headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ user_id: uid, default_stack: Number(localStack) })
+                        body: JSON.stringify({
+                          user_id: uid,
+                          default_stack: Number(localStack),
+                          default_players: Number(localPlayers)
+                        })
                       });
+
                       setDefaultStack(Number(localStack));
+                      setDefaultPlayers(Number(localPlayers));
+
                       const u = JSON.parse(localStorage.getItem("pa_user") || "null");
-                      if (u) { u.default_stack = Number(localStack); localStorage.setItem("pa_user", JSON.stringify(u)); }
+                      if (u) {
+                        u.default_stack = Number(localStack);
+                        u.default_players = Number(localPlayers);
+                        localStorage.setItem("pa_user", JSON.stringify(u));
+                      }
+
                       alert("設定を保存しました");
                     } catch (e) { alert("エラー: " + e.message); }
                   }}
