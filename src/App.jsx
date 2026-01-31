@@ -179,6 +179,23 @@ export default function App() {
     isDigitalGoodsSupported().then(setIsNativeBillingAvailable);
   }, []);
 
+  // Debug: Digital Goods Async Check
+  const [dgStatus, setDgStatus] = useState("Init");
+  useEffect(() => {
+    let count = 0;
+    const timer = setInterval(() => {
+      count++;
+      if ("getDigitalGoodsService" in window) {
+        setDgStatus("OK");
+        clearInterval(timer);
+      } else {
+        setDgStatus(`NG(${count})`);
+        if (count > 20) clearInterval(timer); // Stop after 10 sec
+      }
+    }, 500);
+    return () => clearInterval(timer);
+  }, []);
+
   // ログアウト（localStorage をクリアしてログインへ）
   const handleLogout = () => {
     try {
@@ -1048,7 +1065,7 @@ export default function App() {
         <div className="logo-pill" style={{ fontSize: 14 }}>
           Poker Analyzer
           <span style={{ fontSize: 9, color: '#f00', marginLeft: 4 }}>
-            D:{("getDigitalGoodsService" in window) ? "OK" : "NG"}
+            D:{dgStatus}
           </span>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
