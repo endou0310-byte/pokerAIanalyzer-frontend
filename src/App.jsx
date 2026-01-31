@@ -761,17 +761,17 @@ export default function App() {
     setFollowupUsed(false);
 
     setAnalyzing(true);
-    sendEvent("analyze_start", {
-      players: config.players,
-      street: config.board?.FLOP ? "POSTFLOP" : "PREFLOP"
-    });
-
     try {
       const u = JSON.parse(localStorage.getItem("pa_user") || "{}");
 
       // hand情報を組み立て
       const base = buildPayload();
       const payload = { ...base, user_id: u.user_id || null };
+
+      sendEvent("analyze_start", {
+        players: base.config.players,
+        street: base.board?.FLOP?.length > 0 ? "POSTFLOP" : "PREFLOP"
+      });
 
       // 解析リクエスト送信
       const res = await analyzeHand(payload);
