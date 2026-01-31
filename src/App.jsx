@@ -2189,6 +2189,65 @@ export default function App() {
                         return;
                       }
 
+                      // =========================================================
+                      // 1. TWA (Google Play Billing) Priority
+                      // =========================================================
+                      if (isNativeBillingAvailable) {
+                        const skuMap = {
+                          basic: "poker_analyzer_basic",
+                          pro: "poker_analyzer_pro",
+                          premium: "poker_analyzer_premium"
+                        };
+                        const sku = skuMap[nextPlan];
+
+                        if (!sku) {
+                          alert("このプランはアプリ内決済に対応していません（ID未設定）。");
+                          return;
+                        }
+
+                        // 確認ダイアログ
+                        if (!window.confirm(`Google Play決済で ${nextPlan.toUpperCase()} プランを購入しますか？`)) {
+                          return;
+                        }
+
+                        try {
+                          const purchase = await purchaseSku(sku);
+
+                          const verifyRes = await fetch(`${API_BASE}/api/verify-android`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              purchaseToken: purchase.token,
+                              productId: sku,
+                              user_id: u.user_id
+                            })
+                          });
+
+                          const verifyData = await verifyRes.json();
+
+                          if (verifyData.ok) {
+                            alert("購入が完了しました！プランが更新されました。");
+                            if (purchase.paymentResponse && purchase.paymentResponse.complete) {
+                              await purchase.paymentResponse.complete('success');
+                            }
+                            window.location.reload();
+                          } else {
+                            console.error("Verification failed:", verifyData);
+                            alert(`購入処理に失敗しました (Verify Error):\n${verifyData.error}\nDetails: ${verifyData.details}`);
+                            if (purchase.paymentResponse && purchase.paymentResponse.complete) {
+                              await purchase.paymentResponse.complete('fail');
+                            }
+                          }
+                        } catch (err) {
+                          console.error("Purchase cancelled or failed:", err);
+                        }
+                        return; // TWAフロー終了
+                      }
+
+                      // =========================================================
+                      // 2. Web (Stripe) Flow
+                      // =========================================================
+
                       // 既存課金ユーザー：アプリ内で /plan/change を叩く（Portalではない）
                       if (currentPlan !== "free") {
                         // プランの大小関係（free < basic < pro < premium）
@@ -2227,58 +2286,6 @@ export default function App() {
                         return;
                       }
 
-                      // 無料 → Native Billing (Android TWA)
-                      if (isNativeBillingAvailable && currentPlan === "free") {
-                        const skuMap = {
-                          basic: "poker_analyzer_basic",
-                          pro: "poker_analyzer_pro",
-                          premium: "poker_analyzer_premium"
-                        };
-                        const sku = skuMap[nextPlan];
-
-                        if (!sku) {
-                          alert("このプランはアプリ内決済に対応していません（ID未設定）。");
-                          return;
-                        }
-
-                        try {
-                          const purchase = await purchaseSku(sku);
-
-                          // Backend Verification
-                          const verifyRes = await fetch(`${base.config.apiBaseUrl}/api/verify-android`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                              purchaseToken: purchase.token,
-                              productId: sku,
-                              user_id: u.user_id
-                            })
-                          });
-
-                          const verifyData = await verifyRes.json();
-
-                          if (verifyData.ok) {
-                            alert("購入が完了しました！プランが更新されました。");
-                            // UI閉じる
-                            if (purchase.paymentResponse && purchase.paymentResponse.complete) {
-                              await purchase.paymentResponse.complete('success');
-                            }
-                            window.location.reload();
-                          } else {
-                            // 失敗
-                            console.error("Verification failed:", verifyData);
-                            alert(`購入処理に失敗しました (Verify Error):\n${verifyData.error}\nDetails: ${verifyData.details}`);
-                            if (purchase.paymentResponse && purchase.paymentResponse.complete) {
-                              await purchase.paymentResponse.complete('fail');
-                            }
-                          }
-
-                        } catch (err) {
-                          console.error("Purchase cancelled or failed:", err);
-                        }
-                        return;
-                      }
-
                       // 無料 → Checkout で新規加入
                       const checkout = await createCheckoutSession({
                         user_id: u.user_id,
@@ -2306,17 +2313,20 @@ export default function App() {
       }
 
       {/* ===== 設定モーダル ===== */}
-      <SettingsModal
-        open={showSettings}
-        onClose={() => setShowSettings(false)}
-        userInfo={userInfo}
-        plan={plan}
-        remainingMonth={remainingMonth}
-        defaultStack={defaultStack}
-        setDefaultStack={setDefaultStack}
-        onLogout={handleLogout}
-        isMobile={isMobile}
-      />
+      {showSettings && (
+        <SettingsModal
+          open={showSettings}
+          onClose={() => setShowSettings(false)}
+          userInfo={userInfo}
+          plan={plan}
+          remainingMonth={remainingMonth}
+          defaultStack={heroStack} // = current default
+          setDefaultStack={setDefaultStack}
+          onLogout={handleLogout}
+          isMobile={isMobile}
+          isNativeBillingAvailable={isNativeBillingAvailable} // ★ Added
+        />
+      )}
 
       {
         analyzing && (
