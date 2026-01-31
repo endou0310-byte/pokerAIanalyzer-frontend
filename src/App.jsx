@@ -3,7 +3,14 @@ import { analyzeHand, followupQuestion, saveHistory, fetchPlan, createCheckoutSe
 import { sendEvent } from "./lib/firebase.js";
 import { isDigitalGoodsSupported, purchaseSku, getExistingPurchases } from "./lib/billing.js";
 
-// ... (other imports)
+import CardPickerModal from "./components/CardPickerModal.jsx";
+import BoardPickerModal from "./components/BoardPickerModal.jsx";
+import ResultModal from "./components/ResultModal.jsx";
+import SettingsModal from "./components/SettingsModal.jsx";
+import ActionBar from "./components/ActionBar.jsx";
+import * as E from "./lib/engine.js";
+// バックエンドのベースURL（.env の VITE_API_BASE）
+const API_BASE = import.meta.env.VITE_API_BASE || "";
 
 export default function App() {
 
