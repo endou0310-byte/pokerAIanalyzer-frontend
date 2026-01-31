@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { analyzeHand, followupQuestion, saveHistory, fetchPlan, createCheckoutSession, createPortalSession, updateHistoryConversation, changePlan, } from "./api.js";
+import { sendEvent } from "./lib/firebase.js";
 import CardPickerModal from "./components/CardPickerModal.jsx";
 import BoardPickerModal from "./components/BoardPickerModal.jsx";
 import ResultModal from "./components/ResultModal.jsx";
@@ -177,6 +178,7 @@ export default function App() {
     try {
       localStorage.removeItem("pa_user");
       localStorage.removeItem("pa_last_access");
+      sendEvent("logout");
     } finally {
       window.location.href = "login.html";
     }
@@ -247,6 +249,7 @@ export default function App() {
         email: auth.user.email,
         user_id: auth.user.user_id || auth.user.id
       });
+      sendEvent("login", { method: "google" });
     } else {
       setUserInfo(null);
     }
@@ -758,6 +761,10 @@ export default function App() {
     setFollowupUsed(false);
 
     setAnalyzing(true);
+    sendEvent("analyze_start", {
+      players: config.players,
+      street: config.board?.FLOP ? "POSTFLOP" : "PREFLOP"
+    });
 
     try {
       const u = JSON.parse(localStorage.getItem("pa_user") || "{}");
@@ -832,9 +839,8 @@ export default function App() {
 
       setResult(wrapped);
       setFollowupQ("");
-      setFollowupRes(null);
-      setFollowupUsed(false);
       setShowResultModal(true);
+      sendEvent("analyze_success");
 
       // ---- 履歴を hand_histories に保存 ----
       try {
@@ -898,6 +904,7 @@ export default function App() {
         ),
       });
       setShowResultModal(true);
+      sendEvent("analyze_error", { message: err?.message || String(err) });
     } finally {
       setAnalyzing(false);
     }
@@ -2221,7 +2228,7 @@ export default function App() {
                   ANALYZING
                 </div>
                 <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 500 }}>
-                  AIが最適解を計算しています...
+                  AIがハンドを解析しています...
                 </div>
               </div>
             </div>
