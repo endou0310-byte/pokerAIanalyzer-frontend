@@ -831,8 +831,8 @@ input[type="range"].bb-slider::-moz-range-thumb {
   .cardpicker-row {
     gap: 3px;
     margin-bottom: 6px;
-    grid-template-columns: repeat(8, 1fr);
-    /* 1行8枚で折り返し（2行目は5枚） */
+    grid-template-columns: repeat(7, 1fr);
+    /* 1行7枚（2段目は6枚）が最も四角く収まる */
   }
 
   .cardpicker-card {

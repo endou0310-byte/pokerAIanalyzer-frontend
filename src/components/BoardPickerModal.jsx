@@ -113,18 +113,16 @@ export default function BoardPickerModal({
           padding: '8px'
         }}>
           {SUITS.map((suit) => (
-            <div className="cardpicker-row" key={suit} style={{
-              display: 'flex',
-              gap: '4px',
-              flexWrap: 'nowrap',
-              justifyContent: 'center'
-            }}>
+            <div className="cardpicker-row" key={suit}>
               {RANKS.map((rank) => {
                 const code = rank + suit;
                 const disabled =
                   usedSet.has(code) || (!sel.includes(code) && sel.length >= maxPick);
                 const active = sel.includes(code);
-                const suitColor = (suit === 'h' || suit === 'd') ? '#ff6b81' : '#9ecbff';
+                // color logic is handled by CSS or helper now, but we'll keep inline color for suit icon if needed or move to logic
+                // Actually CardPickerModal relies on .s-red class.
+                // Let's mirror CardPickerModal's structure closely.
+                const isRed = suit === 'h' || suit === 'd';
 
                 return (
                   <button
@@ -132,27 +130,11 @@ export default function BoardPickerModal({
                     type="button"
                     onClick={() => toggle(code)}
                     disabled={disabled}
+                    className={`cardpicker-card ${active ? "active" : ""} ${isRed ? "s-red" : "s-black"}`}
                     title={code}
-                    style={{
-                      width: '23px',
-                      height: '32px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      background: active ? 'rgba(0, 212, 255, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-                      border: active ? '2px solid #00d4ff' : '1px solid rgba(255, 255, 255, 0.1)',
-                      borderRadius: '4px',
-                      cursor: disabled ? 'not-allowed' : 'pointer',
-                      opacity: disabled ? 0.3 : 1,
-                      transition: 'all 0.2s',
-                      padding: '2px'
-                    }}
                   >
-                    <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#fff' }}>{rank}</span>
-                    <span style={{ fontSize: '14px', color: suitColor }}>
-                      {suitSym[suit]}
-                    </span>
+                    <span className="cardpicker-rank">{rank}</span>
+                    <span className="cardpicker-suit">{suitSym[suit]}</span>
                   </button>
                 );
               })}
