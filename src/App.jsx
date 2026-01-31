@@ -185,11 +185,19 @@ export default function App() {
         try {
           const purchases = await getExistingPurchases();
           if (purchases && purchases.length > 0) {
-            console.log("Restoring purchases:", purchases);
             const p = purchases[0];
+            console.log("Found existing purchase:", p);
 
             const u = JSON.parse(localStorage.getItem("pa_user") || "null");
             if (u && u.user_id) {
+              // Loop Prevention: すでにプランが反映済みなら復元しない
+              // itemId: "poker_analyzer_basic", plan: "basic"
+              const currentPlan = u.plan || "free";
+              if (currentPlan !== "free" && p.itemId.includes(currentPlan)) {
+                console.log("Plan already active, skipping restore.");
+                return;
+              }
+
               // Send to backend
               fetch(`${API_BASE}/api/verify-android`, {
                 method: 'POST',
@@ -201,7 +209,11 @@ export default function App() {
                 })
               }).then(res => res.json()).then(data => {
                 if (data.ok) {
-                  alert("未反映の購入を復元しました！プランが適用されました。");
+                  // Update LocalStorage immediately to prevent loop on next load
+                  u.plan = data.plan;
+                  localStorage.setItem("pa_user", JSON.stringify(u));
+
+                  alert(`未反映の購入を復元しました！\nプラン: ${data.plan}`);
                   window.location.reload();
                 }
               }).catch(e => console.error("Restore failed", e));
