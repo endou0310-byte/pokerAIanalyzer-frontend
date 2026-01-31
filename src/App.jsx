@@ -1,182 +1,50 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { analyzeHand, followupQuestion, saveHistory, fetchPlan, createCheckoutSession, createPortalSession, updateHistoryConversation, changePlan, } from "./api.js";
 import { sendEvent } from "./lib/firebase.js";
-import { isDigitalGoodsSupported, purchaseSku } from "./lib/billing.js";
-import CardPickerModal from "./components/CardPickerModal.jsx";
-import BoardPickerModal from "./components/BoardPickerModal.jsx";
-import ResultModal from "./components/ResultModal.jsx";
-import SettingsModal from "./components/SettingsModal.jsx";
-import ActionBar from "./components/ActionBar.jsx";
-import * as E from "./lib/engine.js";
-// バックエンドのベースURL（.env の VITE_API_BASE）
-const API_BASE = import.meta.env.VITE_API_BASE || "";
+import { isDigitalGoodsSupported, purchaseSku, getExistingPurchases } from "./lib/billing.js";
 
-/* ====== layout utils ====== */
-function useSize() {
-  const ref = useRef(null);
-  const [s, setS] = useState({ w: 0, h: 0 });
-  useEffect(() => {
-    if (!ref.current) return;
-    const el = ref.current;
-
-    const update = () => {
-      // padding を含む表示実寸で取得（絶対配置の基準と一致させる）
-      setS({ w: el.clientWidth, h: el.clientHeight });
-    };
-
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    update();
-
-    return () => ro.disconnect();
-  }, []);
-
-  return [ref, s];
-}
-
-/* ====== pretty cards ====== */
-const suitSym = { s: "♠", h: "♥", d: "♦", c: "♣" };
-const pretty = (c, cls = "") => {
-  if (!c) return null;
-  const r = c[0], s = c[1];
-  const red = s === "h" || s === "d" ? "s-red" : "s-black";
-  return <span className={`cardStr ${cls} ${red}`}>{r}{suitSym[s]}</span>;
-};
-
-// BB表示を 3.00→3 / 6.50→6.5 に丸める
-function fmtBB(n) {
-  const x = Number(n ?? 0);
-  const s = x.toFixed(2).replace(/\.00$/, "").replace(/(\.\d)0$/, "$1");
-  return `${s}BB`;
-}
-
-// === boardで使う同柄表示（ピッカーと同等配色） ===
-const SUIT_SYM_BOARD = { h: "♥", d: "♦", s: "♠", c: "♣" };
-function PrettyBoardCard({ card }) {
-  if (!card || String(card).length < 2) return null;
-  const r = String(card)[0].toUpperCase();
-  const s = String(card)[1].toLowerCase();
-  const color = s === "h" || s === "d" ? "#ff6b81" : "#9ecbff";
-  return (
-    <span style={{ fontWeight: 800 }}>
-      {r}
-      <span style={{ marginLeft: 6, color }}>{SUIT_SYM_BOARD[s] || ""}</span>
-    </span>
-  );
-}
-
-
-/* ====== log text ====== */
-const fmt = a => {
-  const t = (a.type || "").toUpperCase();
-  if (t === "FOLD" || t === "CHECK") return `${a.actor} ${t}`;
-  if (t === "CALL") return `${a.actor} Call ${fmtBB(a.put)}`;
-  if (t === "BET") return `${a.actor} Bet ${fmtBB(a.put)}`;
-  if (t === "RAISE") return `${a.actor} Raise ${fmtBB(a.to)}`;
-  return `${a.actor} ${a.type}`;
-};
-
-const line = (actions, st) => actions[st].map(fmt).join(" ");
-
-/* ====== history (local) ====== */
-const HKEY = "poker_history";
-const loadHist = () => {
-  try { return JSON.parse(localStorage.getItem(HKEY) || "[]"); }
-  catch { return []; }
-};
-const saveHist = (rows) => localStorage.setItem(HKEY, JSON.stringify(rows));
-const uid = () => Math.random().toString(36).slice(2, 10);
-
-
-// Sが未生成でも座席を描画するためのデフォルト座席
-const FALLBACK_SEATS = ["UTG", "UTG+1", "LJ", "HJ", "CO", "BTN", "SB", "BB", "Seat9", "Seat10"];
-const buildSeatsList = (S, players) =>
-  (S?.seats ?? FALLBACK_SEATS).slice(0, Math.max(2, players));
-
-
-/* ====== main ====== */
-// Helper: Get point on rounded rectangle perimeter
-// cx, cy: Center
-// w, h: Full width/height of the rect
-// r: Corner radius
-// t: 0..1 (0 = Bottom Center, clockwise)
-function getPointOnRect(cx, cy, w, h, r, t) {
-  // Effective dimensions of the rectangle formed by corner centers
-  const rw = w / 2 - r;
-  const rh = h / 2 - r;
-
-  // Perimeter total
-  const lineH = rh * 2;
-  const lineW = rw * 2;
-  const circle = 2 * Math.PI * r;
-  const P = (2 * lineW) + (2 * lineH) + circle;
-
-  let d = t * P; // distance to travel
-
-  // 1. Bottom Line (Left-ward from center)
-  // (0, rh+r) to (-rw, rh+r)
-  if (d < rw) {
-    return { x: cx - d, y: cy + (rh + r) };
-  }
-  d -= rw;
-
-  // 2. Bottom-Left Arc (90 deg to 180 deg)
-  const qArc = (Math.PI * r) / 2;
-  if (d < qArc) {
-    const angle = Math.PI / 2 + (d / r);
-    return { x: cx - rw + r * Math.cos(angle), y: cy + rh + r * Math.sin(angle) };
-  }
-  d -= qArc;
-
-  // 3. Left Line (Upward)
-  if (d < lineH) {
-    return { x: cx - (rw + r), y: cy + (rh - d) };
-  }
-  d -= lineH;
-
-  // 4. Top-Left Arc (180 to 270)
-  if (d < qArc) {
-    const angle = Math.PI + (d / r);
-    return { x: cx - rw + r * Math.cos(angle), y: cy - rh + r * Math.sin(angle) };
-  }
-  d -= qArc;
-
-  // 5. Top Line (Right-ward)
-  if (d < lineW) {
-    return { x: cx - rw + d, y: cy - (rh + r) };
-  }
-  d -= lineW;
-
-  // 6. Top-Right Arc (270 to 360/0)
-  if (d < qArc) {
-    const angle = 1.5 * Math.PI + (d / r);
-    return { x: cx + rw + r * Math.cos(angle), y: cy - rh + r * Math.sin(angle) };
-  }
-  d -= qArc;
-
-  // 7. Right Line (Downward)
-  if (d < lineH) {
-    return { x: cx + (rw + r), y: cy - rh + d };
-  }
-  d -= lineH;
-
-  // 8. Bottom-Right Arc (0 to 90)
-  if (d < qArc) {
-    const angle = (d / r);
-    return { x: cx + rw + r * Math.cos(angle), y: cy + rh + r * Math.sin(angle) };
-  }
-  d -= qArc;
-
-  // 9. Bottom Line (Remaining to center)
-  return { x: cx + rw - d, y: cy + (rh + r) };
-}
+// ... (other imports)
 
 export default function App() {
 
   // Native Billing Availability
   const [isNativeBillingAvailable, setIsNativeBillingAvailable] = useState(false);
   useEffect(() => {
-    isDigitalGoodsSupported().then(setIsNativeBillingAvailable);
+    isDigitalGoodsSupported().then(async (available) => {
+      setIsNativeBillingAvailable(available);
+
+      // Restore: アプリ起動時に「購入済みだけど未処理」のものがあれば回復する
+      if (available) {
+        try {
+          const purchases = await getExistingPurchases();
+          if (purchases && purchases.length > 0) {
+            console.log("Restoring purchases:", purchases);
+            const p = purchases[0];
+
+            const u = JSON.parse(localStorage.getItem("pa_user") || "null");
+            if (u && u.user_id) {
+              // Send to backend
+              fetch(`${API_BASE}/api/verify-android`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  purchaseToken: p.purchaseToken,
+                  productId: p.itemId,
+                  user_id: u.user_id
+                })
+              }).then(res => res.json()).then(data => {
+                if (data.ok) {
+                  alert("未反映の購入を復元しました！プランが適用されました。");
+                  window.location.reload();
+                }
+              }).catch(e => console.error("Restore failed", e));
+            }
+          }
+        } catch (e) {
+          console.error("Restore check error:", e);
+        }
+      }
+    });
   }, []);
 
   // 認証状態（B案：未ログインでも画面に入れる）アウト（localStorage をクリアしてログインへ）

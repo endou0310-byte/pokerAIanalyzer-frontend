@@ -74,3 +74,18 @@ export async function purchaseSku(sku) {
         throw error;
     }
 }
+
+/**
+ * 既存の購入（承認済みだがアプリに未反映）を取得する
+ */
+export async function getExistingPurchases() {
+    if (!("getDigitalGoodsService" in window)) return [];
+    try {
+        const service = await window.getDigitalGoodsService(PAYMENT_METHOD);
+        const purchases = await service.listPurchases();
+        return purchases; // Array of PurchaseDetails
+    } catch (err) {
+        console.warn("listPurchases failed:", err);
+        return [];
+    }
+}
