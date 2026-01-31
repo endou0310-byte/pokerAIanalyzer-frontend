@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics, logEvent } from "firebase/analytics";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAeN9M4j-AltdefKy7KDHgiwiD-QliAiKQ",
+    apiKey: "AIzaSyAeN9M4j-AltdefKy7kDHgiwiD-QliAiKQ",
     authDomain: "poker-analyzer-7f4b9.firebaseapp.com",
     projectId: "poker-analyzer-7f4b9",
     storageBucket: "poker-analyzer-7f4b9.firebasestorage.app",
