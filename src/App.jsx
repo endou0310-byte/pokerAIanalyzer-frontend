@@ -1239,14 +1239,14 @@ export default function App() {
                 プラン変更
               </button>
               <button
-                className="btn glow"
+                className="btn"
                 onClick={() => {
                   window.location.href = "history.html";
                 }}
               >
                 履歴
               </button>
-              <button className="btn glow" onClick={() => setShowSettings(true)}>
+              <button className="btn" onClick={() => setShowSettings(true)}>
                 設定
               </button>
             </>
@@ -1326,7 +1326,7 @@ export default function App() {
                 <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
                   {!recording
                     ? <button className="btn glow btn-accent" onClick={begin} style={{ flex: 1 }}>記録開始</button>
-                    : <button className="btn glow btn-danger" onClick={endRecord} style={{ flex: 1 }}>記録終了</button>}
+                    : <button className="btn btn-danger" onClick={endRecord} style={{ flex: 1 }}>記録終了</button>}
                 </div>
 
                 <div style={{ display: "flex", gap: 8, marginTop: 8, flexDirection: "column" }}>
