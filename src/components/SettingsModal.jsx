@@ -3,7 +3,7 @@ import { fetchPlan, createPortalSession } from "../api.js";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "";
 
-export default function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultStack, setDefaultStack, onLogout, isMobile, isNativeBillingAvailable }) {
+export default function SettingsModal({ open, onClose, userInfo, plan, remainingMonth, defaultStack, setDefaultStack, defaultPlayers, setDefaultPlayers, onLogout, isMobile, isNativeBillingAvailable }) {
   // ...
 
   // リンク先
@@ -15,9 +15,13 @@ export default function SettingsModal({ open, onClose, userInfo, plan, remaining
 
   // 入力フォーム用ローカルステート
   const [localStack, setLocalStack] = useState(defaultStack);
+  const [localPlayers, setLocalPlayers] = useState(defaultPlayers);
   useEffect(() => {
     setLocalStack(defaultStack);
   }, [defaultStack]);
+  useEffect(() => {
+    setLocalPlayers(defaultPlayers);
+  }, [defaultPlayers]);
 
   if (!open) return null;
 

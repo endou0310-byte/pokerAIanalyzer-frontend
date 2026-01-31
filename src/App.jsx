@@ -2352,11 +2352,13 @@ export default function App() {
           userInfo={userInfo}
           plan={plan}
           remainingMonth={remainingMonth}
-          defaultStack={heroStack} // = current default
+          defaultStack={defaultStack}
           setDefaultStack={setDefaultStack}
+          defaultPlayers={defaultPlayers}
+          setDefaultPlayers={setDefaultPlayers}
           onLogout={handleLogout}
           isMobile={isMobile}
-          isNativeBillingAvailable={isNativeBillingAvailable} // ★ Added
+          isNativeBillingAvailable={isNativeBillingAvailable}
         />
       )}
 
