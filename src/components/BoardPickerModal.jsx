@@ -66,36 +66,13 @@ export default function BoardPickerModal({
       role="dialog"
       aria-modal="true"
       onClick={onClose}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(0, 0, 0, 0.8)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 100,
-        padding: '16px'
-      }}
     >
       <div
         className="cardpicker-dialog"
         onClick={(e) => e.stopPropagation()}
-        style={{
-          background: 'rgba(13, 22, 35, 0.95)',
-          borderRadius: '16px',
-          border: '1px solid rgba(100, 149, 237, 0.2)',
-          maxWidth: '95vw',
-          width: '100%',
-          maxHeight: '90vh',
-          display: 'flex',
-          flexDirection: 'column'
-        }}
       >
         {/* ヘッダー */}
-        <div className="cardpicker-header" style={{
-          padding: '16px',
-          borderBottom: '1px solid rgba(100, 149, 237, 0.15)'
-        }}>
+        <div className="cardpicker-header">
           <div className="cardpicker-title">
             ボード選択 {street} / {maxPick}枚
           </div>
@@ -106,12 +83,7 @@ export default function BoardPickerModal({
         </div>
 
         {/* カードグリッド：4行×13列（カードのみ） */}
-        <div className="cardpicker-grid" style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '4px',
-          padding: '8px'
-        }}>
+        <div className="cardpicker-grid">
           {SUITS.map((suit) => (
             <div className="cardpicker-row" key={suit}>
               {RANKS.map((rank) => {
@@ -144,13 +116,7 @@ export default function BoardPickerModal({
 
 
         {/* フッター */}
-        <div className="cardpicker-footer" style={{
-          padding: '16px',
-          borderTop: '1px solid rgba(100, 149, 237, 0.15)',
-          display: 'flex',
-          gap: '12px',
-          justifyContent: 'flex-end'
-        }}>
+        <div className="cardpicker-footer">
           <button
             className="btn"
             onClick={() => canDecide && onPick(sel)}
