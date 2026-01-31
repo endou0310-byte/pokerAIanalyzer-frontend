@@ -182,13 +182,13 @@ export default function SettingsModal({ open, onClose, userInfo, plan, remaining
                 />
 
                 {/* Default Players */}
-                <label style={{ fontSize: 12, color: "#9ca3af", display: "block", marginBottom: 6 }}>初期プレイヤー人数 (2-10人)</label>
+                <label style={{ fontSize: 12, color: "#9ca3af", display: "block", marginBottom: 6 }}>初期プレイヤー人数 (2-9人)</label>
                 <select
                   value={localPlayers}
                   onChange={(e) => setLocalPlayers(Number(e.target.value))}
                   style={{ width: "100%", padding: 10, borderRadius: 8, background: "#1e293b", border: "1px solid #334155", color: "#fff" }}
                 >
-                  {[2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+                  {[2, 3, 4, 5, 6, 7, 8, 9].map(n => (
                     <option key={n} value={n}>{n}人</option>
                   ))}
                 </select>

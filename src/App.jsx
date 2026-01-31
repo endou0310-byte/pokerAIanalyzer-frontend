@@ -186,7 +186,7 @@ export default function App() {
     try {
       const u = JSON.parse(localStorage.getItem("pa_user") || "null");
       const v = Number(u?.default_players);
-      return (Number.isFinite(v) && v >= 2 && v <= 10) ? v : 6;
+      return (Number.isFinite(v) && v >= 2 && v <= 9) ? v : 6;
     } catch { return 6; }
   });
 
@@ -378,7 +378,7 @@ export default function App() {
           // default_players
           if (data.user?.default_players != null) {
             const raw = Number(data.user.default_players);
-            const p = (Number.isFinite(raw) && raw >= 2 && raw >= 2 && raw <= 10) ? raw : 6;
+            const p = (Number.isFinite(raw) && raw >= 2 && raw <= 9) ? raw : 6;
             setDefaultPlayers(prev => {
               if (prev !== p) {
                 try {
