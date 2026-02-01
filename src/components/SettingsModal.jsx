@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { fetchPlan, createPortalSession } from "../api.js";
+import InformationList from "./InformationList.jsx";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "";
 
@@ -48,6 +49,7 @@ export default function SettingsModal({ open, onClose, userInfo, plan, remaining
 
   const tabs = [
     { id: "account", label: "アカウント" },
+    { id: "information", label: "お知らせ" },
     { id: "input", label: "入力設定" },
     { id: "analysis", label: "解析設定" },
     { id: "plan", label: "プラン" },
@@ -167,6 +169,13 @@ export default function SettingsModal({ open, onClose, userInfo, plan, remaining
                 {typeof onLogout === "function" && (
                   <button onClick={onLogout} className="btn" style={{ marginTop: 16, fontSize: 12 }}>ログアウト</button>
                 )}
+              </>
+            )}
+
+            {activeTab === "information" && (
+              <>
+                <h3 style={{ marginTop: 0 }}>お知らせ</h3>
+                <InformationList />
               </>
             )}
 

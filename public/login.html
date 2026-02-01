@@ -222,16 +222,14 @@
           </div>
         </section>
 
+
         <!-- Information / News -->
         <section class="card" style="padding: 24px;">
           <h3 style="margin: 0 0 16px 0; font-size: 15px; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
             Information
           </h3>
-          <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
-            <div style="display: flex; gap: 12px;">
-              <span style="color: var(--accent-cyan); font-family: monospace;">2026.01.30</span>
-              <span>Poker Analyzer v1.0 リリース！AI解析機能を公開しました。</span>
-            </div>
+          <div id="information-list" style="display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
+            <!-- Dynamically loaded -->
           </div>
         </section>
       </div>
@@ -336,7 +334,38 @@
       if (params.get("expired")) {
         showError("セッションの有効期限が切れました。再度ログインしてください。");
       }
+
+      // Load information
+      loadInformation();
     };
+
+    async function loadInformation() {
+      try {
+        const res = await fetch('./announcements.json?_t=' + Date.now());
+        if (!res.ok) {
+          console.warn('Failed to load announcements');
+          return;
+        }
+        const data = await res.json();
+        const container = document.getElementById('information-list');
+        
+        if (!data.information || data.information.length === 0) {
+          container.innerHTML = '<div style="color: var(--text-muted); font-size: 12px;">お知らせはありません</div>';
+          return;
+        }
+
+        // Show latest 3 items
+        const latest = data.information.slice(0, 3);
+        container.innerHTML = latest.map(info => `
+          <div style="display: flex; gap: 12px;">
+            <span style="color: var(--accent-cyan); font-family: monospace; flex-shrink: 0;">${info.date}</span>
+            <span>${info.title}</span>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error('Error loading information:', err);
+      }
+    }
   </script>
 </body>
 </html>

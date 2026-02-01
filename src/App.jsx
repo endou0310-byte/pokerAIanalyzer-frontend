@@ -7,6 +7,7 @@ import CardPickerModal from "./components/CardPickerModal.jsx";
 import BoardPickerModal from "./components/BoardPickerModal.jsx";
 import ResultModal from "./components/ResultModal.jsx";
 import SettingsModal from "./components/SettingsModal.jsx";
+import NewsModal from "./components/NewsModal.jsx";
 import ActionBar from "./components/ActionBar.jsx";
 import * as E from "./lib/engine.js";
 // バックエンドのベースURL（.env の VITE_API_BASE）
@@ -255,6 +256,65 @@ export default function App() {
     setPlayers(defaultPlayers);
   }, [defaultPlayers]);
 
+  // === News Modal State ===
+  const [currentNews, setCurrentNews] = useState(null);
+
+  // Check for unread news on app load
+  useEffect(() => {
+    checkForNews();
+  }, []);
+
+  async function checkForNews() {
+    try {
+      const res = await fetch('./announcements.json?_t=' + Date.now());
+      if (!res.ok) return;
+      const data = await res.json();
+
+      if (!data.news || data.news.length === 0) return;
+
+      // Get read news IDs from localStorage
+      const readIds = JSON.parse(localStorage.getItem('readNewsIds') || '[]');
+      const today = new Date().toISOString().split('T')[0];
+
+      // Find unread news that should be shown today
+      const activeNews = data.news.filter(news => {
+        // Check if already read (only if showOnce is true)
+        if (news.showOnce && readIds.includes(news.id)) return false;
+
+        // Check date range
+        if (news.startDate && news.startDate > today) return false;
+        if (news.endDate && news.endDate < today) return false;
+
+        return true;
+      });
+
+      if (activeNews.length > 0) {
+        // Show the highest priority news
+        const priorityOrder = { high: 0, medium: 1, low: 2 };
+        activeNews.sort((a, b) => {
+          const aPriority = priorityOrder[a.priority] ?? 1;
+          const bPriority = priorityOrder[b.priority] ?? 1;
+          return aPriority - bPriority;
+        });
+
+        setCurrentNews(activeNews[0]);
+      }
+    } catch (err) {
+      console.error('Error checking news:', err);
+    }
+  }
+
+  function handleCloseNews() {
+    if (currentNews) {
+      // Mark as read
+      const readIds = JSON.parse(localStorage.getItem('readNewsIds') || '[]');
+      if (!readIds.includes(currentNews.id)) {
+        readIds.push(currentNews.id);
+        localStorage.setItem('readNewsIds', JSON.stringify(readIds));
+      }
+    }
+    setCurrentNews(null);
+  }
 
 
   // 認証状態（B案：未ログインでも画面に入れる）アウト（localStorage をクリアしてログインへ）
@@ -2408,13 +2468,21 @@ export default function App() {
                   ANALYZING
                 </div>
                 <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 500 }}>
-                  AIがハンドを解析しています...
+                  AIが最適な解説内容を生成中
                 </div>
               </div>
             </div>
           </div>
         )
       }
+
+      {/* ===== News Modal ===== */}
+      {currentNews && (
+        <NewsModal
+          news={currentNews}
+          onClose={handleCloseNews}
+        />
+      )}
 
     </>
   );
