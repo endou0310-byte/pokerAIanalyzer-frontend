@@ -187,10 +187,13 @@ export default function ResultModal({
         shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text + url)}`;
         break;
       case 'discord':
-        // Discord doesn't have a web share intent like others, just copy details
-        navigator.clipboard.writeText(`${text}\n${url}`);
-        alert('共有用テキストをコピーしました！Discordに貼り付けてください。');
-        break;
+        // Discord: Copy text -> Open App
+        navigator.clipboard.writeText(`${text}\n${url}`).then(() => {
+          alert('共有用テキストをコピーしました！\nDiscordアプリが開きますので、貼り付けて投稿してください。');
+          // Try to open Discord app
+          window.open('discord://', '_blank');
+        });
+        return;
       case 'facebook':
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
         break;
@@ -199,7 +202,7 @@ export default function ResultModal({
     }
 
     if (shareUrl) {
-      window.open(shareUrl, '_blank', 'width=600,height=400');
+      window.open(shareUrl, '_blank');
     }
   };
 
