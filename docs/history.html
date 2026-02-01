@@ -1212,8 +1212,8 @@ if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
            summaryStr = currentAnalysisText.replace(/[#*`]/g, '').replace(/\n+/g, ' ').trim();
         }
 
-        if (summaryStr.length > 90) {
-          summaryStr = summaryStr.substring(0, 90) + '...';
+        if (summaryStr.length > 80) {
+          summaryStr = summaryStr.substring(0, 80) + '...';
         }
         
         if (summaryStr && summaryStr !== "解析本文が保存されていません。") {
@@ -1233,7 +1233,7 @@ if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
       return {
         text,
         url,
-        hashtags: 'PokerAnalyzer,ポーカー,GTO,戦略分析'
+        hashtags: 'PokerAnalyzer,ポーカー'
       };
     }
 
@@ -1311,13 +1311,13 @@ if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
           shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text + url)}`;
           break;
         case 'discord':
-          navigator.clipboard.writeText(`${text}\n${url}`).then(() => {
-            alert('共有用テキストをコピーしました！\nDiscordアプリが開きますので、貼り付けて投稿してください。');
-            window.open('discord://', '_blank');
-          });
+          navigator.clipboard.writeText(`${text}\n${url}`).catch(e => console.error(e));
+          // Instant redirect to app scheme
+          window.location.href = 'discord://';
           return;
         case 'facebook':
-          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+          navigator.clipboard.writeText(`${text}\n${url}`).catch(e => console.error(e));
+          shareUrl = `https://www.facebook.com`;
           break;
         default:
           break;
