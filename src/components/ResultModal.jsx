@@ -102,9 +102,10 @@ export default function ResultModal({
     // Try Web Share API first (mobile)
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
       try {
+        const { text } = generateShareText();
         await navigator.share({
           title: 'PokerAnalyzer - ハンド解析結果',
-          text: 'AIによるポーカー戦略分析',
+          text: text,
           url: 'https://pokeranalyzer.jp',
           files: [file]
         });
@@ -122,6 +123,44 @@ export default function ResultModal({
     setIsSharing(false);
   };
 
+  // Generate share text based on hand data
+  const generateShareText = () => {
+    if (!snapshot) {
+      return {
+        text: 'PokerAnalyzerでハンド解析！\nAIによる戦略分析を体験 🎯\n\n',
+        hashtags: 'PokerAnalyzer,ポーカー,GTO'
+      };
+    }
+
+    const parts = [];
+
+    // Hand
+    if (snapshot.heroHand && snapshot.heroHand.length === 2) {
+      const handStr = snapshot.heroHand.map(c => c.rank + c.suit).join('');
+      parts.push(`🃏 Hand: ${handStr}`);
+    }
+
+    // Position
+    if (snapshot.heroPosition) {
+      parts.push(`📍 Position: ${snapshot.heroPosition}`);
+    }
+
+    // Board
+    if (snapshot.board && snapshot.board.length > 0) {
+      const boardStr = snapshot.board.map(c => c.rank + c.suit).join(' ');
+      parts.push(`🎯 Board: ${boardStr}`);
+    }
+
+    const text = parts.length > 0
+      ? `PokerAnalyzerでハンド解析！\n\n${parts.join('\n')}\n\n`
+      : 'PokerAnalyzerでハンド解析！\nAIによる戦略分析を体験 🎯\n\n';
+
+    return {
+      text,
+      hashtags: 'PokerAnalyzer,ポーカー,GTO,戦略分析'
+    };
+  };
+
   // Share to specific SNS
   const shareToSNS = async (platform) => {
     if (!shareImageUrl) {
@@ -136,9 +175,8 @@ export default function ResultModal({
       setShareImageUrl(screenshot.url);
     }
 
-    const text = 'PokerAnalyzerでハンド解析！\nAIによる戦略分析を体験 🎯\n\n';
+    const { text, hashtags } = generateShareText();
     const url = 'https://pokeranalyzer.jp';
-    const hashtags = 'PokerAnalyzer,ポーカー,GTO';
 
     // Download image first
     const a = document.createElement('a');

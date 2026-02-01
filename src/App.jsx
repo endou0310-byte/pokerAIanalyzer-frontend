@@ -2468,7 +2468,7 @@ export default function App() {
                   ANALYZING
                 </div>
                 <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 500 }}>
-                  AIが最適な解説内容を生成中
+                  AIが最適な解説内容を生成中...
                 </div>
               </div>
             </div>
