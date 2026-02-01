@@ -96,26 +96,19 @@ export default function ResultModal({
     if (isMobile && navigator.share) {
       try {
         // Construct full text with hashtags for native share
-        // Note: Twitter(X) via Web Share might duplicate text if we aren't careful, 
-        // but native share sheet handles intents well mostly.
         const tags = hashtags.split(',').map(t => `#${t}`).join(' ');
         await navigator.share({
           title: 'PokerAnalyzer',
           text: `${text}\n${tags}`,
           url: url
         });
-        return; // Success, do not show custom menu
       } catch (err) {
         if (err.name !== 'AbortError') {
           console.error('Share failed:', err);
-        } else {
-          // User canceled, do nothing
-          return;
         }
-        // If error (not abort) or API fails, fall through to custom menu?
-        // Actually for mobile, share sheet failure usually means cancel.
-        // Let's fallback only if API is missing.
       }
+      // Always return on mobile (even if canceled/failed) to avoid showing custom UI
+      return;
     }
 
     // Default: Show custom share menu (PC or API unavailable)

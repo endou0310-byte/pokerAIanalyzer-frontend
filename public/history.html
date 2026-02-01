@@ -1036,36 +1036,16 @@ if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
     // -------- SNS Share Functionality --------
     let currentHandId = null;
     let currentSnapshot = null;
-    let shareImageUrl = null;
-    let isSharing = false;
-
+    let currentAnalysisText = null; // Added to store analysis text for sharing
+    
+    // UI Elements
     const snsMenuOverlay = document.getElementById('snsMenuOverlay');
-    const shareBtn = document.getElementById('shareBtn');
-    const snsCancel = document.getElementById('snsCancel');
-
-    // Generate screenshot
-    async function generateScreenshot() {
-      if (!modalBody) return null;
-      
-      try {
-        const canvas = await html2canvas(modalBody, {
-          backgroundColor: '#0b121e',
-          scale: 2,
-          logging: false,
-          useCORS: true,
-        });
-        
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-        const url = URL.createObjectURL(blob);
-        return { blob, url };
-      } catch (err) {
-        console.error('Screenshot generation error:', err);
-        return null;
-      }
-    }
-
-    // Generate share text
+    const snsCloseBtn = document.getElementById('snsCloseBtn');
+    const snsCopyBtn = document.getElementById('snsCopyBtn');
+    
+    // Generate share text (Latest logic: 45 chars summary, GTO tag)
     function generateShareText() {
+      // 1. Snapshot check
       if (!currentSnapshot) {
         return {
           text: 'PokerAnalyzerでハンド解析！\nAIによる戦略分析を体験 🎯\n\n',
@@ -1076,34 +1056,66 @@ if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
 
       const parts = [];
       
-      // Hand
+      // 2. Hand info
       if (currentSnapshot.hero && currentSnapshot.hero.cards && currentSnapshot.hero.cards.length === 2) {
-        const handStr = currentSnapshot.hero.cards.join(' ');
+        // Convert cards to symbols if needed, or stick to text
+        // Used in history list: convertCards returns HTML, here we probably want text or emojis?
+        // Let's use simple text representation or reuse simple converter
+        const handStr = currentSnapshot.hero.cards.map(c => {
+            const r = c.slice(0, -1);
+            const s = c.slice(-1).toLowerCase();
+            const sym = {s:'♠', h:'♥', d:'♦', c:'♣'}[s] || s;
+            return r + sym;
+        }).join(' ');
         parts.push(`🃏 Hand: ${handStr}`);
       }
       
-      // Position
+      // 3. Position
       if (currentSnapshot.hero && currentSnapshot.hero.seat) {
         parts.push(`📍 Position: ${currentSnapshot.hero.seat}`);
       }
       
-      // Board
+      // 4. Board
       if (currentSnapshot.board) {
         const boardCards = [];
-        if (currentSnapshot.board.FLOP) boardCards.push(...currentSnapshot.board.FLOP);
-        if (currentSnapshot.board.TURN) boardCards.push(...currentSnapshot.board.TURN);
-        if (currentSnapshot.board.RIVER) boardCards.push(...currentSnapshot.board.RIVER);
+        ['FLOP','TURN','RIVER'].forEach(stage => {
+            if (currentSnapshot.board[stage]) boardCards.push(...currentSnapshot.board[stage]);
+        });
         
         if (boardCards.length > 0) {
-          parts.push(`🎯 Board: ${boardCards.join(' ')}`);
+          const boardStr = boardCards.map(c => {
+              const r = c.slice(0, -1);
+              const s = c.slice(-1).toLowerCase();
+              const sym = {s:'♠', h:'♥', d:'♦', c:'♣'}[s] || s;
+              return r + sym;
+          }).join(' ');
+          parts.push(`🎯 Board: ${boardStr}`);
+        }
+      }
+
+      // 5. AI Analysis Summary
+      if (currentAnalysisText) {
+        // Simple extraction logic
+        const lines = currentAnalysisText.split('\n');
+        let summaryStr = "";
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('Part ')) continue;
+          summaryStr = trimmed.replace(/[#*`]/g, '');
+          break;
+        }
+        if (!summaryStr) summaryStr = currentAnalysisText.replace(/[#*`]/g, '').replace(/\n+/g, ' ').trim();
+        if (summaryStr.length > 45) summaryStr = summaryStr.substring(0, 45) + '...';
+        
+        if (summaryStr && summaryStr !== "解析本文が保存されていません。") {
+          parts.push(`\n🤖 AI: ${summaryStr}`);
         }
       }
 
       const text = parts.length > 0 
-        ? `PokerAnalyzerでハンド解析！\n\n${parts.join('\n')}\n\n`
+        ? `PokerAnalyzerでハンド解析！\n\n${parts.join('\n')}\n`
         : 'PokerAnalyzerでハンド解析！\nAIによる戦略分析を体験 🎯\n\n';
 
-      // Generate URL based on handId
       const url = currentHandId 
         ? `https://pokeranalyzer.jp/#/hand/${currentHandId}`
         : 'https://pokeranalyzer.jp';
@@ -1111,130 +1123,111 @@ if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
       return {
         text,
         url,
-        hashtags: 'PokerAnalyzer,ポーカー,GTO,戦略分析'
+        hashtags: 'PokerAnalyzer,ポーカー,GTO'
       };
     }
 
-    // Share button click
-    shareBtn.addEventListener('click', async () => {
-      if (isSharing) return;
-      
-      isSharing = true;
-      shareBtn.disabled = true;
-      shareBtn.style.opacity = '0.5';
-      
-      // Generate screenshot
-      const screenshot = await generateScreenshot();
-      if (!screenshot) {
-        alert('画像の生成に失敗しました');
-        isSharing = false;
-        shareBtn.disabled = false;
-        shareBtn.style.opacity = '1';
-        return;
-      }
-      
-      shareImageUrl = screenshot.url;
-      
-      // Check if Web Share API is available (mobile)
-      if (navigator.share && navigator.canShare?.({ files: [new File([screenshot.blob], 'poker-analysis.png', { type: 'image/png' })] })) {
-        try {
-          const { text, url } = generateShareText();
-          await navigator.share({
-            title: 'PokerAnalyzer - ハンド解析結果',
-            text: text,
-            url: url,
-            files: [new File([screenshot.blob], 'poker-analysis.png', { type: 'image/png' })]
-          });
+    // Share button click (Hybrid)
+    // Note: shareBtn is moved dynamically, but we can attach listener if element exists.
+    const shareBtnRef = document.getElementById('shareBtn');
+    if (shareBtnRef) {
+        shareBtnRef.addEventListener('click', async () => {
+          // Get current data
+          const { text, url, hashtags } = generateShareText();
           
-          if (shareImageUrl) URL.revokeObjectURL(shareImageUrl);
-          shareImageUrl = null;
-          isSharing = false;
-          shareBtn.disabled = false;
-          shareBtn.style.opacity = '1';
-          return;
-        } catch (err) {
-          if (err.name !== 'AbortError') {
-            console.error('Share failed:', err);
-          }
-        }
-      }
-      
-      // Desktop: Show SNS menu
-      snsMenuOverlay.style.display = 'flex';
-      isSharing = false;
-      shareBtn.disabled = false;
-      shareBtn.style.opacity = '1';
-    });
-
-    // SNS menu handlers
-    snsCancel.addEventListener('click', () => {
-      snsMenuOverlay.style.display = 'none';
-      if (shareImageUrl) {
-        URL.revokeObjectURL(shareImageUrl);
-        shareImageUrl = null;
-      }
-    });
-
-    snsMenuOverlay.addEventListener('click', (e) => {
-      if (e.target === snsMenuOverlay) {
-        snsMenuOverlay.style.display = 'none';
-        if (shareImageUrl) {
-          URL.revokeObjectURL(shareImageUrl);
-          shareImageUrl = null;
-        }
-      }
-    });
-
-    // Share to specific SNS
-    async function shareToSNS(platform) {
-      if (!shareImageUrl) return;
-      
-      const { text, url, hashtags } = generateShareText();
-      
-      // Download image first
-      const a = document.createElement('a');
-      a.href = shareImageUrl;
-      a.download = 'poker-analysis.png';
-      a.click();
-      
-      // Wait a moment then open SNS
-      setTimeout(() => {
-        let shareUrl = '';
-        
-        switch (platform) {
-          case 'twitter':
-            shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=${encodeURIComponent(hashtags)}`;
-            break;
-          case 'line':
-            shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text + url)}`;
-            break;
-          case 'discord':
-            alert('画像をダウンロードしました。Discordに直接投稿してください。');
-            snsMenuOverlay.style.display = 'none';
-            if (shareImageUrl) URL.revokeObjectURL(shareImageUrl);
-            shareImageUrl = null;
+          // Check if mobile
+          // IMPORTANT: Mobile check logic
+          const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+          if (isMobile && navigator.share) {
+            try {
+              const tags = hashtags.split(',').map(t => `#${t}`).join(' ');
+              await navigator.share({
+                title: 'PokerAnalyzer',
+                text: `${text}\n${tags}`,
+                url: url
+              });
+            } catch (err) {
+              if (err.name !== 'AbortError') console.error(err);
+            }
+            // Always return on mobile to prevent double UI
             return;
-          case 'facebook':
-            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-            break;
-          default:
-            break;
-        }
-        
-        if (shareUrl) {
-          window.open(shareUrl, '_blank', 'width=600,height=400');
-        }
-        
-        snsMenuOverlay.style.display = 'none';
-        if (shareImageUrl) URL.revokeObjectURL(shareImageUrl);
-        shareImageUrl = null;
-      }, 500);
+          }
+    
+          // Show Custom UI (PC or fallback)
+          const urlTextEl = document.getElementById('snsUrlText');
+          if (urlTextEl) urlTextEl.textContent = url;
+          if (snsMenuOverlay) snsMenuOverlay.style.display = 'flex';
+        });
     }
 
-    document.getElementById('snsTwitter').addEventListener('click', () => shareToSNS('twitter'));
-    document.getElementById('snsLine').addEventListener('click', () => shareToSNS('line'));
-    document.getElementById('snsDiscord').addEventListener('click', () => shareToSNS('discord'));
-    document.getElementById('snsFacebook').addEventListener('click', () => shareToSNS('facebook'));
+    // SNS menu handlers
+    function closeSnsMenu() {
+        if (snsMenuOverlay) snsMenuOverlay.style.display = 'none';
+    }
+
+    if (snsCloseBtn) snsCloseBtn.addEventListener('click', closeSnsMenu);
+    
+    if (snsMenuOverlay) {
+        snsMenuOverlay.addEventListener('click', (e) => {
+          if (e.target === snsMenuOverlay) closeSnsMenu();
+        });
+    }
+
+    // SNS Platform Handlers (Custom UI)
+    const snsHandlers = {
+        'snsTwitter': 'twitter',
+        'snsLine': 'line',
+        'snsDiscord': 'discord',
+        'snsFacebook': 'facebook'
+    };
+
+    Object.keys(snsHandlers).forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.addEventListener('click', () => {
+                const platform = snsHandlers[id];
+                const { text, url, hashtags } = generateShareText();
+                let shareUrl = '';
+
+                switch (platform) {
+                  case 'twitter':
+                    shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=${encodeURIComponent(hashtags)}`;
+                    break;
+                  case 'line':
+                    shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text + url)}`;
+                    break;
+                  case 'discord':
+                    // Try deep link first, then clipboard
+                    navigator.clipboard.writeText(`${text}\n${url}`).catch(() => {});
+                    window.location.href = 'discord://';
+                    // Fallback or just close
+                    closeSnsMenu();
+                    return;
+                  case 'facebook':
+                    // FB sharer doesn't support pre-filled text well, but let's copy it
+                    navigator.clipboard.writeText(`${text}\n${url}`).catch(() => {});
+                    shareUrl = `https://www.facebook.com`; 
+                    break;
+                }
+                
+                if (shareUrl) window.open(shareUrl, '_blank');
+                closeSnsMenu();
+            });
+        }
+    });
+
+    // Copy URL Button
+    if (snsCopyBtn) {
+        snsCopyBtn.addEventListener('click', () => {
+            const { url } = generateShareText();
+            navigator.clipboard.writeText(url).then(() => {
+                const originalText = snsCopyBtn.textContent;
+                snsCopyBtn.textContent = 'コピー完了!';
+                setTimeout(() => snsCopyBtn.textContent = originalText, 2000);
+            });
+        });
+    }
 
     // -------- HTML エスケープ --------
     function escapeHtml(str) {
