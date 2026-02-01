@@ -137,8 +137,26 @@ export default function ResultModal({
       parts.push(`🎯 Board: ${boardStr}`);
     }
 
+    // AI Analysis Summary
+    if (initialMd) {
+      // Simple extraction: Remove markdown symbols and take first line/sentence
+      let summary = initialMd
+        .replace(/[#*`]/g, '') // Remove markdown symbols
+        .replace(/\n+/g, ' ')  // Replace creating newlines with spaces
+        .trim();
+
+      // Take first 60 chars approx
+      if (summary.length > 60) {
+        summary = summary.substring(0, 60) + '...';
+      }
+
+      if (summary && summary !== "解析結果が見つかりません。") {
+        parts.push(`\n🤖 AI: ${summary}`);
+      }
+    }
+
     const text = parts.length > 0
-      ? `PokerAnalyzerでハンド解析！\n\n${parts.join('\n')}\n\n`
+      ? `PokerAnalyzerでハンド解析！\n\n${parts.join('\n')}\n`
       : 'PokerAnalyzerでハンド解析！\nAIによる戦略分析を体験 🎯\n\n';
 
     // Generate URL based on handId

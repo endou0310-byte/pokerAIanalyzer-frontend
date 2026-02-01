@@ -687,9 +687,12 @@
     let currentPage = 1;
 
     // タイトル編集用
-    let currentTitle = "";
     let currentEditingId = null;
+    let currentTitle = "";
     let titleEditing = false;
+    let currentHandId = null;
+    let currentSnapshot = null;
+    let currentAnalysisText = ""; // AI Analysis text for sharing
 
 
     modalClose.onclick = () => { modalOuter.style.display = "none"; };
@@ -955,6 +958,8 @@ renderHistoryPage();
           (h.markdown && typeof h.markdown === "string" && h.markdown.trim()) ||
           (h.evaluation && typeof h.evaluation === "string" && h.evaluation.trim()) ||
           "解析本文が保存されていません。";
+        
+        currentAnalysisText = analysisText;
 
         let html = "";
 
@@ -1121,8 +1126,6 @@ if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
     }
 
     // -------- SNS Share Functionality --------
-    let currentHandId = null;
-    let currentSnapshot = null;
     let shareImageUrl = null;
     let isSharing = false;
 
@@ -1189,8 +1192,26 @@ if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
         }
       }
 
-      const text = parts.length > 0 
-        ? `PokerAnalyzerでハンド解析！\n\n${parts.join('\n')}\n\n`
+      // AI Analysis Summary
+      if (currentAnalysisText) {
+        // Simple extraction: Remove markdown symbols and take first line/sentence
+        let summary = currentAnalysisText
+          .replace(/[#*`]/g, '') // Remove markdown symbols
+          .replace(/\n+/g, ' ')  // Replace creating newlines with spaces
+          .trim();
+        
+        // Take first 60 chars approx
+        if (summary.length > 60) {
+          summary = summary.substring(0, 60) + '...';
+        }
+        
+        if (summary && summary !== "解析本文が保存されていません。") {
+          parts.push(`\n🤖 AI: ${summary}`);
+        }
+      }
+
+      const text = parts.length > 0
+        ? `PokerAnalyzerでハンド解析！\n\n${parts.join('\n')}\n`
         : 'PokerAnalyzerでハンド解析！\nAIによる戦略分析を体験 🎯\n\n';
 
       // Generate URL based on handId
