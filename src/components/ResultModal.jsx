@@ -173,7 +173,7 @@ export default function ResultModal({
 
     // Generate URL based on handId
     const url = handId
-      ? `https://pokeranalyzer.jp/hand/${handId}`
+      ? `https://pokeranalyzer.jp/#/hand/${handId}`
       : 'https://pokeranalyzer.jp';
 
     return {
