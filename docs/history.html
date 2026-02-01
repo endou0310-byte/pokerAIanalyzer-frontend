@@ -1238,36 +1238,38 @@ if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
     }
 
     // Share button click
+    // Share button click (Hybrid: Web Share API on Mobile, Custom UI on PC)
     shareBtn.addEventListener('click', async () => {
-      if (isSharing) return;
+      // Get current data
+      const { text, url, hashtags } = generateShareText();
       
-      isSharing = true;
-      shareBtn.disabled = true;
-      shareBtn.style.opacity = '0.5';
-      
-      // Generate screenshot
-      const screenshot = await generateScreenshot();
-      if (!screenshot) {
-        alert('画像の生成に失敗しました');
-        isSharing = false;
-        shareBtn.disabled = false;
-        shareBtn.style.opacity = '1';
-        return;
+      // Check if mobile
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+      if (isMobile && navigator.share) {
+        try {
+          const tags = hashtags.split(',').map(t => `#${t}`).join(' ');
+          await navigator.share({
+            title: 'PokerAnalyzer',
+            text: `${text}\n${tags}`,
+            url: url
+          });
+          return;
+        } catch (err) {
+          if (err.name !== 'AbortError') console.error(err);
+          // If canceled, do nothing
+          else return;
+        }
       }
+
+      // Show Custom UI (PC or fallback)
+      // Custom Share Menu Logic
+      const currentData = generateShareText();
+      const urlTextEl = document.getElementById('snsUrlText');
+      if (urlTextEl) urlTextEl.textContent = currentData.url;
       
-      shareImageUrl = screenshot.url;
-      
-      // Check if Web Share API is available (mobile) -> DISABLED to show custom UI
-      // if (navigator.share && navigator.canShare?.({ files: [new File([screenshot.blob], 'poker-analysis.png', { type: 'image/png' })] })) { ... }
-      
-      // Desktop: Show SNS menu
-      const { url } = generateShareText();
-      document.getElementById('snsUrlText').textContent = url;
-      
-      snsMenuOverlay.style.display = 'flex';
-      isSharing = false;
-      shareBtn.disabled = false;
-      shareBtn.style.opacity = '1';
+      const overlay = document.getElementById('snsMenuOverlay');
+      if (overlay) overlay.style.display = 'flex';
     });
 
     // SNS menu handlers
