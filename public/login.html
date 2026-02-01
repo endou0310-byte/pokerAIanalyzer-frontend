@@ -156,6 +156,50 @@
     }
     .fineprint a { color: var(--accent-cyan); text-decoration: none; }
 
+    /* Custom Google Button (Fallback) */
+    .google-btn-wrapper {
+      position: relative;
+      width: 250px;
+      height: 44px;
+      margin: 0 auto;
+    }
+    
+    .custom-google-btn {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #ffffff;
+      border: 1px solid #747775;
+      border-radius: 99px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      z-index: 1;
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: #1f1f1f;
+      transition: background 0.2s;
+    }
+    .custom-google-btn:hover {
+      background: #f8faff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    
+    /* Official button overlay (Invisible) */
+    #google-login-button {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      opacity: 0.1; /* Keep slightly visible for debugging, or 0.01 for prod. LINE browser might need specific handling so 0.01 is safer than 0 */
+      opacity: 0.01;
+      z-index: 10;
+      overflow: hidden;
+    }
+
     /* Steps */
     .steps-row {
       display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
@@ -241,7 +285,16 @@
           <p class="login-desc">Googleアカウントですぐに始められます</p>
         </div>
         
-        <div id="google-login-button" style="display:flex; justify-content:center;"></div>
+        <div class="google-btn-wrapper">
+          <!-- Fallback/Custom Button -->
+          <button class="custom-google-btn">
+            <img src="img/google-g.svg" alt="G" style="width:20px; height:20px;">
+            <span>Googleでログイン</span>
+          </button>
+          
+          <!-- Official Button (Overlay) -->
+          <div id="google-login-button"></div>
+        </div>
         <div id="login-error" style="color:#ff7b7b; font-size:12px; display:none; background:rgba(255,0,0,0.1); padding:8px; border-radius:8px;"></div>
 
         <div class="fineprint">
