@@ -83,29 +83,46 @@ export default function ResultModal({
     }
   };
 
-  // Handle share - always show custom SNS menu
+  // Handle generic share (Web Share API or download)
+  // Handle share (Hybrid: Web Share API on Mobile, Custom UI on PC)
   const handleShare = async () => {
-    setIsSharing(true);
+    // Generate latest share text/url
+    const { text, url, hashtags } = generateShareText();
 
-    const screenshot = await generateScreenshot();
-    if (!screenshot) {
-      alert('画像の生成に失敗しました');
-      setIsSharing(false);
-      return;
+    // Check if mobile device
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    // Use Web Share API on mobile if available
+    if (isMobile && navigator.share) {
+      try {
+        // Construct full text with hashtags for native share
+        // Note: Twitter(X) via Web Share might duplicate text if we aren't careful, 
+        // but native share sheet handles intents well mostly.
+        const tags = hashtags.split(',').map(t => `#${t}`).join(' ');
+        await navigator.share({
+          title: 'PokerAnalyzer',
+          text: `${text}\n${tags}`,
+          url: url
+        });
+        return; // Success, do not show custom menu
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error('Share failed:', err);
+        } else {
+          // User canceled, do nothing
+          return;
+        }
+        // If error (not abort) or API fails, fall through to custom menu?
+        // Actually for mobile, share sheet failure usually means cancel.
+        // Let's fallback only if API is missing.
+      }
     }
 
-    const { blob, url } = screenshot;
-    setShareImageUrl(url);
-
-    // Always show custom SNS menu (not using Web Share API)
+    // Default: Show custom share menu (PC or API unavailable)
+    setIsSharing(true);
+    setShareImageUrl(null); // No screenshot needed for text link share
     setShowShareMenu(true);
     setIsSharing(false);
-  };
-
-  // Format card with suit symbols
-  const formatCard = (card) => {
-    const suitSymbols = { s: '♠', h: '♥', d: '♦', c: '♣' };
-    return card.rank + suitSymbols[card.suit];
   };
 
   // Generate share text based on hand data
@@ -120,9 +137,9 @@ export default function ResultModal({
 
     const parts = [];
 
-    // Hand - with suit symbols
+    // Hand
     if (snapshot.heroHand && snapshot.heroHand.length === 2) {
-      const handStr = snapshot.heroHand.map(c => formatCard(c)).join(' ');
+      const handStr = snapshot.heroHand.map(c => c.rank + c.suit).join('');
       parts.push(`🃏 Hand: ${handStr}`);
     }
 
@@ -131,97 +148,81 @@ export default function ResultModal({
       parts.push(`📍 Position: ${snapshot.heroPosition}`);
     }
 
-    // Board - with suit symbols
+    // Board
     if (snapshot.board && snapshot.board.length > 0) {
-      const boardStr = snapshot.board.map(c => formatCard(c)).join(' ');
+      const boardStr = snapshot.board.map(c => c.rank + c.suit).join(' ');
       parts.push(`🎯 Board: ${boardStr}`);
     }
 
-    // AI Analysis Summary
-    if (initialMd) {
-      // Improved extraction: Skip headers and find first meaningful paragraph
-      const lines = initialMd.split('\n');
-      let summaryStr = "";
-
-      for (const line of lines) {
-        const trimmed = line.trim();
-        // Skip empty lines, headers (#), and "Part X:" titles
-        if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('Part ')) {
-          continue;
-        }
-        // Found content
-        summaryStr = trimmed.replace(/[#*`]/g, '');
-        break;
-      }
-
-      if (!summaryStr) {
-        summaryStr = initialMd.replace(/[#*`]/g, '').replace(/\n+/g, ' ').trim();
-      }
-
-      if (summaryStr.length > 45) {
-        summaryStr = summaryStr.substring(0, 45) + '...';
-      }
-
-      if (summaryStr && summaryStr !== "解析結果が見つかりません。") {
-        parts.push(`\n🤖 AI: ${summaryStr}`);
-      }
-    }
-
     const text = parts.length > 0
-      ? `PokerAnalyzerでハンド解析！\n\n${parts.join('\n')}\n`
+      ? `PokerAnalyzerでハンド解析！\n\n${parts.join('\n')}\n\n`
       : 'PokerAnalyzerでハンド解析！\nAIによる戦略分析を体験 🎯\n\n';
 
     // Generate URL based on handId
     const url = handId
-      ? `https://pokeranalyzer.jp/#/hand/${handId}`
+      ? `https://pokeranalyzer.jp/hand/${handId}`
       : 'https://pokeranalyzer.jp';
 
     return {
       text,
       url,
-      hashtags: 'PokerAnalyzer,ポーカー,GTO'
+      hashtags: 'PokerAnalyzer,ポーカー,GTO,戦略分析'
     };
   };
 
   // Share to specific SNS
-  // Share to specific SNS
-  const shareToSNS = (platform) => {
-    // Generate share content (always available from snapshot)
+  const shareToSNS = async (platform) => {
+    if (!shareImageUrl) {
+      // Generate screenshot if not already done
+      setIsSharing(true);
+      const screenshot = await generateScreenshot();
+      if (!screenshot) {
+        alert('画像の生成に失敗しました');
+        setIsSharing(false);
+        return;
+      }
+      setShareImageUrl(screenshot.url);
+    }
+
     const { text, url, hashtags } = generateShareText();
 
-    let shareUrl = '';
+    // Download image first
+    const a = document.createElement('a');
+    a.href = shareImageUrl;
+    a.download = 'poker-analysis.png';
+    a.click();
 
-    switch (platform) {
-      case 'twitter':
-        shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=${encodeURIComponent(hashtags)}`;
-        break;
-      case 'line':
-        shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text + url)}`;
-        break;
-      case 'discord':
-        // Discord: Copy text -> Open App immediately (no alert to avoid blocking)
-        navigator.clipboard.writeText(`${text}\n${url}`).catch(() => { }); // Fire and forget
-        // Try to open Discord app using URL scheme
-        // Using location.href is often more effective for deep links on mobile than window.open
-        window.location.href = 'discord://';
+    // Wait a moment then open SNS
+    setTimeout(() => {
+      let shareUrl = '';
 
-        // Fallback or PC: If app doesn't open, user stays on page. 
-        // We could open web version in new tab as backup but that might be annoying if app opens.
-        // Let's just show a non-blocking toast/message if possible, or nothing.
-        return;
-      case 'facebook':
-        // Facebook: Copy text -> Open Facebook (User manually pastes)
-        navigator.clipboard.writeText(`${text}\n${url}`).catch(() => { });
-        // Open Facebook so user can paste
-        shareUrl = `https://www.facebook.com`;
-        break;
-      default:
-        break;
-    }
+      switch (platform) {
+        case 'twitter':
+          shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=${encodeURIComponent(hashtags)}`;
+          break;
+        case 'line':
+          shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text + url)}`;
+          break;
+        case 'discord':
+          // Discord doesn't have a direct share URL, so just download
+          alert('画像をダウンロードしました。Discordに直接投稿してください。');
+          setShowShareMenu(false);
+          setIsSharing(false);
+          return;
+        case 'facebook':
+          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+          break;
+        default:
+          break;
+      }
 
-    if (shareUrl) {
-      window.open(shareUrl, '_blank');
-    }
+      if (shareUrl) {
+        window.open(shareUrl, '_blank', 'width=600,height=400');
+      }
+
+      setShowShareMenu(false);
+      setIsSharing(false);
+    }, 500);
   };
 
   const [q, setQ] = useState("");
@@ -474,203 +475,85 @@ export default function ResultModal({
 
         {/* Action Buttons */}
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", flexWrap: "wrap" }}>
-          {/* SNS Share Menu - YouTube Style */}
+          {/* SNS Share Menu */}
           {showShareMenu && (
             <div style={{
-              position: "fixed",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              top: 0, // Cover entire screen
-              background: "rgba(0,0,0,0.6)", // Dim background
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 99999 // Highest priority
-            }} onClick={() => setShowShareMenu(false)}>
-              <div
-                onClick={(e) => e.stopPropagation()}
-                style={{
-                  width: "min(500px, 90vw)",
-                  background: "#212121", // YouTube Dark bg color
-                  color: "#fff",
-                  borderRadius: 16,
-                  padding: "20px 24px",
-                  boxShadow: "0 24px 38px 3px rgba(0,0,0,0.14), 0 9px 46px 8px rgba(0,0,0,0.12)",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 24,
-                  position: "relative"
-                }}
-              >
-                {/* Header */}
-                <div style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center"
-                }}>
-                  <div style={{ fontSize: 18, fontWeight: 500 }}>共有</div>
-                  <button
-                    onClick={() => setShowShareMenu(false)}
-                    style={{
-                      background: "transparent",
-                      border: "none",
-                      color: "#aaa",
-                      fontSize: 24,
-                      cursor: "pointer",
-                      padding: 4,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center"
-                    }}
-                  >
-                    ×
-                  </button>
-                </div>
-
-                {/* Icons Row */}
-                <div style={{
-                  display: "flex",
-                  gap: 24,
-                  overflowX: "auto",
-                  paddingBottom: 8,
-                  justifyContent: "flex-start" // Left align to allow scroll if needed
-                }}>
-                  {/* Twitter / X */}
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, minWidth: 60 }}>
-                    <button
-                      onClick={() => shareToSNS('twitter')}
-                      style={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: "50%",
-                        background: "#000",
-                        border: "1px solid #333",
-                        color: "#fff",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        cursor: "pointer",
-                        padding: 0,
-                        overflow: "hidden"
-                      }}
-                    >
-                      <img src="/img/logo.svg" alt="X" style={{ width: "30px", height: "30px", objectFit: "contain" }} />
-                    </button>
-                    <span style={{ fontSize: 12, color: "#aaa" }}>X</span>
-                  </div>
-
-                  {/* LINE */}
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, minWidth: 60 }}>
-                    <button
-                      onClick={() => shareToSNS('line')}
-                      style={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: "50%",
-                        background: "#fff", // White bg for colored icon
-                        border: "none",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        cursor: "pointer",
-                        padding: 0,
-                        overflow: "hidden"
-                      }}
-                    >
-                      <img src="/img/icons8-line-96.svg" alt="LINE" style={{ width: "60px", height: "60px", objectFit: "cover" }} />
-                    </button>
-                    <span style={{ fontSize: 12, color: "#aaa" }}>LINE</span>
-                  </div>
-
-                  {/* Discord */}
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, minWidth: 60 }}>
-                    <button
-                      onClick={() => shareToSNS('discord')}
-                      style={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: "50%",
-                        background: "#fff", // White bg for colored icon
-                        border: "none",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        cursor: "pointer",
-                        padding: 0,
-                        overflow: "hidden"
-                      }}
-                    >
-                      <img src="/img/icons8-discordの新しいロゴ-96.svg" alt="Discord" style={{ width: "60px", height: "60px", objectFit: "cover" }} />
-                    </button>
-                    <span style={{ fontSize: 12, color: "#aaa" }}>Discord</span>
-                  </div>
-
-                  {/* Facebook */}
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, minWidth: 60 }}>
-                    <button
-                      onClick={() => shareToSNS('facebook')}
-                      style={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: "50%",
-                        background: "#fff", // White bg for colored icon
-                        border: "none",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        cursor: "pointer",
-                        padding: 0,
-                        overflow: "hidden"
-                      }}
-                    >
-                      <img src="/img/2021_Facebook_icon.svg" alt="Facebook" style={{ width: "60px", height: "60px", objectFit: "cover" }} />
-                    </button>
-                    <span style={{ fontSize: 12, color: "#aaa" }}>Facebook</span>
-                  </div>
-                </div>
-
-                {/* URL Copy Section */}
-                <div style={{
-                  background: "#121212",
-                  border: "1px solid #333",
-                  borderRadius: 8,
-                  padding: "8px 8px 8px 12px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12
-                }}>
-                  <div style={{
-                    flex: 1,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                    color: "#3ea6ff",
-                    fontSize: 14
-                  }}>
-                    {generateShareText().url}
-                  </div>
-                  <button
-                    onClick={() => {
-                      const url = generateShareText().url;
-                      navigator.clipboard.writeText(url);
-                      alert("URLをコピーしました！");
-                    }}
-                    style={{
-                      background: "#3ea6ff",
-                      color: "#0f0f0f",
-                      border: "none",
-                      borderRadius: 18,
-                      padding: "8px 16px",
-                      fontSize: 14,
-                      fontWeight: 600,
-                      cursor: "pointer"
-                    }}
-                  >
-                    コピー
-                  </button>
-                </div>
-
+              position: "absolute",
+              bottom: 60,
+              right: 24,
+              background: "#1e293b",
+              border: "1px solid #334155",
+              borderRadius: 12,
+              padding: 16,
+              boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
+              zIndex: 100,
+              minWidth: 200
+            }}>
+              <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 12 }}>共有先を選択</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <button
+                  className="btn"
+                  onClick={() => shareToSNS('twitter')}
+                  style={{
+                    width: "100%",
+                    justifyContent: "flex-start",
+                    background: "#1DA1F2",
+                    border: "none",
+                    color: "#fff"
+                  }}
+                >
+                  <span style={{ marginRight: 8 }}>𝕏</span> X (Twitter)
+                </button>
+                <button
+                  className="btn"
+                  onClick={() => shareToSNS('line')}
+                  style={{
+                    width: "100%",
+                    justifyContent: "flex-start",
+                    background: "#00B900",
+                    border: "none",
+                    color: "#fff"
+                  }}
+                >
+                  <span style={{ marginRight: 8 }}>💬</span> LINE
+                </button>
+                <button
+                  className="btn"
+                  onClick={() => shareToSNS('discord')}
+                  style={{
+                    width: "100%",
+                    justifyContent: "flex-start",
+                    background: "#5865F2",
+                    border: "none",
+                    color: "#fff"
+                  }}
+                >
+                  <span style={{ marginRight: 8 }}>🎮</span> Discord
+                </button>
+                <button
+                  className="btn"
+                  onClick={() => shareToSNS('facebook')}
+                  style={{
+                    width: "100%",
+                    justifyContent: "flex-start",
+                    background: "#1877F2",
+                    border: "none",
+                    color: "#fff"
+                  }}
+                >
+                  <span style={{ marginRight: 8 }}>📘</span> Facebook
+                </button>
+                <button
+                  className="btn"
+                  onClick={() => setShowShareMenu(false)}
+                  style={{
+                    width: "100%",
+                    marginTop: 4,
+                    fontSize: 12
+                  }}
+                >
+                  キャンセル
+                </button>
               </div>
             </div>
           )}
