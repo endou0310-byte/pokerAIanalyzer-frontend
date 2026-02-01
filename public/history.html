@@ -416,117 +416,60 @@
       filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.5)); 
     }
 
-    /* SNS Share Menu - YouTube Style */
+    /* SNS Share Menu */
     .sns-menu-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 99999;
+      z-index: 2000;
     }
 
     .sns-menu {
-      width: min(500px, 90vw);
-      background: #212121;
+      background: linear-gradient(180deg, rgba(16, 26, 41, 0.95), rgba(8, 14, 24, 0.98));
+      border: 1px solid rgba(100, 149, 237, 0.25);
       border-radius: 16px;
-      padding: 20px 24px;
-      box-shadow: 0 24px 38px 3px rgba(0,0,0,0.14), 0 9px 46px 8px rgba(0,0,0,0.12);
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      color: #fff;
-      position: relative;
+      padding: 20px;
+      min-width: 280px;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.9);
     }
 
-    .sns-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .sns-header h3 {
-      font-size: 18px;
-      font-weight: 500;
-      margin: 0;
+    .sns-menu h3 {
+      margin: 0 0 16px;
+      font-size: 16px;
       color: #fff;
+      text-align: center;
     }
 
-    .sns-close {
-      background: transparent;
-      border: none;
-      color: #aaa;
-      font-size: 24px;
+    .sns-menu button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-size: 14px;
       cursor: pointer;
-      padding: 4px;
+      transition: all 0.2s;
       display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .sns-icons-row {
-      display: flex;
-      gap: 24px;
-      overflow-x: auto;
-      padding-bottom: 8px;
-    }
-
-    .sns-item {
-      display: flex;
-      flex-direction: column;
       align-items: center;
       gap: 8px;
-      min-width: 60px;
-    }
-
-    .sns-icon-btn {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: none;
-      color: #fff;
-      font-size: 28px;
-      display: flex;
-      align-items: center;
       justify-content: center;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-    .sns-icon-btn:hover { opacity: 0.8; }
-
-    .sns-label {
-      font-size: 12px;
-      color: #aaa;
     }
 
-    .sns-url-area {
-      background: #121212;
-      border: 1px solid #333;
-      border-radius: 8px;
-      padding: 8px 8px 8px 12px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    
-    .sns-url-text {
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      color: #3ea6ff;
-      font-size: 14px;
+    .sns-menu button:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
     }
 
-    .sns-copy-btn {
-      background: #3ea6ff;
-      color: #0f0f0f;
-      border: none;
-      border-radius: 18px;
-      padding: 8px 16px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
+    .sns-menu button:last-child {
+      margin-bottom: 0;
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.3);
     }
 
   </style>
@@ -599,49 +542,15 @@
     </div>
   </div>
 
-  <!-- SNS Share Menu (YouTube Style) -->
+  <!-- SNS Share Menu -->
   <div id="snsMenuOverlay" class="sns-menu-overlay">
-    <div class="sns-menu" onclick="event.stopPropagation()">
-      <div class="sns-header">
-        <h3>共有</h3>
-        <button id="snsCloseBtn" class="sns-close">×</button>
-      </div>
-
-      <div class="sns-icons-row">
-        <!-- Twitter/X -->
-        <div class="sns-item">
-          <button id="snsTwitter" class="sns-icon-btn" style="background:#000; border:1px solid #333; overflow:hidden;">
-            <img src="/img/logo.svg" alt="X" style="width:30px; height:30px; object-fit:contain;" />
-          </button>
-          <span class="sns-label">X</span>
-        </div>
-        <!-- LINE -->
-        <div class="sns-item">
-          <button id="snsLine" class="sns-icon-btn" style="background:#fff; border:none; overflow:hidden;">
-            <img src="/img/icons8-line-96.svg" alt="LINE" style="width:60px; height:60px; object-fit:cover;" />
-          </button>
-          <span class="sns-label">LINE</span>
-        </div>
-        <!-- Discord -->
-        <div class="sns-item">
-          <button id="snsDiscord" class="sns-icon-btn" style="background:#fff; border:none; overflow:hidden;">
-            <img src="/img/icons8-discordの新しいロゴ-96.svg" alt="Discord" style="width:60px; height:60px; object-fit:cover;" />
-          </button>
-          <span class="sns-label">Discord</span>
-        </div>
-        <!-- Facebook -->
-        <div class="sns-item">
-          <button id="snsFacebook" class="sns-icon-btn" style="background:#fff; border:none; overflow:hidden;">
-            <img src="/img/2021_Facebook_icon.svg" alt="Facebook" style="width:60px; height:60px; object-fit:cover;" />
-          </button>
-          <span class="sns-label">Facebook</span>
-        </div>
-      </div>
-
-      <div class="sns-url-area">
-        <div id="snsUrlText" class="sns-url-text">https://pokeranalyzer.jp</div>
-        <button id="snsCopyBtn" class="sns-copy-btn">コピー</button>
-      </div>
+    <div class="sns-menu">
+      <h3>📤 SNSでシェア</h3>
+      <button id="snsTwitter">𝕏 (Twitter) でシェア</button>
+      <button id="snsLine">LINE でシェア</button>
+      <button id="snsDiscord">Discord でシェア</button>
+      <button id="snsFacebook">Facebook でシェア</button>
+      <button id="snsCancel">キャンセル</button>
     </div>
   </div>
 
@@ -687,27 +596,15 @@
     let currentPage = 1;
 
     // タイトル編集用
-    let currentEditingId = null;
     let currentTitle = "";
+    let currentEditingId = null;
     let titleEditing = false;
-    let currentHandId = null;
-    let currentSnapshot = null;
-    let currentAnalysisText = ""; // AI Analysis text for sharing
 
 
     modalClose.onclick = () => { modalOuter.style.display = "none"; };
     modalOuter.onclick = (e) => {
       if (e.target === modalOuter) modalOuter.style.display = "none";
     };
-
-    // Helper for pure text card conversion (for share text)
-    function convertCardText(card) {
-      if (!card || card.length < 2) return card;
-      const rank = card.slice(0, card.length - 1);
-      const suit = card.slice(-1).toLowerCase();
-      const suitSymbols = { s: '♠', h: '♥', d: '♦', c: '♣' };
-      return rank + (suitSymbols[suit] || suit);
-    }
 
     // ===== カード変換ユーティリティ =====
     // 例: "Ah" -> "A♥"
@@ -958,8 +855,6 @@ renderHistoryPage();
           (h.markdown && typeof h.markdown === "string" && h.markdown.trim()) ||
           (h.evaluation && typeof h.evaluation === "string" && h.evaluation.trim()) ||
           "解析本文が保存されていません。";
-        
-        currentAnalysisText = analysisText;
 
         let html = "";
 
@@ -967,7 +862,12 @@ renderHistoryPage();
           html += `<p style="font-size:11px;color:#aaa;margin-bottom:6px;">${created}</p>`;
         }
 
-        html += `<div class="modal-section-title">解析結果</div>`;
+        html += `
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:0;">
+            <div class="modal-section-title" style="margin:0;">解析結果</div>
+            <div id="shareBtnContainer"></div>
+          </div>
+        `;
 
         // Markdown を HTML に変換（marked が利用可能なら使用）
         const analysisHtml =
@@ -998,6 +898,14 @@ if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
   html += `</div>`;
 }
         modalBody.innerHTML = html;
+        
+        // Move Share Button to Content Area
+        const shareBtn = document.getElementById('shareBtn');
+        const container = document.getElementById('shareBtnContainer');
+        if (shareBtn && container) {
+          container.appendChild(shareBtn);
+          shareBtn.style.display = 'flex'; // Ensure it's visible
+        }
         modalOuter.style.display = "flex";
       } catch (err) {
         console.error("openDetail error:", err);
@@ -1126,6 +1034,8 @@ if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
     }
 
     // -------- SNS Share Functionality --------
+    let currentHandId = null;
+    let currentSnapshot = null;
     let shareImageUrl = null;
     let isSharing = false;
 
@@ -1143,7 +1053,6 @@ if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
           scale: 2,
           logging: false,
           useCORS: true,
-          // ignoreElements: (element) => element.id === 'snsMenuOverlay' // Avoid capturing overlay if visible
         });
         
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
@@ -1169,8 +1078,7 @@ if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
       
       // Hand
       if (currentSnapshot.hero && currentSnapshot.hero.cards && currentSnapshot.hero.cards.length === 2) {
-        // Convert cards to symbols
-        const handStr = currentSnapshot.hero.cards.map(c => convertCardText(c)).join(' ');
+        const handStr = currentSnapshot.hero.cards.join(' ');
         parts.push(`🃏 Hand: ${handStr}`);
       }
       
@@ -1187,42 +1095,12 @@ if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
         if (currentSnapshot.board.RIVER) boardCards.push(...currentSnapshot.board.RIVER);
         
         if (boardCards.length > 0) {
-          const boardStr = boardCards.map(c => convertCardText(c)).join(' ');
-          parts.push(`🎯 Board: ${boardStr}`);
+          parts.push(`🎯 Board: ${boardCards.join(' ')}`);
         }
       }
 
-      // AI Analysis Summary
-      if (currentAnalysisText) {
-        // Improved extraction: Skip headers and find first meaningful paragraph
-        const lines = currentAnalysisText.split('\n');
-        let summaryStr = "";
-        
-        for (const line of lines) {
-          const trimmed = line.trim();
-          // Skip empty lines, headers (#), and "Part X:" titles
-          if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('Part ')) {
-            continue;
-          }
-          summaryStr = trimmed.replace(/[#*`]/g, '');
-          break;
-        }
-        
-        if (!summaryStr) {
-           summaryStr = currentAnalysisText.replace(/[#*`]/g, '').replace(/\n+/g, ' ').trim();
-        }
-
-        if (summaryStr.length > 45) {
-          summaryStr = summaryStr.substring(0, 45) + '...';
-        }
-        
-        if (summaryStr && summaryStr !== "解析本文が保存されていません。") {
-          parts.push(`\n🤖 AI: ${summaryStr}`);
-        }
-      }
-
-      const text = parts.length > 0
-        ? `PokerAnalyzerでハンド解析！\n\n${parts.join('\n')}\n`
+      const text = parts.length > 0 
+        ? `PokerAnalyzerでハンド解析！\n\n${parts.join('\n')}\n\n`
         : 'PokerAnalyzerでハンド解析！\nAIによる戦略分析を体験 🎯\n\n';
 
       // Generate URL based on handId
@@ -1233,102 +1111,124 @@ if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
       return {
         text,
         url,
-        hashtags: 'PokerAnalyzer,ポーカー,GTO'
+        hashtags: 'PokerAnalyzer,ポーカー,GTO,戦略分析'
       };
     }
 
     // Share button click
-    // Share button click (Hybrid: Web Share API on Mobile, Custom UI on PC)
     shareBtn.addEventListener('click', async () => {
-      // Get current data
-      const { text, url, hashtags } = generateShareText();
+      if (isSharing) return;
       
-      // Check if mobile
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-      if (isMobile && navigator.share) {
+      isSharing = true;
+      shareBtn.disabled = true;
+      shareBtn.style.opacity = '0.5';
+      
+      // Generate screenshot
+      const screenshot = await generateScreenshot();
+      if (!screenshot) {
+        alert('画像の生成に失敗しました');
+        isSharing = false;
+        shareBtn.disabled = false;
+        shareBtn.style.opacity = '1';
+        return;
+      }
+      
+      shareImageUrl = screenshot.url;
+      
+      // Check if Web Share API is available (mobile)
+      if (navigator.share && navigator.canShare?.({ files: [new File([screenshot.blob], 'poker-analysis.png', { type: 'image/png' })] })) {
         try {
-          const tags = hashtags.split(',').map(t => `#${t}`).join(' ');
+          const { text, url } = generateShareText();
           await navigator.share({
-            title: 'PokerAnalyzer',
-            text: `${text}\n${tags}`,
-            url: url
+            title: 'PokerAnalyzer - ハンド解析結果',
+            text: text,
+            url: url,
+            files: [new File([screenshot.blob], 'poker-analysis.png', { type: 'image/png' })]
           });
+          
+          if (shareImageUrl) URL.revokeObjectURL(shareImageUrl);
+          shareImageUrl = null;
+          isSharing = false;
+          shareBtn.disabled = false;
+          shareBtn.style.opacity = '1';
           return;
         } catch (err) {
-          if (err.name !== 'AbortError') console.error(err);
-          // If canceled, do nothing
-          else return;
+          if (err.name !== 'AbortError') {
+            console.error('Share failed:', err);
+          }
         }
       }
-
-      // Show Custom UI (PC or fallback)
-      // Custom Share Menu Logic
-      const currentData = generateShareText();
-      const urlTextEl = document.getElementById('snsUrlText');
-      if (urlTextEl) urlTextEl.textContent = currentData.url;
       
-      const overlay = document.getElementById('snsMenuOverlay');
-      if (overlay) overlay.style.display = 'flex';
+      // Desktop: Show SNS menu
+      snsMenuOverlay.style.display = 'flex';
+      isSharing = false;
+      shareBtn.disabled = false;
+      shareBtn.style.opacity = '1';
     });
 
     // SNS menu handlers
-    const snsCloseBtn = document.getElementById('snsCloseBtn');
-    const snsCopyBtn = document.getElementById('snsCopyBtn');
-
-    function closeSnsMenu() {
+    snsCancel.addEventListener('click', () => {
       snsMenuOverlay.style.display = 'none';
       if (shareImageUrl) {
         URL.revokeObjectURL(shareImageUrl);
         shareImageUrl = null;
       }
-    }
-
-    snsCloseBtn.addEventListener('click', closeSnsMenu);
+    });
 
     snsMenuOverlay.addEventListener('click', (e) => {
       if (e.target === snsMenuOverlay) {
-        closeSnsMenu();
+        snsMenuOverlay.style.display = 'none';
+        if (shareImageUrl) {
+          URL.revokeObjectURL(shareImageUrl);
+          shareImageUrl = null;
+        }
       }
-    });
-
-    snsCopyBtn.addEventListener('click', () => {
-      const url = document.getElementById('snsUrlText').textContent;
-      navigator.clipboard.writeText(url).then(() => {
-        alert("URLをコピーしました！");
-      });
     });
 
     // Share to specific SNS
     async function shareToSNS(platform) {
+      if (!shareImageUrl) return;
+      
       const { text, url, hashtags } = generateShareText();
       
-      let shareUrl = '';
+      // Download image first
+      const a = document.createElement('a');
+      a.href = shareImageUrl;
+      a.download = 'poker-analysis.png';
+      a.click();
       
-      switch (platform) {
-        case 'twitter':
-          shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=${encodeURIComponent(hashtags)}`;
-          break;
-        case 'line':
-          shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text + url)}`;
-          break;
-        case 'discord':
-          navigator.clipboard.writeText(`${text}\n${url}`).catch(e => console.error(e));
-          // Instant redirect to app scheme
-          window.location.href = 'discord://';
-          return;
-        case 'facebook':
-          navigator.clipboard.writeText(`${text}\n${url}`).catch(e => console.error(e));
-          shareUrl = `https://www.facebook.com`;
-          break;
-        default:
-          break;
-      }
-      
-      if (shareUrl) {
-        // Open in new tab
-        window.open(shareUrl, '_blank');
-      }
+      // Wait a moment then open SNS
+      setTimeout(() => {
+        let shareUrl = '';
+        
+        switch (platform) {
+          case 'twitter':
+            shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=${encodeURIComponent(hashtags)}`;
+            break;
+          case 'line':
+            shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text + url)}`;
+            break;
+          case 'discord':
+            alert('画像をダウンロードしました。Discordに直接投稿してください。');
+            snsMenuOverlay.style.display = 'none';
+            if (shareImageUrl) URL.revokeObjectURL(shareImageUrl);
+            shareImageUrl = null;
+            return;
+          case 'facebook':
+            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+            break;
+          default:
+            break;
+        }
+        
+        if (shareUrl) {
+          window.open(shareUrl, '_blank', 'width=600,height=400');
+        }
+        
+        snsMenuOverlay.style.display = 'none';
+        if (shareImageUrl) URL.revokeObjectURL(shareImageUrl);
+        shareImageUrl = null;
+      }, 500);
     }
 
     document.getElementById('snsTwitter').addEventListener('click', () => shareToSNS('twitter'));
