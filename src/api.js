@@ -66,6 +66,18 @@ export async function saveHistory(payload) {
 }
 
 /**
+ * handIdから解析結果を取得
+ */
+export async function fetchHandById(handId) {
+  const res = await fetch(`${BASE}/hand/${encodeURIComponent(handId)}`);
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`fetchHandById failed: ${res.status} ${text}`);
+  }
+  return res.json();
+}
+
+/**
  * プラン取得
  */
 export async function fetchPlan(user_id) {

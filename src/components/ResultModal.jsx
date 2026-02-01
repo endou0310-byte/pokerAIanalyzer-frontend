@@ -102,11 +102,11 @@ export default function ResultModal({
     // Try Web Share API first (mobile)
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
       try {
-        const { text } = generateShareText();
+        const { text, url } = generateShareText();
         await navigator.share({
           title: 'PokerAnalyzer - ハンド解析結果',
           text: text,
-          url: 'https://pokeranalyzer.jp',
+          url: url,
           files: [file]
         });
         setIsSharing(false);
@@ -128,6 +128,7 @@ export default function ResultModal({
     if (!snapshot) {
       return {
         text: 'PokerAnalyzerでハンド解析！\nAIによる戦略分析を体験 🎯\n\n',
+        url: 'https://pokeranalyzer.jp',
         hashtags: 'PokerAnalyzer,ポーカー,GTO'
       };
     }
@@ -155,8 +156,14 @@ export default function ResultModal({
       ? `PokerAnalyzerでハンド解析！\n\n${parts.join('\n')}\n\n`
       : 'PokerAnalyzerでハンド解析！\nAIによる戦略分析を体験 🎯\n\n';
 
+    // Generate URL based on handId
+    const url = handId
+      ? `https://pokeranalyzer.jp/hand/${handId}`
+      : 'https://pokeranalyzer.jp';
+
     return {
       text,
+      url,
       hashtags: 'PokerAnalyzer,ポーカー,GTO,戦略分析'
     };
   };
@@ -175,8 +182,7 @@ export default function ResultModal({
       setShareImageUrl(screenshot.url);
     }
 
-    const { text, hashtags } = generateShareText();
-    const url = 'https://pokeranalyzer.jp';
+    const { text, url, hashtags } = generateShareText();
 
     // Download image first
     const a = document.createElement('a');
