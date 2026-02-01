@@ -776,7 +776,7 @@ PERFORMANCE OF THIS SOFTWARE.
 AIによる戦略分析を体験 🎯
 
 `,url:"https://pokeranalyzer.jp",hashtags:"PokerAnalyzer,ポーカー,GTO"};const O=[];if(s.heroHand&&s.heroHand.length===2){const P=s.heroHand.map(y=>x(y)).join(" ");O.push(`🃏 Hand: ${P}`)}if(s.heroPosition&&O.push(`📍 Position: ${s.heroPosition}`),s.board&&s.board.length>0){const P=s.board.map(y=>x(y)).join(" ");O.push(`🎯 Board: ${P}`)}{const P=l.split(`
-`);let y="";for(const AA of P){const eA=AA.trim();if(!(!eA||eA.startsWith("#")||eA.startsWith("Part "))){y=eA.replace(/[#*`]/g,"");break}}y||(y=l.replace(/[#*`]/g,"").replace(/\n+/g," ").trim()),y.length>80&&(y=y.substring(0,80)+"..."),y&&y!=="解析結果が見つかりません。"&&O.push(`
+`);let y="";for(const AA of P){const eA=AA.trim();if(!(!eA||eA.startsWith("#")||eA.startsWith("Part "))){y=eA.replace(/[#*`]/g,"");break}}y||(y=l.replace(/[#*`]/g,"").replace(/\n+/g," ").trim()),y.length>45&&(y=y.substring(0,45)+"..."),y&&y!=="解析結果が見つかりません。"&&O.push(`
 🤖 AI: ${y}`)}const j=O.length>0?`PokerAnalyzerでハンド解析！
 
 ${O.join(`
@@ -784,7 +784,7 @@ ${O.join(`
 `:`PokerAnalyzerでハンド解析！
 AIによる戦略分析を体験 🎯
 
-`,L=a?`https://pokeranalyzer.jp/#/hand/${a}`:"https://pokeranalyzer.jp";return{text:j,url:L,hashtags:"PokerAnalyzer,ポーカー"}},k=O=>{const{text:j,url:L,hashtags:P}=C();let y="";switch(O){case"twitter":y=`https://twitter.com/intent/tweet?text=${encodeURIComponent(j)}&url=${encodeURIComponent(L)}&hashtags=${encodeURIComponent(P)}`;break;case"line":y=`https://line.me/R/msg/text/?${encodeURIComponent(j+L)}`;break;case"discord":navigator.clipboard.writeText(`${j}
+`,L=a?`https://pokeranalyzer.jp/#/hand/${a}`:"https://pokeranalyzer.jp";return{text:j,url:L,hashtags:"PokerAnalyzer,ポーカー,GTO"}},k=O=>{const{text:j,url:L,hashtags:P}=C();let y="";switch(O){case"twitter":y=`https://twitter.com/intent/tweet?text=${encodeURIComponent(j)}&url=${encodeURIComponent(L)}&hashtags=${encodeURIComponent(P)}`;break;case"line":y=`https://line.me/R/msg/text/?${encodeURIComponent(j+L)}`;break;case"discord":navigator.clipboard.writeText(`${j}
 ${L}`).catch(()=>{}),window.location.href="discord://";return;case"facebook":navigator.clipboard.writeText(`${j}
 ${L}`).catch(()=>{}),y="https://www.facebook.com";break}y&&window.open(y,"_blank")},[S,R]=E.useState(""),[F,H]=E.useState(!1),D=n==null?null:Math.max(0,n-(r||0)),V=D!==null&&D<=0,I=E.useMemo(()=>{const O=c.map(j=>j.role==="user"?`
 
