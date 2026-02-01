@@ -83,7 +83,7 @@ export default function ResultModal({
     }
   };
 
-  // Handle generic share (Web Share API or download)
+  // Handle share - always show custom SNS menu
   const handleShare = async () => {
     setIsSharing(true);
 
@@ -97,30 +97,15 @@ export default function ResultModal({
     const { blob, url } = screenshot;
     setShareImageUrl(url);
 
-    const file = new File([blob], 'poker-analysis.png', { type: 'image/png' });
-
-    // Try Web Share API first (mobile)
-    if (navigator.share && navigator.canShare?.({ files: [file] })) {
-      try {
-        const { text, url } = generateShareText();
-        await navigator.share({
-          title: 'PokerAnalyzer - ハンド解析結果',
-          text: text,
-          url: url,
-          files: [file]
-        });
-        setIsSharing(false);
-        return;
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          console.error('Share failed:', err);
-        }
-      }
-    }
-
-    // Desktop: Show SNS options
+    // Always show custom SNS menu (not using Web Share API)
     setShowShareMenu(true);
     setIsSharing(false);
+  };
+
+  // Format card with suit symbols
+  const formatCard = (card) => {
+    const suitSymbols = { s: '♠', h: '♥', d: '♦', c: '♣' };
+    return card.rank + suitSymbols[card.suit];
   };
 
   // Generate share text based on hand data
@@ -135,9 +120,9 @@ export default function ResultModal({
 
     const parts = [];
 
-    // Hand
+    // Hand - with suit symbols
     if (snapshot.heroHand && snapshot.heroHand.length === 2) {
-      const handStr = snapshot.heroHand.map(c => c.rank + c.suit).join('');
+      const handStr = snapshot.heroHand.map(c => formatCard(c)).join(' ');
       parts.push(`🃏 Hand: ${handStr}`);
     }
 
@@ -146,9 +131,9 @@ export default function ResultModal({
       parts.push(`📍 Position: ${snapshot.heroPosition}`);
     }
 
-    // Board
+    // Board - with suit symbols
     if (snapshot.board && snapshot.board.length > 0) {
-      const boardStr = snapshot.board.map(c => c.rank + c.suit).join(' ');
+      const boardStr = snapshot.board.map(c => formatCard(c)).join(' ');
       parts.push(`🎯 Board: ${boardStr}`);
     }
 
@@ -473,85 +458,202 @@ export default function ResultModal({
 
         {/* Action Buttons */}
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", flexWrap: "wrap" }}>
-          {/* SNS Share Menu */}
+          {/* SNS Share Menu - YouTube Style */}
           {showShareMenu && (
             <div style={{
-              position: "absolute",
-              bottom: 60,
-              right: 24,
-              background: "#1e293b",
-              border: "1px solid #334155",
-              borderRadius: 12,
-              padding: 16,
-              boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
-              zIndex: 100,
-              minWidth: 200
-            }}>
-              <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 12 }}>共有先を選択</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <button
-                  className="btn"
-                  onClick={() => shareToSNS('twitter')}
-                  style={{
-                    width: "100%",
-                    justifyContent: "flex-start",
-                    background: "#1DA1F2",
-                    border: "none",
-                    color: "#fff"
-                  }}
-                >
-                  <span style={{ marginRight: 8 }}>𝕏</span> X (Twitter)
-                </button>
-                <button
-                  className="btn"
-                  onClick={() => shareToSNS('line')}
-                  style={{
-                    width: "100%",
-                    justifyContent: "flex-start",
-                    background: "#00B900",
-                    border: "none",
-                    color: "#fff"
-                  }}
-                >
-                  <span style={{ marginRight: 8 }}>💬</span> LINE
-                </button>
-                <button
-                  className="btn"
-                  onClick={() => shareToSNS('discord')}
-                  style={{
-                    width: "100%",
-                    justifyContent: "flex-start",
-                    background: "#5865F2",
-                    border: "none",
-                    color: "#fff"
-                  }}
-                >
-                  <span style={{ marginRight: 8 }}>🎮</span> Discord
-                </button>
-                <button
-                  className="btn"
-                  onClick={() => shareToSNS('facebook')}
-                  style={{
-                    width: "100%",
-                    justifyContent: "flex-start",
-                    background: "#1877F2",
-                    border: "none",
-                    color: "#fff"
-                  }}
-                >
-                  <span style={{ marginRight: 8 }}>📘</span> Facebook
-                </button>
-                <button
-                  className="btn"
-                  onClick={() => setShowShareMenu(false)}
-                  style={{
-                    width: "100%",
-                    marginTop: 4,
-                    fontSize: 12
-                  }}
-                >
-                  キャンセル
-                </button>
+              position: "fixed",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              top: 0, // Cover entire screen
+              background: "rgba(0,0,0,0.6)", // Dim background
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 99999 // Highest priority
+            }} onClick={() => setShowShareMenu(false)}>
+              <div
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  width: "min(500px, 90vw)",
+                  background: "#212121", // YouTube Dark bg color
+                  color: "#fff",
+                  borderRadius: 16,
+                  padding: "20px 24px",
+                  boxShadow: "0 24px 38px 3px rgba(0,0,0,0.14), 0 9px 46px 8px rgba(0,0,0,0.12)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 24,
+                  position: "relative"
+                }}
+              >
+                {/* Header */}
+                <div style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center"
+                }}>
+                  <div style={{ fontSize: 18, fontWeight: 500 }}>共有</div>
+                  <button
+                    onClick={() => setShowShareMenu(false)}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      color: "#aaa",
+                      fontSize: 24,
+                      cursor: "pointer",
+                      padding: 4,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center"
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+
+                {/* Icons Row */}
+                <div style={{
+                  display: "flex",
+                  gap: 24,
+                  overflowX: "auto",
+                  paddingBottom: 8,
+                  justifyContent: "flex-start" // Left align to allow scroll if needed
+                }}>
+                  {/* Twitter / X */}
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, minWidth: 60 }}>
+                    <button
+                      onClick={() => shareToSNS('twitter')}
+                      style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: "50%",
+                        background: "#000",
+                        border: "1px solid #333",
+                        color: "#fff",
+                        fontSize: 28,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer"
+                      }}
+                    >
+                      𝕏
+                    </button>
+                    <span style={{ fontSize: 12, color: "#aaa" }}>X</span>
+                  </div>
+
+                  {/* LINE */}
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, minWidth: 60 }}>
+                    <button
+                      onClick={() => shareToSNS('line')}
+                      style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: "50%",
+                        background: "#06c755", // LINE Green
+                        border: "none",
+                        color: "#fff",
+                        fontSize: 28,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer"
+                      }}
+                    >
+                      💬
+                    </button>
+                    <span style={{ fontSize: 12, color: "#aaa" }}>LINE</span>
+                  </div>
+
+                  {/* Discord */}
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, minWidth: 60 }}>
+                    <button
+                      onClick={() => shareToSNS('discord')}
+                      style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: "50%",
+                        background: "#5865F2", // Discord Blurple
+                        border: "none",
+                        color: "#fff",
+                        fontSize: 28,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer"
+                      }}
+                    >
+                      🎮
+                    </button>
+                    <span style={{ fontSize: 12, color: "#aaa" }}>Discord</span>
+                  </div>
+
+                  {/* Facebook */}
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, minWidth: 60 }}>
+                    <button
+                      onClick={() => shareToSNS('facebook')}
+                      style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: "50%",
+                        background: "#1877F2", // Facebook Blue
+                        border: "none",
+                        color: "#fff",
+                        fontSize: 28,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer"
+                      }}
+                    >
+                      📘
+                    </button>
+                    <span style={{ fontSize: 12, color: "#aaa" }}>Facebook</span>
+                  </div>
+                </div>
+
+                {/* URL Copy Section */}
+                <div style={{
+                  background: "#121212",
+                  border: "1px solid #333",
+                  borderRadius: 8,
+                  padding: "8px 8px 8px 12px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12
+                }}>
+                  <div style={{
+                    flex: 1,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    color: "#3ea6ff",
+                    fontSize: 14
+                  }}>
+                    {generateShareText().url}
+                  </div>
+                  <button
+                    onClick={() => {
+                      const url = generateShareText().url;
+                      navigator.clipboard.writeText(url);
+                      alert("URLをコピーしました！");
+                    }}
+                    style={{
+                      background: "#3ea6ff",
+                      color: "#0f0f0f",
+                      border: "none",
+                      borderRadius: 18,
+                      padding: "8px 16px",
+                      fontSize: 14,
+                      fontWeight: 600,
+                      cursor: "pointer"
+                    }}
+                  >
+                    コピー
+                  </button>
+                </div>
+
               </div>
             </div>
           )}
