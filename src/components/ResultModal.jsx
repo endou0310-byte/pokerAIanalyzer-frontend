@@ -158,8 +158,8 @@ export default function ResultModal({
         summaryStr = initialMd.replace(/[#*`]/g, '').replace(/\n+/g, ' ').trim();
       }
 
-      if (summaryStr.length > 80) {
-        summaryStr = summaryStr.substring(0, 80) + '...';
+      if (summaryStr.length > 45) {
+        summaryStr = summaryStr.substring(0, 45) + '...';
       }
 
       if (summaryStr && summaryStr !== "解析結果が見つかりません。") {
@@ -179,7 +179,7 @@ export default function ResultModal({
     return {
       text,
       url,
-      hashtags: 'PokerAnalyzer,ポーカー'
+      hashtags: 'PokerAnalyzer,ポーカー,GTO'
     };
   };
 
