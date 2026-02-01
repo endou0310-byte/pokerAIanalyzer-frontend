@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import html2canvas from "html2canvas";
 import { followupQuestion, saveHistory, updateHistoryConversation } from "../api";
 
 /**
@@ -48,6 +49,135 @@ export default function ResultModal({
       );
     }
   }, [result]);
+
+  // Share functionality
+  const contentRef = useRef(null);
+  const [isSharing, setIsSharing] = useState(false);
+  const [shareImageUrl, setShareImageUrl] = useState(null);
+  const [showShareMenu, setShowShareMenu] = useState(false);
+
+  // Generate screenshot and store it
+  const generateScreenshot = async () => {
+    if (!contentRef.current) return null;
+
+    try {
+      const canvas = await html2canvas(contentRef.current, {
+        backgroundColor: '#0b1524',
+        scale: 2,
+        logging: false
+      });
+
+      return new Promise((resolve) => {
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            resolve(null);
+            return;
+          }
+          const url = URL.createObjectURL(blob);
+          resolve({ blob, url });
+        }, 'image/png');
+      });
+    } catch (err) {
+      console.error('Screenshot failed:', err);
+      return null;
+    }
+  };
+
+  // Handle generic share (Web Share API or download)
+  const handleShare = async () => {
+    setIsSharing(true);
+
+    const screenshot = await generateScreenshot();
+    if (!screenshot) {
+      alert('画像の生成に失敗しました');
+      setIsSharing(false);
+      return;
+    }
+
+    const { blob, url } = screenshot;
+    setShareImageUrl(url);
+
+    const file = new File([blob], 'poker-analysis.png', { type: 'image/png' });
+
+    // Try Web Share API first (mobile)
+    if (navigator.share && navigator.canShare?.({ files: [file] })) {
+      try {
+        await navigator.share({
+          title: 'PokerAnalyzer - ハンド解析結果',
+          text: 'AIによるポーカー戦略分析',
+          url: 'https://pokeranalyzer.jp',
+          files: [file]
+        });
+        setIsSharing(false);
+        return;
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error('Share failed:', err);
+        }
+      }
+    }
+
+    // Desktop: Show SNS options
+    setShowShareMenu(true);
+    setIsSharing(false);
+  };
+
+  // Share to specific SNS
+  const shareToSNS = async (platform) => {
+    if (!shareImageUrl) {
+      // Generate screenshot if not already done
+      setIsSharing(true);
+      const screenshot = await generateScreenshot();
+      if (!screenshot) {
+        alert('画像の生成に失敗しました');
+        setIsSharing(false);
+        return;
+      }
+      setShareImageUrl(screenshot.url);
+    }
+
+    const text = 'PokerAnalyzerでハンド解析！\nAIによる戦略分析を体験 🎯\n\n';
+    const url = 'https://pokeranalyzer.jp';
+    const hashtags = 'PokerAnalyzer,ポーカー,GTO';
+
+    // Download image first
+    const a = document.createElement('a');
+    a.href = shareImageUrl;
+    a.download = 'poker-analysis.png';
+    a.click();
+
+    // Wait a moment then open SNS
+    setTimeout(() => {
+      let shareUrl = '';
+
+      switch (platform) {
+        case 'twitter':
+          shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=${encodeURIComponent(hashtags)}`;
+          break;
+        case 'line':
+          shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text + url)}`;
+          break;
+        case 'discord':
+          // Discord doesn't have a direct share URL, so just download
+          alert('画像をダウンロードしました。Discordに直接投稿してください。');
+          setShowShareMenu(false);
+          setIsSharing(false);
+          return;
+        case 'facebook':
+          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+          break;
+        default:
+          break;
+      }
+
+      if (shareUrl) {
+        window.open(shareUrl, '_blank', 'width=600,height=400');
+      }
+
+      setShowShareMenu(false);
+      setIsSharing(false);
+    }, 500);
+  };
 
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(false);
@@ -249,6 +379,7 @@ export default function ResultModal({
       >
         {/* 本文 */}
         <div
+          ref={contentRef}
           className="markdown-result"
           style={{
             overflow: "auto",
@@ -262,7 +393,7 @@ export default function ResultModal({
         </div>
 
         {/* 追い質問入力 */}
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 12 }}>
           {remainingFU !== null && (
             <div style={{ fontSize: 12, color: "#9ca3af", minWidth: 110 }}>
               追い質問 残り {remainingFU} 回
@@ -293,6 +424,101 @@ export default function ResultModal({
             disabled={loading || !q.trim() || noMoreFU}
           >
             {loading ? "送信中..." : "送信"}
+          </button>
+        </div>
+
+        {/* Action Buttons */}
+        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", flexWrap: "wrap" }}>
+          {/* SNS Share Menu */}
+          {showShareMenu && (
+            <div style={{
+              position: "absolute",
+              bottom: 60,
+              right: 24,
+              background: "#1e293b",
+              border: "1px solid #334155",
+              borderRadius: 12,
+              padding: 16,
+              boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
+              zIndex: 100,
+              minWidth: 200
+            }}>
+              <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 12 }}>共有先を選択</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <button
+                  className="btn"
+                  onClick={() => shareToSNS('twitter')}
+                  style={{
+                    width: "100%",
+                    justifyContent: "flex-start",
+                    background: "#1DA1F2",
+                    border: "none",
+                    color: "#fff"
+                  }}
+                >
+                  <span style={{ marginRight: 8 }}>𝕏</span> X (Twitter)
+                </button>
+                <button
+                  className="btn"
+                  onClick={() => shareToSNS('line')}
+                  style={{
+                    width: "100%",
+                    justifyContent: "flex-start",
+                    background: "#00B900",
+                    border: "none",
+                    color: "#fff"
+                  }}
+                >
+                  <span style={{ marginRight: 8 }}>💬</span> LINE
+                </button>
+                <button
+                  className="btn"
+                  onClick={() => shareToSNS('discord')}
+                  style={{
+                    width: "100%",
+                    justifyContent: "flex-start",
+                    background: "#5865F2",
+                    border: "none",
+                    color: "#fff"
+                  }}
+                >
+                  <span style={{ marginRight: 8 }}>🎮</span> Discord
+                </button>
+                <button
+                  className="btn"
+                  onClick={() => shareToSNS('facebook')}
+                  style={{
+                    width: "100%",
+                    justifyContent: "flex-start",
+                    background: "#1877F2",
+                    border: "none",
+                    color: "#fff"
+                  }}
+                >
+                  <span style={{ marginRight: 8 }}>📘</span> Facebook
+                </button>
+                <button
+                  className="btn"
+                  onClick={() => setShowShareMenu(false)}
+                  style={{
+                    width: "100%",
+                    marginTop: 4,
+                    fontSize: 12
+                  }}
+                >
+                  キャンセル
+                </button>
+              </div>
+            </div>
+          )}
+
+          <button
+            className="btn"
+            onClick={handleShare}
+            disabled={isSharing}
+            style={{ fontSize: 13, padding: "8px 16px" }}
+          >
+            {isSharing ? "生成中..." : "📤 SNSでシェア"}
           </button>
           <button className="btn" onClick={() => onClose?.()}>
             閉じる
