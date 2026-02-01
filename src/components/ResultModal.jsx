@@ -139,19 +139,31 @@ export default function ResultModal({
 
     // AI Analysis Summary
     if (initialMd) {
-      // Simple extraction: Remove markdown symbols and take first line/sentence
-      let summary = initialMd
-        .replace(/[#*`]/g, '') // Remove markdown symbols
-        .replace(/\n+/g, ' ')  // Replace creating newlines with spaces
-        .trim();
+      // Improved extraction: Skip headers and find first meaningful paragraph
+      const lines = initialMd.split('\n');
+      let summaryStr = "";
 
-      // Take first 60 chars approx
-      if (summary.length > 60) {
-        summary = summary.substring(0, 60) + '...';
+      for (const line of lines) {
+        const trimmed = line.trim();
+        // Skip empty lines, headers (#), and "Part X:" titles
+        if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('Part ')) {
+          continue;
+        }
+        // Found content
+        summaryStr = trimmed.replace(/[#*`]/g, '');
+        break;
       }
 
-      if (summary && summary !== "解析結果が見つかりません。") {
-        parts.push(`\n🤖 AI: ${summary}`);
+      if (!summaryStr) {
+        summaryStr = initialMd.replace(/[#*`]/g, '').replace(/\n+/g, ' ').trim();
+      }
+
+      if (summaryStr.length > 90) {
+        summaryStr = summaryStr.substring(0, 90) + '...';
+      }
+
+      if (summaryStr && summaryStr !== "解析結果が見つかりません。") {
+        parts.push(`\n🤖 AI: ${summaryStr}`);
       }
     }
 
