@@ -784,7 +784,8 @@ ${O.join(`
 AIによる戦略分析を体験 🎯
 
 `,L=a?`https://pokeranalyzer.jp/hand/${a}`:"https://pokeranalyzer.jp";return{text:j,url:L,hashtags:"PokerAnalyzer,ポーカー,GTO,戦略分析"}},k=O=>{const{text:j,url:L,hashtags:_}=C();let y="";switch(O){case"twitter":y=`https://twitter.com/intent/tweet?text=${encodeURIComponent(j)}&url=${encodeURIComponent(L)}&hashtags=${encodeURIComponent(_)}`;break;case"line":y=`https://line.me/R/msg/text/?${encodeURIComponent(j+L)}`;break;case"discord":navigator.clipboard.writeText(`${j}
-${L}`),alert("共有用テキストをコピーしました！Discordに貼り付けてください。");break;case"facebook":y=`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(L)}`;break}y&&window.open(y,"_blank","width=600,height=400")},[S,R]=E.useState(""),[F,H]=E.useState(!1),D=n==null?null:Math.max(0,n-(r||0)),V=D!==null&&D<=0,I=E.useMemo(()=>{const O=c.map(j=>j.role==="user"?`
+${L}`).then(()=>{alert(`共有用テキストをコピーしました！
+Discordアプリが開きますので、貼り付けて投稿してください。`),window.open("discord://","_blank")});return;case"facebook":y=`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(L)}`;break}y&&window.open(y,"_blank")},[S,R]=E.useState(""),[F,H]=E.useState(!1),D=n==null?null:Math.max(0,n-(r||0)),V=D!==null&&D<=0,I=E.useMemo(()=>{const O=c.map(j=>j.role==="user"?`
 
 **Q:** ${j.message}`:`
 

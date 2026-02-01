@@ -1300,8 +1300,10 @@ if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
           shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text + url)}`;
           break;
         case 'discord':
-          navigator.clipboard.writeText(`${text}\n${url}`);
-          alert('共有用テキストをコピーしました！Discordに貼り付けてください。');
+          navigator.clipboard.writeText(`${text}\n${url}`).then(() => {
+            alert('共有用テキストをコピーしました！\nDiscordアプリが開きますので、貼り付けて投稿してください。');
+            window.open('discord://', '_blank');
+          });
           return;
         case 'facebook':
           shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
@@ -1311,7 +1313,8 @@ if (h.conversation && Array.isArray(h.conversation) && h.conversation.length) {
       }
       
       if (shareUrl) {
-        window.open(shareUrl, '_blank', 'width=600,height=400');
+        // Open in new tab
+        window.open(shareUrl, '_blank');
       }
     }
 
