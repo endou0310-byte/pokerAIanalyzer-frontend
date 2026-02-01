@@ -199,15 +199,21 @@ export default function ResultModal({
         shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text + url)}`;
         break;
       case 'discord':
-        // Discord: Copy text -> Open App
-        navigator.clipboard.writeText(`${text}\n${url}`).then(() => {
-          alert('共有用テキストをコピーしました！\nDiscordアプリが開きますので、貼り付けて投稿してください。');
-          // Try to open Discord app
-          window.open('discord://', '_blank');
-        });
+        // Discord: Copy text -> Open App immediately (no alert to avoid blocking)
+        navigator.clipboard.writeText(`${text}\n${url}`).catch(() => { }); // Fire and forget
+        // Try to open Discord app using URL scheme
+        // Using location.href is often more effective for deep links on mobile than window.open
+        window.location.href = 'discord://';
+
+        // Fallback or PC: If app doesn't open, user stays on page. 
+        // We could open web version in new tab as backup but that might be annoying if app opens.
+        // Let's just show a non-blocking toast/message if possible, or nothing.
         return;
       case 'facebook':
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+        // Facebook: Copy text -> Open Facebook (User manually pastes)
+        navigator.clipboard.writeText(`${text}\n${url}`).catch(() => { });
+        // Open Facebook so user can paste
+        shareUrl = `https://www.facebook.com`;
         break;
       default:
         break;
