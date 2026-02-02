@@ -56,35 +56,84 @@ export default function ResultModal({
   const [shareImageUrl, setShareImageUrl] = useState(null);
   const [showShareMenu, setShowShareMenu] = useState(false);
 
-  // Generate screenshot and store it
-  const generateScreenshot = async () => {
-    if (!contentRef.current) return null;
-
-    try {
-      const canvas = await html2canvas(contentRef.current, {
-        backgroundColor: '#0b1524',
-        scale: 2,
-        logging: false
-      });
-
-      return new Promise((resolve) => {
-        canvas.toBlob((blob) => {
-          if (!blob) {
-            resolve(null);
-            return;
-          }
-          const url = URL.createObjectURL(blob);
-          resolve({ blob, url });
-        }, 'image/png');
-      });
-    } catch (err) {
-      console.error('Screenshot failed:', err);
-      return null;
+  // Generate share text based on hand data & AI summary
+  const generateShareText = () => {
+    // 1. Initial check
+    if (!snapshot) {
+      return {
+        text: 'PokerAnalyzerでハンド解析！\nAIによる戦略分析を体験 🎯\n\n',
+        url: 'https://pokeranalyzer.jp',
+        hashtags: 'PokerAnalyzer,ポーカー,GTO'
+      };
     }
+
+    const parts = [];
+
+    // 2. Hand
+    if (snapshot.heroHand && snapshot.heroHand.length === 2) {
+      const handStr = snapshot.heroHand.map(c => {
+        // c might be object {rank, suit} or string
+        if (typeof c === 'string') return c;
+        return (c.rank || '') + (c.suit || '');
+      }).join(' ');
+      parts.push(`🃏 Hand: ${handStr}`);
+    }
+
+    // 3. Position
+    if (snapshot.heroPosition) {
+      parts.push(`📍 Position: ${snapshot.heroPosition}`);
+    }
+
+    // 4. Board
+    if (snapshot.board && snapshot.board.length > 0) {
+      const boardStr = snapshot.board.map(c => {
+        if (typeof c === 'string') return c;
+        return (c.rank || '') + (c.suit || '');
+      }).join(' ');
+      parts.push(`🎯 Board: ${boardStr}`);
+    }
+
+    // 5. AI Analysis Summary (Extract first 50 chars from initialMd)
+    if (initialMd) {
+      const lines = initialMd.split('\n');
+      let summaryStr = "";
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('Part ')) continue;
+        summaryStr = trimmed.replace(/[#*`]/g, '');
+        break;
+      }
+
+      if (!summaryStr) {
+        summaryStr = initialMd.replace(/[#*`]/g, '').replace(/\n+/g, ' ').trim();
+      }
+
+      if (summaryStr.length > 50) {
+        summaryStr = summaryStr.substring(0, 50) + '...';
+      }
+
+      if (summaryStr) {
+        parts.push(`\n🤖 AI: ${summaryStr}`);
+      }
+    }
+
+    const text = parts.length > 0
+      ? `PokerAnalyzerでハンド解析！\n\n${parts.join('\n')}\n`
+      : 'PokerAnalyzerでハンド解析！\nAIによる戦略分析を体験 🎯\n\n';
+
+    // Generate URL based on handId
+    const url = handId
+      ? `https://pokeranalyzer.jp/#/hand/${handId}`
+      : 'https://pokeranalyzer.jp';
+
+    return {
+      text,
+      url,
+      hashtags: 'PokerAnalyzer,ポーカー,GTO,戦略分析'
+    };
   };
 
-  // Handle generic share (Web Share API or download)
-  // Handle share (Hybrid: Web Share API on Mobile, Custom UI on PC)
+  // Handle generic share (Hybrid: Web Share API on Mobile, Custom UI on PC)
   const handleShare = async () => {
     // Generate latest share text/url
     const { text, url, hashtags } = generateShareText();
@@ -95,7 +144,6 @@ export default function ResultModal({
     // Use Web Share API on mobile if available
     if (isMobile && navigator.share) {
       try {
-        // Construct full text with hashtags for native share
         const tags = hashtags.split(',').map(t => `#${t}`).join(' ');
         await navigator.share({
           title: 'PokerAnalyzer',
@@ -107,115 +155,51 @@ export default function ResultModal({
           console.error('Share failed:', err);
         }
       }
-      // Always return on mobile (even if canceled/failed) to avoid showing custom UI
+      // Always return on mobile to avoid showing custom UI
       return;
     }
 
     // Default: Show custom share menu (PC or API unavailable)
     setIsSharing(true);
-    setShareImageUrl(null); // No screenshot needed for text link share
+    // setShareImageUrl(null); // No longer used
     setShowShareMenu(true);
     setIsSharing(false);
   };
 
-  // Generate share text based on hand data
-  const generateShareText = () => {
-    if (!snapshot) {
-      return {
-        text: 'PokerAnalyzerでハンド解析！\nAIによる戦略分析を体験 🎯\n\n',
-        url: 'https://pokeranalyzer.jp',
-        hashtags: 'PokerAnalyzer,ポーカー,GTO'
-      };
-    }
-
-    const parts = [];
-
-    // Hand
-    if (snapshot.heroHand && snapshot.heroHand.length === 2) {
-      const handStr = snapshot.heroHand.map(c => c.rank + c.suit).join('');
-      parts.push(`🃏 Hand: ${handStr}`);
-    }
-
-    // Position
-    if (snapshot.heroPosition) {
-      parts.push(`📍 Position: ${snapshot.heroPosition}`);
-    }
-
-    // Board
-    if (snapshot.board && snapshot.board.length > 0) {
-      const boardStr = snapshot.board.map(c => c.rank + c.suit).join(' ');
-      parts.push(`🎯 Board: ${boardStr}`);
-    }
-
-    const text = parts.length > 0
-      ? `PokerAnalyzerでハンド解析！\n\n${parts.join('\n')}\n\n`
-      : 'PokerAnalyzerでハンド解析！\nAIによる戦略分析を体験 🎯\n\n';
-
-    // Generate URL based on handId
-    const url = handId
-      ? `https://pokeranalyzer.jp/hand/${handId}`
-      : 'https://pokeranalyzer.jp';
-
-    return {
-      text,
-      url,
-      hashtags: 'PokerAnalyzer,ポーカー,GTO,戦略分析'
-    };
-  };
-
-  // Share to specific SNS
+  // Share to specific SNS (from Custom UI)
   const shareToSNS = async (platform) => {
-    if (!shareImageUrl) {
-      // Generate screenshot if not already done
-      setIsSharing(true);
-      const screenshot = await generateScreenshot();
-      if (!screenshot) {
-        alert('画像の生成に失敗しました');
-        setIsSharing(false);
+    const { text, url, hashtags } = generateShareText();
+    let shareUrl = '';
+
+    switch (platform) {
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=${encodeURIComponent(hashtags)}`;
+        break;
+      case 'line':
+        shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text + url)}`;
+        break;
+      case 'discord':
+        // Copy text + open app
+        navigator.clipboard.writeText(`${text}\n${url}`).catch(() => { });
+        // Try deep link
+        window.location.href = 'discord://';
+        // Close menu
+        setShowShareMenu(false);
         return;
-      }
-      setShareImageUrl(screenshot.url);
+      case 'facebook':
+        // Copy text + open FB
+        navigator.clipboard.writeText(`${text}\n${url}`).catch(() => { });
+        shareUrl = `https://www.facebook.com`;
+        break;
+      default:
+        break;
     }
 
-    const { text, url, hashtags } = generateShareText();
+    if (shareUrl) {
+      window.open(shareUrl, '_blank');
+    }
 
-    // Download image first
-    const a = document.createElement('a');
-    a.href = shareImageUrl;
-    a.download = 'poker-analysis.png';
-    a.click();
-
-    // Wait a moment then open SNS
-    setTimeout(() => {
-      let shareUrl = '';
-
-      switch (platform) {
-        case 'twitter':
-          shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=${encodeURIComponent(hashtags)}`;
-          break;
-        case 'line':
-          shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text + url)}`;
-          break;
-        case 'discord':
-          // Discord doesn't have a direct share URL, so just download
-          alert('画像をダウンロードしました。Discordに直接投稿してください。');
-          setShowShareMenu(false);
-          setIsSharing(false);
-          return;
-        case 'facebook':
-          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-          break;
-        default:
-          break;
-      }
-
-      if (shareUrl) {
-        window.open(shareUrl, '_blank', 'width=600,height=400');
-      }
-
-      setShowShareMenu(false);
-      setIsSharing(false);
-    }, 500);
+    setShowShareMenu(false);
   };
 
   const [q, setQ] = useState("");
