@@ -179,16 +179,28 @@ export default function ResultModal({
         shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text + url)}`;
         break;
       case 'discord':
-        // Copy text + open app
-        navigator.clipboard.writeText(`${text}\n${url}`).catch(() => { });
+        // Copy text + open app with feedback
+        try {
+          await navigator.clipboard.writeText(`${text}\n${url}`);
+          alert("解析結果をコピーしました！\nDiscordが開いたら貼り付けてください。");
+        } catch (e) {
+          console.error(e);
+          alert("コピーに失敗しました。手動で入力してください。");
+        }
         // Try deep link
         window.location.href = 'discord://';
         // Close menu
         setShowShareMenu(false);
         return;
       case 'facebook':
-        // Copy text + open FB
-        navigator.clipboard.writeText(`${text}\n${url}`).catch(() => { });
+        // FB doesn't support pre-filled text well anymore, so we copy it.
+        try {
+          await navigator.clipboard.writeText(`${text}\n${url}`);
+          alert("解析結果をコピーしました！\nFacebook投稿画面で貼り付けてください。");
+        } catch (e) {
+          console.error(e);
+          alert("テキストのコピーに失敗しました。");
+        }
         shareUrl = `https://www.facebook.com`;
         break;
       default:
@@ -196,6 +208,7 @@ export default function ResultModal({
     }
 
     if (shareUrl) {
+      // Twitter & Facebook & Line
       window.open(shareUrl, '_blank');
     }
 
